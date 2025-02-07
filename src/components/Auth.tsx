@@ -12,22 +12,21 @@ import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { useMutation } from '@apollo/client';
-import { LOGIN_MUTATION } from '../graphql/mutations/login';
 import { useNavigate } from 'react-router-dom';
+import { useLoginMutation } from '../graphql/graphql_generated';
 
 const theme = createTheme();
 
 export default function Auth() {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
-  const [signIn, { loading, error }] = useMutation(LOGIN_MUTATION);
+  const [login, { loading, error }] = useLoginMutation();
   const navigate = useNavigate();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
-      const response = await signIn({ variables: { email, password } });
+      const response = await login({ variables: { email, password } });
       // alert(`Success: ${response.data.login.success}, \nToken: ${response.data.login.token}`);
       if (response.data?.login?.token) {
         localStorage.setItem('access_token', response.data.login.token);
