@@ -18,7 +18,7 @@ if (!projectToken) {
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors) {
     graphQLErrors.forEach(({ message, locations, path }) =>
-      console.log(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`),
+      console.log(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`)
     );
   }
   if (networkError) {
@@ -44,6 +44,7 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 const client = new ApolloClient({
+  connectToDevTools: import.meta.env.DEV,
   link: ApolloLink.from([errorLink, authLink.concat(httpLink)]),
   cache: new InMemoryCache(),
   ssrMode: typeof window === 'undefined', // Disable SSR mode for Apollo
