@@ -22,10 +22,13 @@ const theme = createTheme();
 export default function Auth() {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const [emailError, setEmailError] = React.useState<string>('');
+  const [passwordError, setPasswordError] = React.useState<string>('');
+  const [serverError, setServerError] = React.useState<string | null>(null);
   const navigate = useNavigate();
 
   // Using the generated hook for login mutation
-  const [login, { loading, error }] = useLoginMutation();
+  const [login, { loading }] = useLoginMutation();
 
   // State for Material UI Snackbar notifications
   const [snackbar, setSnackbar] = React.useState<{
@@ -39,11 +42,44 @@ export default function Auth() {
     setSnackbar((prev) => ({ ...prev, open: false }));
   };
 
+  // Validate the form fields before login
+  const validate = () => {
+    let isValid = true;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!email.trim()) {
+      setEmailError('Email is required');
+      isValid = false;
+    } else if (!emailRegex.test(email)) {
+      setEmailError('Invalid email address');
+      isValid = false;
+    } else {
+      setEmailError('');
+    }
+
+    if (!password) {
+      setPasswordError('Password is required');
+      isValid = false;
+    } else {
+      setPasswordError('');
+    }
+
+    // Clear any previous server error if client-side validation kicks in.
+    if (!isValid) {
+      setServerError(null);
+    }
+
+    return isValid;
+  };
+
   const handleLogin = React.useCallback(() => {
     login({
       variables: { email, password },
       notifyOnNetworkStatusChange: true,
       onCompleted: (data) => {
+        // Clear any previous server error
+        setServerError(null);
+
         if (data?.login?.token) {
           localStorage.setItem('access_token', data.login.token);
           setSnackbar({
@@ -56,6 +92,7 @@ export default function Auth() {
             navigate('/dashboard');
           }, 1000);
         } else {
+          setServerError('Login failed');
           setSnackbar({
             open: false,
             message: 'Login failed',
@@ -64,6 +101,7 @@ export default function Auth() {
         }
       },
       onError: (err) => {
+        setServerError(err.message);
         setSnackbar({
           open: false,
           message: `Login failed: ${err.message}`,
@@ -75,7 +113,9 @@ export default function Auth() {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    handleLogin();
+    if (validate()) {
+      handleLogin();
+    }
   };
 
   return (
@@ -110,9 +150,9 @@ export default function Auth() {
             <Typography component="h1" variant="h5">
               Sign in
             </Typography>
-            {error && (
+            {serverError && (
               <Alert severity="error" sx={{ mt: 2 }}>
-                {error.message}
+                {serverError}
               </Alert>
             )}
             <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
@@ -120,13 +160,22 @@ export default function Auth() {
                 margin="normal"
                 required
                 fullWidth
+                type="email"
                 id="email"
                 label="Email Address"
                 name="email"
                 autoComplete="email"
                 autoFocus
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                error={Boolean(emailError)}
+                helperText={emailError}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (e.target.value.trim()) {
+                    setEmailError('');
+                    setServerError(null);
+                  }
+                }}
               />
               <TextField
                 margin="normal"
@@ -138,7 +187,15 @@ export default function Auth() {
                 id="password"
                 autoComplete="current-password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                error={Boolean(passwordError)}
+                helperText={passwordError}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  if (e.target.value) {
+                    setPasswordError('');
+                    setServerError(null);
+                  }
+                }}
               />
               {/* <FormControlLabel
                 control={<Checkbox value="remember" color="primary" />}
