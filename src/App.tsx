@@ -1,5 +1,5 @@
 import { ApolloProvider } from '@apollo/client';
-import client from './apolloClient';
+import client from './graphql/apolloClient';
 import AppRoutes from './Routes/AppRoutes';
 
 function App() {
