@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -6,8 +6,8 @@ function Dashboard() {
   const handleLogout = () => {
     localStorage.clear();
     sessionStorage.clear();
-    navigate("/");
-    window["location"].reload();
+    navigate('/');
+    window['location'].reload();
   };
 
   return (
