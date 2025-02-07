@@ -1,7 +1,7 @@
 // src/AppRoutes.tsx
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import Auth from '../components/Auth';
+import Auth from '../components/Auth/Auth';
 import Dashboard from '../Dashboard';
 import NotFoundPage from '../components/NotFoundPage';
 import { ProtectedRoute, PublicRoute } from './RouteGuards';
