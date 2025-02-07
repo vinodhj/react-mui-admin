@@ -13,7 +13,7 @@ const config: CodegenConfig = {
   },
   documents: 'src/**/*.graphql',
   generates: {
-    'src/graphql_generated.tsx': {
+    'src/graphql/graphql_generated.tsx': {
       plugins: ['typescript', 'typescript-operations', 'typescript-react-apollo'],
       config: {
         scalars: {
