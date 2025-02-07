@@ -3,14 +3,12 @@ import { setContext } from '@apollo/client/link/context';
 import Auth from './components/Auth';
 import { onError } from '@apollo/client/link/error';
 import { Route, Routes, Navigate } from 'react-router-dom';
-import Dashboard from './components/Dashboard';
-
+import Dashboard from './Dashboard';
+import NotFoundPage from './components/NotFoundPage';
+import { getToken } from './utils/getToken';
 const apiUrl = import.meta.env.DEV ? import.meta.env.VITE_DEV_API_URL : import.meta.env.VITE_PROD_API_URL;
 
 const projectToken = import.meta.env.VITE_PROJECT_TOKEN;
-
-// Check if token exists
-const getToken = () => localStorage.getItem('access_token');
 
 // Check if `VITE_PROJECT_TOKEN` is defined
 if (!projectToken) {
@@ -20,7 +18,7 @@ if (!projectToken) {
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors) {
     graphQLErrors.forEach(({ message, locations, path }) =>
-      console.log(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`)
+      console.log(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`),
     );
   }
   if (networkError) {
@@ -56,13 +54,18 @@ const ProtectedRoute = ({ element }: { element: React.ReactNode }) => {
   return getToken() ? element : <Navigate to="/" replace />;
 };
 
+// Public Route Component: Redirects authenticated users away from the sign-in page
+const PublicRoute = ({ element }: { element: React.ReactNode }) => {
+  return getToken() ? <Navigate to="/dashboard" replace /> : element;
+};
+
 function App() {
   return (
     <ApolloProvider client={client}>
       <Routes>
-        <Route path="/" element={<Auth />} />
+        <Route path="/" element={<PublicRoute element={<Auth />} />} />
         <Route path="/dashboard" element={<ProtectedRoute element={<Dashboard />} />} />
-        <Route path="*" element={<Navigate to={getToken() ? '/dashboard' : '/'} replace />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </ApolloProvider>
   );
