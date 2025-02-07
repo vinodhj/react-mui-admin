@@ -14,27 +14,68 @@ import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import { useLoginMutation } from '../graphql/graphql_generated';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 const theme = createTheme();
 
 export default function Auth() {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
-  const [login, { loading, error }] = useLoginMutation();
   const navigate = useNavigate();
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  // Using the generated hook for login mutation
+  const [login, { loading, error }] = useLoginMutation();
+
+  // State for Material UI Snackbar notifications
+  const [snackbar, setSnackbar] = React.useState<{
+    open: boolean;
+    message: string;
+    severity: 'success' | 'error';
+  }>({ open: false, message: '', severity: 'success' });
+
+  const handleCloseSnackbar = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') return;
+    setSnackbar((prev) => ({ ...prev, open: false }));
+  };
+
+  const handleLogin = React.useCallback(() => {
+    login({
+      variables: { email, password },
+      notifyOnNetworkStatusChange: true,
+      onCompleted: (data) => {
+        if (data?.login?.token) {
+          localStorage.setItem('access_token', data.login.token);
+          setSnackbar({
+            open: true,
+            message: 'Logged in successfully',
+            severity: 'success',
+          });
+          // Navigate to dashboard after a short delay to show the snackbar
+          setTimeout(() => {
+            navigate('/dashboard');
+          }, 1000);
+        } else {
+          setSnackbar({
+            open: false,
+            message: 'Login failed',
+            severity: 'error',
+          });
+        }
+      },
+      onError: (err) => {
+        setSnackbar({
+          open: false,
+          message: `Login failed: ${err.message}`,
+          severity: 'error',
+        });
+      },
+    });
+  }, [email, password, login, navigate]);
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    try {
-      const response = await login({ variables: { email, password } });
-      // alert(`Success: ${response.data.login.success}, \nToken: ${response.data.login.token}`);
-      if (response.data?.login?.token) {
-        localStorage.setItem('access_token', response.data.login.token);
-        navigate('/dashboard');
-      }
-    } catch (err) {
-      alert('Login failed: ' + err);
-    }
+    handleLogin();
   };
 
   return (
@@ -69,6 +110,11 @@ export default function Auth() {
             <Typography component="h1" variant="h5">
               Sign in
             </Typography>
+            {error && (
+              <Alert severity="error" sx={{ mt: 2 }}>
+                {error.message}
+              </Alert>
+            )}
             <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
               <TextField
                 margin="normal"
@@ -101,7 +147,6 @@ export default function Auth() {
               <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }} disabled={loading}>
                 {loading ? 'Signing In...' : 'Sign In'}
               </Button>
-              {error && <Typography color="error">{error.message}</Typography>}
               {/* <Grid container>
                 <Grid item xs>
                   <Link href="#" variant="body2">
@@ -118,6 +163,16 @@ export default function Auth() {
           </Box>
         </Grid>
       </Grid>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={1000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </ThemeProvider>
   );
 }
