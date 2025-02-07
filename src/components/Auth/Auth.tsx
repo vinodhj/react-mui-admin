@@ -33,7 +33,7 @@ export default function Auth() {
     }
   }, [initialLogoutMessage, location.pathname, navigate]);
 
-  const handleLogoutSnackbarClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+  const handleLogoutSnackbarClose = (_event?: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') return;
     setLogoutSnackbarOpen(false);
   };
@@ -50,7 +50,7 @@ export default function Auth() {
     severity: 'success' | 'error';
   }>({ open: false, message: '', severity: 'success' });
 
-  const handleCloseSnackbar = (event?: React.SyntheticEvent | Event, reason?: string) => {
+  const handleCloseSnackbar = (_event?: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') return;
     setSnackbar((prev) => ({ ...prev, open: false }));
   };
