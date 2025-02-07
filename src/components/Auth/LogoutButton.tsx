@@ -1,14 +1,15 @@
+import React from 'react';
 import { Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
-function LogoutButton() {
+const LogoutButton: React.FC = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
     localStorage.clear();
     sessionStorage.clear();
-    navigate('/');
-    window.location.reload();
+    // Pass a logout message via navigation state
+    navigate('/', { state: { logoutMessage: 'Logout successfully!' } });
   };
 
   return (
@@ -16,6 +17,6 @@ function LogoutButton() {
       Logout
     </Button>
   );
-}
+};
 
 export default LogoutButton;

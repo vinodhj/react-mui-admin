@@ -1,4 +1,4 @@
-import LogoutButton from './components/LogoutButton';
+import LogoutButton from './components/Auth/LogoutButton';
 
 function Dashboard() {
   return (

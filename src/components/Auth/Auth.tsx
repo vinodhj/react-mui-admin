@@ -3,34 +3,47 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-// import FormControlLabel from "@mui/material/FormControlLabel";
-// import Checkbox from "@mui/material/Checkbox";
-// import Link from "@mui/material/Link";
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { useNavigate } from 'react-router-dom';
-import { useLoginMutation } from '../graphql/graphql_generated';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useLoginMutation } from '../../graphql/graphql_generated';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import { useForm } from './useForm'; // Adjust the import path as needed
 
 const theme = createTheme();
 
 export default function Auth() {
-  const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const [emailError, setEmailError] = React.useState<string>('');
-  const [passwordError, setPasswordError] = React.useState<string>('');
-  const [serverError, setServerError] = React.useState<string | null>(null);
+  const location = useLocation();
   const navigate = useNavigate();
 
-  // Using the generated hook for login mutation
-  const [login, { loading }] = useLoginMutation();
+  // Capture the logout message from location state once
+  const [initialLogoutMessage] = React.useState<string | null>(location.state?.logoutMessage || null);
+  // Control Snackbar open state based on the captured message
+  const [logoutSnackbarOpen, setLogoutSnackbarOpen] = React.useState<boolean>(!!initialLogoutMessage);
 
-  // State for Material UI Snackbar notifications
+  // Clear the location state so refreshes don't show the message again
+  React.useEffect(() => {
+    if (initialLogoutMessage) {
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [initialLogoutMessage, location.pathname, navigate]);
+
+  const handleLogoutSnackbarClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') return;
+    setLogoutSnackbarOpen(false);
+  };
+
+  const [login, { loading }] = useLoginMutation();
+  const { values, errors, serverError, setServerError, handleChange, validate } = useForm({
+    email: '',
+    password: '',
+  });
+
   const [snackbar, setSnackbar] = React.useState<{
     open: boolean;
     message: string;
@@ -42,44 +55,12 @@ export default function Auth() {
     setSnackbar((prev) => ({ ...prev, open: false }));
   };
 
-  // Validate the form fields before login
-  const validate = () => {
-    let isValid = true;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!email.trim()) {
-      setEmailError('Email is required');
-      isValid = false;
-    } else if (!emailRegex.test(email)) {
-      setEmailError('Invalid email address');
-      isValid = false;
-    } else {
-      setEmailError('');
-    }
-
-    if (!password) {
-      setPasswordError('Password is required');
-      isValid = false;
-    } else {
-      setPasswordError('');
-    }
-
-    // Clear any previous server error if client-side validation kicks in.
-    if (!isValid) {
-      setServerError(null);
-    }
-
-    return isValid;
-  };
-
   const handleLogin = React.useCallback(() => {
     login({
-      variables: { email, password },
+      variables: { email: values.email, password: values.password },
       notifyOnNetworkStatusChange: true,
       onCompleted: (data) => {
-        // Clear any previous server error
         setServerError(null);
-
         if (data?.login?.token) {
           localStorage.setItem('access_token', data.login.token);
           setSnackbar({
@@ -94,7 +75,7 @@ export default function Auth() {
         } else {
           setServerError('Login failed');
           setSnackbar({
-            open: false,
+            open: true,
             message: 'Login failed',
             severity: 'error',
           });
@@ -103,13 +84,13 @@ export default function Auth() {
       onError: (err) => {
         setServerError(err.message);
         setSnackbar({
-          open: false,
+          open: true,
           message: `Login failed: ${err.message}`,
           severity: 'error',
         });
       },
     });
-  }, [email, password, login, navigate]);
+  }, [values.email, values.password, login, navigate, setServerError]);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -166,16 +147,10 @@ export default function Auth() {
                 name="email"
                 autoComplete="email"
                 autoFocus
-                value={email}
-                error={Boolean(emailError)}
-                helperText={emailError}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  if (e.target.value.trim()) {
-                    setEmailError('');
-                    setServerError(null);
-                  }
-                }}
+                value={values.email}
+                error={Boolean(errors.email)}
+                helperText={errors.email}
+                onChange={handleChange}
               />
               <TextField
                 margin="normal"
@@ -186,36 +161,14 @@ export default function Auth() {
                 type="password"
                 id="password"
                 autoComplete="current-password"
-                value={password}
-                error={Boolean(passwordError)}
-                helperText={passwordError}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  if (e.target.value) {
-                    setPasswordError('');
-                    setServerError(null);
-                  }
-                }}
+                value={values.password}
+                error={Boolean(errors.password)}
+                helperText={errors.password}
+                onChange={handleChange}
               />
-              {/* <FormControlLabel
-                control={<Checkbox value="remember" color="primary" />}
-                label="Remember me"
-              /> */}
               <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }} disabled={loading}>
                 {loading ? 'Signing In...' : 'Sign In'}
               </Button>
-              {/* <Grid container>
-                <Grid item xs>
-                  <Link href="#" variant="body2">
-                    Forgot password?
-                  </Link>
-                </Grid>
-                <Grid item>
-                  <Link href="#" variant="body2">
-                    {"Don't have an account? Sign Up"}
-                  </Link>
-                </Grid>
-              </Grid> */}
             </Box>
           </Box>
         </Grid>
@@ -230,6 +183,19 @@ export default function Auth() {
           {snackbar.message}
         </Alert>
       </Snackbar>
+
+      {initialLogoutMessage && (
+        <Snackbar
+          open={logoutSnackbarOpen}
+          autoHideDuration={3000}
+          onClose={handleLogoutSnackbarClose}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert onClose={handleLogoutSnackbarClose} severity="success" sx={{ width: '100%' }}>
+            {initialLogoutMessage}
+          </Alert>
+        </Snackbar>
+      )}
     </ThemeProvider>
   );
 }
