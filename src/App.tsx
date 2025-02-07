@@ -30,8 +30,8 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 
 const httpLink = createHttpLink({
   uri: `${apiUrl}/graphql`,
-  //credentials: "include",
-  credentials: 'same-origin', // Change this
+  credentials: 'include',
+  //credentials: 'same-origin', // Change this
 });
 
 // Add the project token to headers
