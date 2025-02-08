@@ -1,11 +1,14 @@
 import { ApolloProvider } from '@apollo/client';
 import client from './graphql/apolloClient';
 import AppRoutes from './Routes/AppRoutes';
+import SessionProvider from './hooks/SessionContext';
 
 function App() {
   return (
     <ApolloProvider client={client}>
-      <AppRoutes />
+      <SessionProvider>
+        <AppRoutes />
+      </SessionProvider>
     </ApolloProvider>
   );
 }

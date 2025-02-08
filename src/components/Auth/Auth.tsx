@@ -13,13 +13,15 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useLoginMutation } from '../../graphql/graphql_generated';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
-import { useForm } from './useForm'; // Adjust the import path as needed
+import { useForm } from './useForm';
+import { useSession } from '../../hooks/useSession';
 
 const theme = createTheme();
 
 export default function Auth() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { updateSession } = useSession();
 
   // Capture the logout message from location state once
   const [initialLogoutMessage] = React.useState<string | null>(location.state?.logoutMessage || null);
@@ -62,7 +64,13 @@ export default function Auth() {
       onCompleted: (data) => {
         setServerError(null);
         if (data?.login?.token) {
-          localStorage.setItem('access_token', data.login.token);
+          // Update the session state
+          updateSession({
+            token: data.login.token,
+            adminName: data.login.user?.name ?? '',
+            adminEmail: data.login.user?.email ?? '',
+            adminRole: data.login.user?.role ?? '',
+          });
           setSnackbar({
             open: true,
             message: 'Logged in successfully',
@@ -90,7 +98,7 @@ export default function Auth() {
         });
       },
     });
-  }, [values.email, values.password, login, navigate, setServerError]);
+  }, [values.email, values.password, login, navigate, setServerError, updateSession]);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
