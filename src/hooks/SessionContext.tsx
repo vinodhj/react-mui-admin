@@ -12,11 +12,15 @@ export interface SessionContextProps {
   updateSession: (data: SessionData) => void;
 }
 
+const isBrowser = typeof window !== 'undefined';
+
+const getStorageItem = (storage: Storage, key: string): string => (isBrowser ? storage.getItem(key) || '' : '');
+
 const defaultSession: SessionData = {
-  token: localStorage.getItem('access_token') || '',
-  adminName: sessionStorage.getItem('session_admin_name') || '',
-  adminEmail: sessionStorage.getItem('session_admin_email') || '',
-  adminRole: sessionStorage.getItem('session_admin_role') || '',
+  token: getStorageItem(localStorage, 'access_token'),
+  adminName: getStorageItem(sessionStorage, 'session_admin_name'),
+  adminEmail: getStorageItem(sessionStorage, 'session_admin_email'),
+  adminRole: getStorageItem(sessionStorage, 'session_admin_role'),
 };
 
 // eslint-disable-next-line react-refresh/only-export-components
