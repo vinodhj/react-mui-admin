@@ -130,20 +130,24 @@ export type LoginMutationVariables = Exact<{
 export type LoginMutation = {
   __typename?: 'Mutation';
   login: {
-    __typename?: 'LoginResponse';
+    __typename: 'LoginResponse';
     success: boolean;
     token?: string | null;
-    user?: { __typename?: 'UserSuccessResponse'; name: string } | null;
+    user?: { __typename: 'UserSuccessResponse'; name: string; email: string; role: Role } | null;
   };
 };
 
 export const LoginDocument = gql`
   mutation login($email: String!, $password: String!) {
     login(input: { email: $email, password: $password }) {
+      __typename
       success
       token
       user {
+        __typename
         name
+        email
+        role
       }
     }
   }
