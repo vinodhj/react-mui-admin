@@ -10,7 +10,7 @@ interface FormErrors {
   password?: string;
 }
 
-export const useForm = (initialValues: FormValues) => {
+export const useValidateSignInForm = (initialValues: FormValues) => {
   const [values, setValues] = useState<FormValues>(initialValues);
   const [errors, setErrors] = useState<FormErrors>({});
   const [serverError, setServerError] = useState<string | null>(null);

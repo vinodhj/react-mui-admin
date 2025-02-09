@@ -8,7 +8,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useLoginMutation } from '../../graphql/graphql_generated';
 import { SignInForm } from '../../components/Auth/SignInForm';
-import { useForm } from '../../components/Auth/useForm';
+import { useValidateSignInForm } from '../../components/Auth/validateSignInForm';
 import { useSession } from '../../hooks/useSession';
 import { Paper } from '@mui/material';
 import signInTheme from '../../theme/signInTheme';
@@ -36,7 +36,7 @@ export default function SignIn() {
   };
 
   const [login, { loading }] = useLoginMutation();
-  const { values, errors, serverError, setServerError, handleChange, validate } = useForm({
+  const { values, errors, serverError, setServerError, handleChange, validate } = useValidateSignInForm({
     email: '',
     password: '',
   });
