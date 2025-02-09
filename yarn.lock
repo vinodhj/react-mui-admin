@@ -1008,7 +1008,7 @@
     yaml "^2.3.1"
     yargs "^17.0.0"
 
-"@graphql-codegen/client-preset@4.6.1", "@graphql-codegen/client-preset@^4.6.0":
+"@graphql-codegen/client-preset@^4.6.0":
   version "4.6.1"
   resolved "https://registry.npmjs.org/@graphql-codegen/client-preset/-/client-preset-4.6.1.tgz"
   integrity sha512-KsgXzM1TbLEomS+sT5M8npTAzI3WberRiiYlJejIvbmvOSvcTVBUICK/Np10IbxghYGkeF7ik2kBw0FxnLtkQg==
@@ -1050,7 +1050,7 @@
 
 "@graphql-codegen/introspection@^4.0.3":
   version "4.0.3"
-  resolved "https://registry.yarnpkg.com/@graphql-codegen/introspection/-/introspection-4.0.3.tgz#756e39fb4529ea15d32a122f0bce9b0a66425379"
+  resolved "https://registry.npmjs.org/@graphql-codegen/introspection/-/introspection-4.0.3.tgz"
   integrity sha512-4cHRG15Zu4MXMF4wTQmywNf4+fkDYv5lTbzraVfliDnB8rJKcaurQpRBi11KVuQUe24YTq/Cfk4uwewfNikWoA==
   dependencies:
     "@graphql-codegen/plugin-helpers" "^5.0.3"
@@ -3402,6 +3402,11 @@ json5@^2.2.3:
   version "2.2.3"
   resolved "https://registry.npmjs.org/json5/-/json5-2.2.3.tgz"
   integrity sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==
+
+jwt-check-expiry@^1.0.10:
+  version "1.0.10"
+  resolved "https://registry.npmjs.org/jwt-check-expiry/-/jwt-check-expiry-1.0.10.tgz"
+  integrity sha512-DaqnmxMu9WSmCnCiL6mblrSxNwG5K7F8xbP9FVXhDlttglbxfluLRIzUqQE8W0mr5SU246HFMJEln/RXjWZkNQ==
 
 keyv@^4.5.4:
   version "4.5.4"

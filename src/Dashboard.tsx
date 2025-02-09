@@ -1,13 +1,9 @@
-import LogoutButton from './components/Auth/LogoutButton';
-import { useSession } from './hooks/useSession';
+import MiniDrawer from './MiniDrawer';
 
 function Dashboard() {
-  const { session } = useSession();
-
   return (
     <div>
-      <h2>Welcome to Dashboard - {session.adminName} </h2>
-      <LogoutButton />
+      <MiniDrawer />
     </div>
   );
 }

@@ -16,7 +16,11 @@ import Alert from '@mui/material/Alert';
 import { useForm } from './useForm';
 import { useSession } from '../../hooks/useSession';
 
-const theme = createTheme();
+const signInTheme = createTheme({
+  palette: {
+    mode: 'light',
+  },
+});
 
 export default function Auth() {
   const location = useLocation();
@@ -108,7 +112,7 @@ export default function Auth() {
   };
 
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={signInTheme}>
       <Grid container component="main" sx={{ height: '100vh' }}>
         <CssBaseline />
         <Grid
