@@ -1,13 +1,13 @@
+// LogoutButton.tsx
 import React from 'react';
-import { Button } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import { handleLogout } from './logOut';
+import Button from '@mui/material/Button';
+import LogoutIcon from '@mui/icons-material/Logout';
+import { useHandleLogout } from '../../utils/logOut';
 
-const LogoutButton: React.FC = () => {
-  const navigate = useNavigate();
-
+const LogoutButton: React.FC<object> = () => {
+  const handleLogout = useHandleLogout();
   return (
-    <Button variant="contained" color="primary" onClick={() => handleLogout(navigate)}>
+    <Button variant="contained" color="secondary" startIcon={<LogoutIcon />} onClick={handleLogout}>
       Logout
     </Button>
   );
