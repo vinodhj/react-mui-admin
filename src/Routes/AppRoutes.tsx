@@ -1,7 +1,6 @@
-// src/AppRoutes.tsx
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import Auth from '../components/Auth/Auth';
+import SignIn from '../pages/signin';
 import Dashboard from '../Dashboard';
 import NotFoundPage from '../components/NotFoundPage';
 import { ProtectedRoute, PublicRoute } from './RouteGuards';
@@ -9,7 +8,7 @@ import { ProtectedRoute, PublicRoute } from './RouteGuards';
 const AppRoutes: React.FC = () => {
   return (
     <Routes>
-      <Route path="/" element={<PublicRoute element={<Auth />} />} />
+      <Route path="/" element={<PublicRoute element={<SignIn />} />} />
       <Route path="/dashboard" element={<ProtectedRoute element={<Dashboard />} />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
