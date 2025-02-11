@@ -1,8 +1,8 @@
 // src/layouts/MainLayout.tsx
 
 import { Outlet } from 'react-router-dom';
-import Topbar from '../components/topbar';
 import { MyProSidebarProvider } from '../contexts/sidebar-context';
+import Topbar from '../components/topbar';
 
 function MainLayout() {
   return (
