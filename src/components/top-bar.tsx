@@ -1,20 +1,23 @@
 import { ColorModeContext, tokens } from '../theme/main-theme';
+import { useHandleLogout } from '../utils/log-out';
 
 import { useContext, FC } from 'react';
-import { useTheme, Box, IconButton, InputBase } from '@mui/material';
+import { useTheme } from '@mui/material';
+import Box from '@mui/material/Box';
+import InputBase from '@mui/material/InputBase';
+import IconButton from '@mui/material/IconButton';
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import LogoutIcon from '@mui/icons-material/Logout';
-import { useHandleLogout } from '../utils/log-out';
 
 const Topbar: FC = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode as 'light' | 'dark');
   const colorMode = useContext(ColorModeContext);
-  const handleLogout = useHandleLogout();
+  const handleLogout: () => void = useHandleLogout();
 
   const toggleSidebar = () => {
     // Replace this with your own sidebar toggle functionality.

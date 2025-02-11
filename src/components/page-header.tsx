@@ -1,8 +1,12 @@
-import { FC } from 'react';
-import { Typography, Box, useTheme, Breadcrumbs, Link } from '@mui/material';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-
 import { tokens } from '../theme/main-theme';
+
+import { FC } from 'react';
+import { useTheme } from '@mui/material';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Breadcrumbs from '@mui/material/Breadcrumbs';
+import Link from '@mui/material/Link';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import startCase from 'lodash/startCase';
 
 interface HeaderProps {
