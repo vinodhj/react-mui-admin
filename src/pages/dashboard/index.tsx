@@ -53,7 +53,7 @@ function Dashboard() {
               subtitle="New Clients"
               progress={0.5}
               increase="+5%"
-              icon={<PersonAddIcon sx={{ color: colors.greenAccent[600], fontSize: '26px' }} />}
+              icon={<PersonAddIcon sx={{ color: colors.greenAccent[400], fontSize: '26px' }} />}
             />
           </Box>
         </Grid>

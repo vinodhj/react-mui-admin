@@ -40,11 +40,11 @@ const getMenuItemStyles = (mode: 'light' | 'dark', colors: ReturnType<typeof tok
     // Hover style
     '&:hover': {
       backgroundColor: 'transparent',
-      color: colors.blueAccent[500],
+      color: colors.blueAccent[400],
     },
     // Active/selected item
     color: (() => {
-      if (active) return colors.greenAccent[500];
+      if (active) return colors.greenAccent[400];
       return mode === 'dark' ? colors.grey[100] : '#333';
     })(),
   }),
