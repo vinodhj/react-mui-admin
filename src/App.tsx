@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-//@ts-nocheck
 import { ApolloProvider } from '@apollo/client';
 import client from './graphql/apollo-client';
 import SessionProvider from './contexts/session-context';
