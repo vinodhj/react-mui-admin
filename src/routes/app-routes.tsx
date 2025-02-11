@@ -6,6 +6,7 @@ import NotFoundPage from '../pages/not-found';
 import { ProtectedRoute, PublicRoute } from './route-guards';
 import AuthLayout from '../layouts/auth-layout';
 import MainLayout from '../layouts/main-layout';
+import Team from '../pages/team';
 
 const AppRoutes: React.FC = () => {
   return (
@@ -17,6 +18,7 @@ const AppRoutes: React.FC = () => {
       {/* Main Layout (Dashboard, other protected pages) */}
       <Route element={<ProtectedRoute element={<MainLayout />} />}>
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/team" element={<Team />} />
         {/* Add more protected routes here if you want */}
 
         {/* Catch-all: Not Found */}
