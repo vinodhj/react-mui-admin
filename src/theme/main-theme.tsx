@@ -1,5 +1,6 @@
 import { createContext, useState, useMemo } from 'react';
 import { createTheme, Theme, ThemeOptions } from '@mui/material/styles';
+// import "@mui/x-data-grid/themeAugmentation";
 
 // Define mode type
 type Mode = 'light' | 'dark';
@@ -207,6 +208,16 @@ export const themeSettings = (mode: Mode): ThemeOptions => {
         fontSize: 14,
       },
     },
+    // components: {
+    //   MuiDataGrid: {
+    //     styleOverrides: {
+    //       columnHeaders: {
+    //         backgroundColor: "#3e4396 !important",
+    //       },
+    //       // or override other slots
+    //     },
+    //   },
+    // },
   };
 };
 

@@ -24,6 +24,8 @@
     "@graphql-codegen/typescript-react-apollo": "^4.3.2",
     "@mui/icons-material": "^6.4.3",
     "@mui/material": "^6.4.3",
+    "@mui/x-data-grid": "^7.26.0",
+    "@types/lodash": "^4.17.15",
     "dotenv": "^16.4.7",
     "graphql": "^16.10.0",
     "graphql-tag": "^2.12.6",

@@ -1,14 +1,61 @@
-import LogoutButton from '../../components/auth/logout-button';
-import { useSession } from '../../hooks/use-session';
+import { Box, Button, useMediaQuery, useTheme } from '@mui/material';
+import DownloadOutlinedIcon from '@mui/icons-material/DownloadOutlined';
+import Grid from '@mui/material/Grid2';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+
+import { tokens } from '../../theme/main-theme';
+import PageHeader from '../../components/page-header';
+import StatBox from '../../components/stat-box';
 
 function Dashboard() {
-  const { session } = useSession();
+  const theme = useTheme();
+  const smScreen = useMediaQuery(theme.breakpoints.up('sm'));
+  const colors = tokens(theme.palette.mode);
 
   return (
-    <div>
-      <h2>Welcome to Dashboard - {session.adminName} </h2>
-      <LogoutButton />
-    </div>
+    <Box m="20px">
+      <Box
+        display={smScreen ? 'flex' : 'block'}
+        flexDirection={smScreen ? 'row' : 'column'}
+        justifyContent={smScreen ? 'space-between' : 'start'}
+        alignItems={smScreen ? 'center' : 'start'}
+        m="10px 0"
+      >
+        <PageHeader
+          title="DASHBOARD"
+          subtitle="A streamlined interface designed specifically for administrators, the admin dashboard provides real-time insights into system performance, user activity, and key metrics."
+        />
+
+        <Box>
+          <Button
+            sx={{
+              backgroundColor: colors.blueAccent[700],
+              color: colors.grey[100],
+              fontSize: '14px',
+              fontWeight: 'bold',
+              padding: '10px 20px',
+            }}
+          >
+            <DownloadOutlinedIcon sx={{ mr: '10px' }} />
+            Download Reports
+          </Button>
+        </Box>
+      </Box>
+
+      <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+        <Grid size={{ xs: 12, sm: 12, md: 6, lg: 3, xl: 3 }}>
+          <Box width="100%" sx={{ backgroundColor: colors.primary[400] }} display="flex" alignItems="center" justifyContent="center">
+            <StatBox
+              title="32,441"
+              subtitle="New Clients"
+              progress={0.5}
+              increase="+5%"
+              icon={<PersonAddIcon sx={{ color: colors.greenAccent[600], fontSize: '26px' }} />}
+            />
+          </Box>
+        </Grid>
+      </Grid>
+    </Box>
   );
 }
 
