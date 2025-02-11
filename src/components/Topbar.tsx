@@ -1,5 +1,5 @@
 import { useContext, FC } from 'react';
-import { ColorModeContext, tokens } from '../theme';
+import { ColorModeContext, tokens } from '../theme/main-theme';
 import { useTheme, Box, IconButton, InputBase } from '@mui/material';
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';

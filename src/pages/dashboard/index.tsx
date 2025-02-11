@@ -1,5 +1,5 @@
-import LogoutButton from '../../components/auth/LogoutButton';
-import { useSession } from '../../hooks/useSession';
+import LogoutButton from '../../components/auth/logout-button';
+import { useSession } from '../../hooks/use-session';
 
 function Dashboard() {
   const { session } = useSession();

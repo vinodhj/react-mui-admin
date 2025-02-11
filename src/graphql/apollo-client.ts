@@ -1,7 +1,7 @@
 import { ApolloClient, ApolloLink, InMemoryCache, createHttpLink } from '@apollo/client';
 import { onError } from '@apollo/client/link/error';
 import { setContext } from '@apollo/client/link/context';
-import { getToken } from '../utils/getToken';
+import { getToken } from '../utils/get-token';
 
 const apiUrl = import.meta.env.DEV ? import.meta.env.VITE_DEV_API_URL : import.meta.env.VITE_PROD_API_URL;
 

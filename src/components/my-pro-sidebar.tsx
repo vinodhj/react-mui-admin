@@ -1,6 +1,6 @@
 import React, { FC, useState } from 'react';
 import { Menu, Sidebar, MenuItem, MenuItemStyles } from 'react-pro-sidebar';
-import { tokens } from '../theme';
+import { tokens } from '../theme/main-theme';
 import { useTheme, Box, Typography, IconButton } from '@mui/material';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import PeopleOutlinedIcon from '@mui/icons-material/PeopleOutlined';
@@ -9,7 +9,7 @@ import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
 import SwitchRightOutlinedIcon from '@mui/icons-material/SwitchRightOutlined';
 import SwitchLeftOutlinedIcon from '@mui/icons-material/SwitchLeftOutlined';
 import { Link as RouterLink } from 'react-router-dom';
-import { useSidebarContext } from '../hooks/useSidebarContext';
+import { useSidebarContext } from '../hooks/use-sidebar-context';
 
 // Define the props for the sidebar menu item
 interface ItemProps {

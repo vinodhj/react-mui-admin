@@ -1,17 +1,15 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 //@ts-nocheck
 import { ApolloProvider } from '@apollo/client';
-import client from './graphql/apolloClient';
-import SessionProvider from './contexts/SessionContext';
+import client from './graphql/apollo-client';
+import SessionProvider from './contexts/session-context';
 import { lazy, Suspense } from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
-import { ColorModeContext, useMode } from './theme';
+import { ColorModeContext, useMode } from './theme/main-theme';
 import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import CssBaseline from '@mui/material/CssBaseline';
-import { MyProSidebarProvider } from './contexts/sidebarContext';
-import Topbar from './components/Topbar';
 
-const AppRoutes = lazy(() => import('./Routes/AppRoutes'));
+const AppRoutes = lazy(() => import('./routes/app-routes'));
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -20,31 +18,24 @@ function App() {
       <ColorModeContext.Provider value={colorMode}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <MyProSidebarProvider>
-            <SessionProvider>
-              <Suspense
-                fallback={
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      height: '100vh',
-                    }}
-                  >
-                    <CircularProgress />
-                  </div>
-                }
-              >
-                <div style={{ height: '100%', width: '100%' }}>
-                  <main>
-                    <Topbar />
-                    <AppRoutes />
-                  </main>
+          <SessionProvider>
+            <Suspense
+              fallback={
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '100vh',
+                  }}
+                >
+                  <CircularProgress />
                 </div>
-              </Suspense>
-            </SessionProvider>
-          </MyProSidebarProvider>
+              }
+            >
+              <AppRoutes />
+            </Suspense>
+          </SessionProvider>
         </ThemeProvider>
       </ColorModeContext.Provider>
     </ApolloProvider>
