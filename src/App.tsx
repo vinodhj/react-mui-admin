@@ -1,6 +1,6 @@
 import { ApolloProvider } from '@apollo/client';
 import client from './graphql/apolloClient';
-import SessionProvider from './hooks/SessionContext';
+import SessionProvider from './contexts/SessionContext';
 import { lazy, Suspense } from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
 
