@@ -6,11 +6,13 @@ import Alert from '@mui/material/Alert';
 import { ThemeProvider } from '@mui/material/styles';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useLoginMutation } from '../../graphql/graphql-generated';
-import { SignInForm } from '../../components/auth/signin-form';
 import { useValidateSignInForm } from '../../hooks/auth/use-validate-signin';
 import { useSession } from '../../hooks/use-session';
-import { Paper } from '@mui/material';
+import Paper from '@mui/material/Paper';
 import signInTheme from '../../theme/signIn-theme';
+import { Suspense } from 'react';
+
+const SignInForm = React.lazy(() => import('../../components/auth/signin-form'));
 
 export default function SignIn() {
   const location = useLocation();
@@ -54,7 +56,7 @@ export default function SignIn() {
   const handleLogin = React.useCallback(() => {
     login({
       variables: { email: values.email, password: values.password },
-      notifyOnNetworkStatusChange: true,
+      notifyOnNetworkStatusChange: false,
       onCompleted: (data) => {
         setServerError(null);
         if (data?.login?.token) {
@@ -103,54 +105,56 @@ export default function SignIn() {
 
   return (
     <ThemeProvider theme={signInTheme}>
-      <Grid container component="main" sx={{ height: '100vh' }}>
-        <CssBaseline />
-        <Grid
-          item
-          xs={false}
-          sm={4}
-          md={7}
-          sx={{
-            backgroundImage: 'url(https://lh3.googleusercontent.com/p/AF1QipPwaVe8g2KzlvObbHdww9zrw4ZI5CRZ2kkbCfm6=s1360-w1360-h1020)',
-            backgroundRepeat: 'no-repeat',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-        />
-        <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
-          <SignInForm
-            serverError={serverError}
-            values={values}
-            errors={errors}
-            loading={loading}
-            handleChange={handleChange}
-            handleSubmit={handleSubmit}
+      <Suspense fallback={<div>Loading...</div>}>
+        <Grid container component="main" sx={{ height: '100vh' }}>
+          <CssBaseline />
+          <Grid
+            item
+            xs={false}
+            sm={4}
+            md={7}
+            sx={{
+              backgroundImage: 'url(https://lh3.googleusercontent.com/p/AF1QipPwaVe8g2KzlvObbHdww9zrw4ZI5CRZ2kkbCfm6=s1360-w1360-h1020)',
+              backgroundRepeat: 'no-repeat',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }}
           />
+          <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
+            <SignInForm
+              serverError={serverError}
+              values={values}
+              errors={errors}
+              loading={loading}
+              handleChange={handleChange}
+              handleSubmit={handleSubmit}
+            />
+          </Grid>
         </Grid>
-      </Grid>
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={1000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-      >
-        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
-
-      {initialLogoutMessage && (
         <Snackbar
-          open={logoutSnackbarOpen}
-          autoHideDuration={3000}
-          onClose={handleLogoutSnackbarClose}
+          open={snackbar.open}
+          autoHideDuration={1000}
+          onClose={handleCloseSnackbar}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         >
-          <Alert onClose={handleLogoutSnackbarClose} severity="success" sx={{ width: '100%' }}>
-            {initialLogoutMessage}
+          <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+            {snackbar.message}
           </Alert>
         </Snackbar>
-      )}
+
+        {initialLogoutMessage && (
+          <Snackbar
+            open={logoutSnackbarOpen}
+            autoHideDuration={3000}
+            onClose={handleLogoutSnackbarClose}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          >
+            <Alert onClose={handleLogoutSnackbarClose} severity="success" sx={{ width: '100%' }}>
+              {initialLogoutMessage}
+            </Alert>
+          </Snackbar>
+        )}
+      </Suspense>
     </ThemeProvider>
   );
 }

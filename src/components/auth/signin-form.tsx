@@ -16,7 +16,7 @@ interface SignInFormProps {
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
 }
 
-export const SignInForm: React.FC<SignInFormProps> = ({ serverError, values, errors, loading, handleChange, handleSubmit }) => {
+const SignInForm: React.FC<SignInFormProps> = ({ serverError, values, errors, loading, handleChange, handleSubmit }) => {
   return (
     <Box
       sx={{
@@ -75,3 +75,5 @@ export const SignInForm: React.FC<SignInFormProps> = ({ serverError, values, err
     </Box>
   );
 };
+
+export default SignInForm;
