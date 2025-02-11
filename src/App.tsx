@@ -1,32 +1,41 @@
 import { ApolloProvider } from '@apollo/client';
-import client from './graphql/apolloClient';
-import SessionProvider from './contexts/SessionContext';
+import client from './graphql/apollo-client';
+import SessionProvider from './contexts/session-context';
 import { lazy, Suspense } from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
+import { ColorModeContext, useMode } from './theme/main-theme';
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
+import CssBaseline from '@mui/material/CssBaseline';
 
-const AppRoutes = lazy(() => import('./Routes/AppRoutes'));
+const AppRoutes = lazy(() => import('./routes/app-routes'));
 
 function App() {
+  const [theme, colorMode] = useMode();
   return (
     <ApolloProvider client={client}>
-      <SessionProvider>
-        <Suspense
-          fallback={
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: '100vh',
-              }}
+      <ColorModeContext.Provider value={colorMode}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <SessionProvider>
+            <Suspense
+              fallback={
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '100vh',
+                  }}
+                >
+                  <CircularProgress />
+                </div>
+              }
             >
-              <CircularProgress />
-            </div>
-          }
-        >
-          <AppRoutes />
-        </Suspense>
-      </SessionProvider>
+              <AppRoutes />
+            </Suspense>
+          </SessionProvider>
+        </ThemeProvider>
+      </ColorModeContext.Provider>
     </ApolloProvider>
   );
 }

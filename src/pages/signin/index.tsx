@@ -6,12 +6,12 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import { ThemeProvider } from '@mui/material/styles';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useLoginMutation } from '../../graphql/graphql_generated';
-import { SignInForm } from '../../components/auth/SignInForm';
-import { useValidateSignInForm } from '../../hooks/auth/validateSignInForm';
-import { useSession } from '../../hooks/useSession';
+import { useLoginMutation } from '../../graphql/graphql-generated';
+import { SignInForm } from '../../components/auth/signin-form';
+import { useValidateSignInForm } from '../../hooks/auth/use-validate-signin';
+import { useSession } from '../../hooks/use-session';
 import { Paper } from '@mui/material';
-import signInTheme from '../../theme/signInTheme';
+import signInTheme from '../../theme/signIn-theme';
 
 export default function SignIn() {
   const location = useLocation();
