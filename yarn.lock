@@ -969,7 +969,7 @@
 
 "@graphql-codegen/cli@^5.0.4":
   version "5.0.4"
-  resolved "https://registry.yarnpkg.com/@graphql-codegen/cli/-/cli-5.0.4.tgz#22a8fc492ff20028f236dda16ecd9f5bd9783c5a"
+  resolved "https://registry.npmjs.org/@graphql-codegen/cli/-/cli-5.0.4.tgz"
   integrity sha512-vPO1mCtrttFVy8mPR+jMAvsYTv8E/7payIPaneeGE15mQjyvQXXsHoAg06Qpf6tykOdCwKVLWre0Mf6g0KBwUg==
   dependencies:
     "@babel/generator" "^7.18.13"

@@ -3,7 +3,7 @@ import { Typography, Box, useTheme, Breadcrumbs, Link } from '@mui/material';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 
 import { tokens } from '../theme/main-theme';
-import { startCase } from 'lodash';
+import startCase from 'lodash/startCase';
 
 interface HeaderProps {
   title: string;
