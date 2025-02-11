@@ -1,14 +1,14 @@
-import React, { lazy } from 'react';
+import React from 'react';
 
 import AuthLayout from '../layouts/auth-layout';
 import MainLayout from '../layouts/main-layout';
 import { Routes, Route } from 'react-router-dom';
 import { ProtectedRoute, PublicRoute } from './route-guards';
 
-const SignIn = lazy(() => import('../pages/signin'));
-const Dashboard = lazy(() => import('../pages/dashboard'));
-const Team = lazy(() => import('../pages/team'));
-const NotFoundPage = lazy(() => import('../pages/not-found'));
+import SignIn from '../pages/signin';
+import Dashboard from '../pages/dashboard';
+import NotFoundPage from '../pages/not-found';
+import Team from '../pages/team';
 
 const AppRoutes: React.FC = () => {
   return (
