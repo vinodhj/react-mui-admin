@@ -72,7 +72,7 @@ const MyProSidebar: FC = () => {
         height: '100vh',
         top: 0,
         bottom: 0,
-        zIndex: 10000,
+        zIndex: 1200,
       }}
     >
       <Sidebar
