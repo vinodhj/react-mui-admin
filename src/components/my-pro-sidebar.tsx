@@ -104,7 +104,13 @@ const MyProSidebar: FC = () => {
           >
             {!collapsed && (
               <Box display="flex" justifyContent="space-between" alignItems="center" ml="15px">
-                <Typography variant="h3" color={colors.grey[100]} component={RouterLink} to="/" sx={{ textDecoration: 'none' }}>
+                <Typography
+                  variant="h4"
+                  color={colors.grey[100]}
+                  component={RouterLink}
+                  to="/"
+                  sx={{ textDecoration: 'none', fontWeight: 'bold' }}
+                >
                   ADMIN
                 </Typography>
                 <IconButton onClick={() => setCollapsed(true)}>
@@ -115,7 +121,7 @@ const MyProSidebar: FC = () => {
           </MenuItem>
 
           <Box paddingLeft={collapsed ? undefined : '10%'}>
-            <Item title="Dashboard" to="/" icon={<HomeOutlinedIcon />} selected={selected} setSelected={setSelected} />
+            <Item title="Dashboard" to="/dashboard" icon={<HomeOutlinedIcon />} selected={selected} setSelected={setSelected} />
 
             <Typography variant="h6" color={colors.grey[300]} sx={{ m: '15px 20px 5px 20px' }}>
               Data
