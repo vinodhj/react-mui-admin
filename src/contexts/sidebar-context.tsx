@@ -4,8 +4,8 @@ import MyProSidebar from '../components/my-pro-sidebar';
 export interface SidebarContextProps {
   sidebarBackgroundColor?: string;
   setSidebarBackgroundColor: Dispatch<SetStateAction<string | undefined>>;
-  sidebarImage?: string;
-  setSidebarImage: Dispatch<SetStateAction<string | undefined>>;
+  sidebarImage: boolean;
+  setSidebarImage: Dispatch<SetStateAction<boolean>>;
   sidebarRTL: boolean;
   setSidebarRTL: Dispatch<SetStateAction<boolean>>;
 }
@@ -20,7 +20,7 @@ interface MyProSidebarProviderProps {
 export const MyProSidebarProvider: FC<MyProSidebarProviderProps> = ({ children }) => {
   const [sidebarRTL, setSidebarRTL] = useState<boolean>(false);
   const [sidebarBackgroundColor, setSidebarBackgroundColor] = useState<string | undefined>(undefined);
-  const [sidebarImage, setSidebarImage] = useState<string | undefined>(undefined);
+  const [sidebarImage, setSidebarImage] = useState<boolean>(false);
 
   const contextValue = useMemo(
     () => ({

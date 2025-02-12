@@ -12,12 +12,15 @@ import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import LogoutIcon from '@mui/icons-material/Logout';
+import { FaRegImages } from 'react-icons/fa6';
+import { useSidebarContext } from '../hooks/use-sidebar-context';
 
 const Topbar: FC = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode as 'light' | 'dark');
   const colorMode = useContext(ColorModeContext);
   const handleLogout: () => void = useHandleLogout();
+  const { setSidebarImage } = useSidebarContext();
 
   const toggleSidebar = () => {
     // Replace this with your own sidebar toggle functionality.
@@ -51,6 +54,9 @@ const Topbar: FC = () => {
       <Box display="flex">
         <IconButton onClick={colorMode.toggleColorMode}>
           {theme.palette.mode === 'dark' ? <LightModeOutlinedIcon /> : <DarkModeOutlinedIcon />}
+        </IconButton>
+        <IconButton onClick={() => setSidebarImage((prev) => !prev)}>
+          <FaRegImages />
         </IconButton>
         <IconButton>
           <SettingsOutlinedIcon />

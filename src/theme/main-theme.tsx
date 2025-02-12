@@ -12,17 +12,30 @@ interface ColorPalette {
 
 // Define tokens interface
 interface Tokens {
+  blackWhite: ColorPalette;
   grey: ColorPalette;
   primary: ColorPalette;
   greenAccent: ColorPalette;
   redAccent: ColorPalette;
   blueAccent: ColorPalette;
+  vibrantBlue: ColorPalette;
 }
 
 // color design tokens export
 export const tokens = (mode: Mode): Tokens => ({
   ...(mode === 'dark'
     ? {
+        blackWhite: {
+          100: '#000000',
+          200: '#1a1a1a',
+          300: 'rgba(11, 41, 72, 0.9)',
+          400: '#4d4d4d',
+          500: '#666666',
+          600: '#808080',
+          700: '#999999',
+          800: '#b3b3b3',
+          900: '#cccccc',
+        },
         grey: {
           100: '#e0e0e0',
           200: '#c2c2c2',
@@ -78,8 +91,30 @@ export const tokens = (mode: Mode): Tokens => ({
           800: '#2a2d64',
           900: '#151632',
         },
+        vibrantBlue: {
+          100: '#cce0fd', // now the lightest variant becomes the light accent
+          200: '#99cdf8',
+          300: '#66bbf2',
+          400: '#33a9ec',
+          500: '#0098e5', // base remains the same
+          600: '#0088cc',
+          700: '#006699',
+          800: '#003d66',
+          900: '#001f33', // darkest variant used for high contrast on dark backgrounds
+        },
       }
     : {
+        blackWhite: {
+          100: '#ffffff',
+          200: '#4b2323',
+          300: 'rgba(255, 255, 255, 0.9)',
+          400: '#c6c6c6',
+          500: '#b0b0b0',
+          600: '#999999',
+          700: '#7f7f7f',
+          800: '#666666',
+          900: '#333333',
+        },
         grey: {
           100: '#141414',
           200: '#292929',
@@ -135,6 +170,17 @@ export const tokens = (mode: Mode): Tokens => ({
           800: '#c3c6fd',
           900: '#e1e2fe',
         },
+        vibrantBlue: {
+          100: '#001f33', // very dark navy blue
+          200: '#003d66',
+          300: '#006699',
+          400: '#0088cc',
+          500: '#0098e5', // base vibrant blue
+          600: '#33a9ec',
+          700: '#66bbf2',
+          800: '#99cdf8',
+          900: '#cce0fd', // very light blue
+        },
       }),
 });
 
@@ -160,6 +206,7 @@ export const themeSettings = (mode: Mode): ThemeOptions => {
             },
             background: {
               default: colors.primary[500],
+              // default: '#0b2948',
             },
           }
         : {
@@ -176,35 +223,36 @@ export const themeSettings = (mode: Mode): ThemeOptions => {
               light: colors.grey[100],
             },
             background: {
-              default: '#fcfcfc',
+              // default: '#fcfcfc',
+              default: '#ffffff',
             },
           }),
     },
     typography: {
-      fontFamily: ['Source Sans Pro', 'sans-serif'].join(','),
+      fontFamily: ['Poppins', 'Roboto', 'sans-serif'].join(','),
       fontSize: 13,
       h1: {
-        fontFamily: ['Source Sans Pro', 'sans-serif'].join(','),
+        fontFamily: ['Poppins', 'Roboto', 'sans-serif'].join(','),
         fontSize: 40,
       },
       h2: {
-        fontFamily: ['Source Sans Pro', 'sans-serif'].join(','),
+        fontFamily: ['Poppins', 'Roboto', 'sans-serif'].join(','),
         fontSize: 32,
       },
       h3: {
-        fontFamily: ['Source Sans Pro', 'sans-serif'].join(','),
+        fontFamily: ['Poppins', 'Roboto', 'sans-serif'].join(','),
         fontSize: 24,
       },
       h4: {
-        fontFamily: ['Source Sans Pro', 'sans-serif'].join(','),
+        fontFamily: ['Poppins', 'Roboto', 'sans-serif'].join(','),
         fontSize: 20,
       },
       h5: {
-        fontFamily: ['Source Sans Pro', 'sans-serif'].join(','),
+        fontFamily: ['Poppins', 'Roboto', 'sans-serif'].join(','),
         fontSize: 16,
       },
       h6: {
-        fontFamily: ['Source Sans Pro', 'sans-serif'].join(','),
+        fontFamily: ['Poppins', 'Roboto', 'sans-serif'].join(','),
         fontSize: 14,
       },
     },

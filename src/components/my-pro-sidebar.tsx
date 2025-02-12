@@ -68,6 +68,10 @@ const MyProSidebar: FC = () => {
   // Context for RTL and sidebar image settings
   const { sidebarRTL, setSidebarRTL, sidebarImage } = useSidebarContext();
 
+  const imageUrl = 'https://user-images.githubusercontent.com/25878302/144499035-2911184c-76d3-4611-86e7-bc4e8ff84ff5.jpg';
+
+  const border = mode === 'dark' ? '1px solid' + colors.blackWhite[200] : '1px dotted' + colors.blackWhite[200];
+
   return (
     <Box
       sx={{
@@ -82,12 +86,13 @@ const MyProSidebar: FC = () => {
       <Sidebar
         breakPoint="md"
         rtl={sidebarRTL}
-        backgroundColor={colors.primary[400]}
-        image={sidebarImage}
+        backgroundColor={colors.blackWhite[300]}
+        image={sidebarImage ? imageUrl : undefined}
         collapsed={collapsed}
+        border-right-width={'2px solid' + colors.blackWhite[200]}
         rootStyles={{
-          border: 'none',
-          boxShadow: 'none',
+          border,
+          // boxShadow: 'none',
         }}
       >
         <Menu menuItemStyles={getMenuItemStyles(mode, colors)}>
@@ -110,12 +115,12 @@ const MyProSidebar: FC = () => {
               <Box display="flex" justifyContent="space-between" alignItems="center" ml="15px">
                 <Typography
                   variant="h4"
-                  color={colors.grey[100]}
+                  color={colors.vibrantBlue[500]}
                   component={RouterLink}
                   to="/"
                   sx={{ textDecoration: 'none', fontWeight: 'bold' }}
                 >
-                  ADMIN
+                  Admin
                 </Typography>
                 <IconButton onClick={() => setCollapsed(true)}>
                   <MenuOutlinedIcon />
@@ -124,7 +129,7 @@ const MyProSidebar: FC = () => {
             )}
           </MenuItem>
 
-          <Box paddingLeft={collapsed ? undefined : '10%'}>
+          <Box paddingLeft={collapsed ? undefined : '2%'}>
             <Item title="Dashboard" to="/dashboard" icon={<HomeOutlinedIcon />} selected={selected} setSelected={setSelected} />
 
             <Typography variant="h6" color={colors.grey[300]} sx={{ m: '15px 20px 5px 20px' }}>

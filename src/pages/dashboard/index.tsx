@@ -34,12 +34,12 @@ function Dashboard() {
             sx={{
               backgroundColor: colors.blueAccent[700],
               color: colors.grey[100],
-              fontSize: '14px',
+              fontSize: '13px',
               fontWeight: 'bold',
               padding: '10px 20px',
             }}
           >
-            <DownloadOutlinedIcon sx={{ mr: '10px' }} />
+            <DownloadOutlinedIcon sx={{ mr: '4px' }} />
             Download Reports
           </Button>
         </Box>
