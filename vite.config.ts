@@ -24,7 +24,7 @@ export default defineConfig({
   plugins: [
     react(),
     visualizer({
-      open: true,
+      open: false,
       filename: 'local/bundle-analysis.html',
       gzipSize: true,
       brotliSize: true,

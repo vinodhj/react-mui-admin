@@ -230,7 +230,7 @@ export const themeSettings = (mode: Mode): ThemeOptions => {
     },
     typography: {
       fontFamily: ['Poppins', 'Roboto', 'sans-serif'].join(','),
-      fontSize: 13,
+      fontSize: 12,
       h1: {
         fontFamily: ['Poppins', 'Roboto', 'sans-serif'].join(','),
         fontSize: 40,
