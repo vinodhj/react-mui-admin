@@ -1,8 +1,8 @@
 import { Box, useTheme } from '@mui/material';
-import { DataGrid, GridToolbar, GridColDef } from '@mui/x-data-grid';
+import { DataGrid } from '@mui/x-data-grid/DataGrid';
+import { GridToolbar, GridColDef } from '@mui/x-data-grid';
 
 import mockDataJson from '../../../mock/mock-data-team.json';
-
 import { tokens } from '../../theme/main-theme';
 import PageHeader from '../../components/page-header';
 
