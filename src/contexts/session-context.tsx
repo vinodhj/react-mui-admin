@@ -19,7 +19,7 @@ const signOutCheckInterval = import.meta.env.VITE_SIGNOUT_CHECK_INTERVAL_MINUTES
 
 const isBrowser = typeof window !== 'undefined';
 
-const getStorageItem = (storage: Storage, key: string): string => (isBrowser ? storage.getItem(key) || '' : '');
+const getStorageItem = (storage: Storage, key: string): string => (isBrowser ? storage.getItem(key) ?? '' : '');
 
 const defaultSession: SessionData = {
   theme: getStorageItem(localStorage, 'theme'),
