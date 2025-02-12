@@ -4,7 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --port 1878",
+    "clean": "rm -rf ./dist ./node_modules",
+    "dev": "(kill -9 $(lsof -t -i:1878) || true) && vite --port 1878",
+    "start": "vite --port 1878 --strictPort",
     "build": "tsc -b && vite build && ANALYZE=true",
     "lint": "eslint .",
     "format": "prettier --write \"**/*.{ts,tsx,md,json,mts,d.ts}\" --no-error-on-unmatched-pattern",
