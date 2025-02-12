@@ -3,9 +3,9 @@ import client from './graphql/apollo-client';
 import SessionProvider from './contexts/session-context';
 import { lazy, Suspense } from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
-import { ColorModeContext, useMode } from './theme/main-theme';
 import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import CssBaseline from '@mui/material/CssBaseline';
+import { ColorModeContext, useMode } from './contexts/color-mode-context';
 
 const AppRoutes = lazy(() => import('./routes/app-routes'));
 

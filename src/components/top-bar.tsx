@@ -1,4 +1,4 @@
-import { ColorModeContext, tokens } from '../theme/main-theme';
+import { tokens } from '../theme/main-theme';
 import { useHandleLogout } from '../utils/log-out';
 
 import { useContext, FC } from 'react';
@@ -14,6 +14,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { FaRegImages } from 'react-icons/fa6';
 import { useSidebarContext } from '../hooks/use-sidebar-context';
+import { ColorModeContext } from '../contexts/color-mode-context';
 
 const Topbar: FC = () => {
   const theme = useTheme();

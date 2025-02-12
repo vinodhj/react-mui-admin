@@ -1,9 +1,8 @@
-import { createContext, useState, useMemo } from 'react';
-import { createTheme, Theme, ThemeOptions } from '@mui/material/styles';
+import { ThemeOptions } from '@mui/material/styles';
 // import "@mui/x-data-grid/themeAugmentation";
 
 // Define mode type
-type Mode = 'light' | 'dark';
+export type Mode = 'light' | 'dark';
 
 // Define a type for color palettes
 interface ColorPalette {
@@ -267,30 +266,4 @@ export const themeSettings = (mode: Mode): ThemeOptions => {
     //   },
     // },
   };
-};
-
-// Define the shape of the color mode context
-interface ColorModeContextProps {
-  toggleColorMode: () => void;
-}
-
-// context for color mode
-export const ColorModeContext = createContext<ColorModeContextProps>({
-  toggleColorMode: () => {},
-});
-
-// custom hook to manage color mode
-export const useMode = (): [Theme, ColorModeContextProps] => {
-  const [mode, setMode] = useState<Mode>('dark');
-
-  const colorMode = useMemo<ColorModeContextProps>(
-    () => ({
-      toggleColorMode: () => setMode((prevMode) => (prevMode === 'dark' ? 'light' : 'dark')),
-    }),
-    []
-  );
-
-  const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
-
-  return [theme, colorMode];
 };

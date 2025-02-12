@@ -20,7 +20,7 @@ interface MyProSidebarProviderProps {
 export const MyProSidebarProvider: FC<MyProSidebarProviderProps> = ({ children }) => {
   const [sidebarRTL, setSidebarRTL] = useState<boolean>(false);
   const [sidebarBackgroundColor, setSidebarBackgroundColor] = useState<string | undefined>(undefined);
-  const [sidebarImage, setSidebarImage] = useState<boolean>(false);
+  const [sidebarImage, setSidebarImage] = useState<boolean>(true);
 
   const contextValue = useMemo(
     () => ({
