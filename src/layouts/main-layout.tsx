@@ -6,8 +6,10 @@ function MainLayout() {
   return (
     <MyProSidebarProvider>
       <div style={{ height: '100%', width: '100%' }}>
-        <main>
+        <header>
           <Topbar />
+        </header>
+        <main>
           <Outlet />
         </main>
       </div>
