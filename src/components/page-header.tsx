@@ -20,7 +20,7 @@ const PageHeader: FC<HeaderProps> = ({ title, subtitle }) => {
 
   return (
     <Box mb="30px">
-      <Typography variant="h2" color={colors.grey[100]} fontWeight="bold" sx={{ mb: '5px' }}>
+      <Typography variant="h3" color={colors.grey[100]} fontWeight="bold" sx={{ mb: '5px' }}>
         {title}
       </Typography>
       {title.toLowerCase() !== 'dashboard' && (
@@ -33,7 +33,7 @@ const PageHeader: FC<HeaderProps> = ({ title, subtitle }) => {
           </Breadcrumbs>
         </Box>
       )}
-      <Typography variant="h5" color={colors.greenAccent[400]}>
+      <Typography variant="h6" color={colors.greenAccent[400]}>
         {subtitle}
       </Typography>
     </Box>

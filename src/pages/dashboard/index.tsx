@@ -36,7 +36,7 @@ function Dashboard() {
               color: colors.grey[100],
               fontSize: '13px',
               fontWeight: 'bold',
-              padding: '10px 20px',
+              padding: '10px 10px',
             }}
           >
             <DownloadOutlinedIcon sx={{ mr: '4px' }} />
