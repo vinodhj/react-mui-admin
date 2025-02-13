@@ -21,7 +21,7 @@ const Topbar: FC = () => {
   const colors = tokens(theme.palette.mode as 'light' | 'dark');
   const colorMode = useContext(ColorModeContext);
   const handleLogout: () => void = useHandleLogout();
-  const sidbarSetImage = useContext(SidebarContext);
+  const sidebarProps = useContext(SidebarContext);
 
   const toggleSidebar = () => {
     // Replace this with your own sidebar toggle functionality.
@@ -56,7 +56,7 @@ const Topbar: FC = () => {
         <IconButton onClick={colorMode.toggleColorMode}>
           {theme.palette.mode === 'dark' ? <LightModeOutlinedIcon /> : <DarkModeOutlinedIcon />}
         </IconButton>
-        <IconButton onClick={() => sidbarSetImage?.setSidebarImage((prev) => !prev)}>
+        <IconButton onClick={() => sidebarProps?.setSidebarImage((prev) => !prev)}>
           <FaRegImages />
         </IconButton>
         <IconButton>
