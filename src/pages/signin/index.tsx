@@ -44,9 +44,9 @@ export default function SignIn() {
     });
   }, [values.email, values.password, login, setServerError, updateSession]);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (validate()) {
+    if (await validate()) {
       handleLogin();
     }
   };

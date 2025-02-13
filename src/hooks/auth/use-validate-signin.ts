@@ -1,4 +1,5 @@
 import { useState, ChangeEvent } from 'react';
+import * as yup from 'yup';
 
 interface FormValues {
   email: string;
@@ -9,6 +10,20 @@ interface FormErrors {
   email?: string;
   password?: string;
 }
+
+// Define a Yup schema for sign-in validation
+const signInSchema = yup.object().shape({
+  email: yup.string().trim().email('Invalid email address').required('Email is required'),
+  password: yup
+    .string()
+    .trim()
+    .required('Password is required')
+    .min(6, 'Password must be at least 6 characters')
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).+$/,
+      'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
+    ),
+});
 
 export const useValidateSignInForm = (initialValues: FormValues) => {
   const [values, setValues] = useState<FormValues>(initialValues);
@@ -24,32 +39,27 @@ export const useValidateSignInForm = (initialValues: FormValues) => {
     setServerError(null);
   };
 
-  const validate = (): boolean => {
-    let isValid = true;
-    const newErrors: FormErrors = {};
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!values.email.trim()) {
-      newErrors.email = 'Email is required';
-      isValid = false;
-    } else if (!emailRegex.test(values.email)) {
-      newErrors.email = 'Invalid email address';
-      isValid = false;
+  const validate = async (): Promise<boolean> => {
+    try {
+      // Validate the values with the schema
+      await signInSchema.validate(values, { abortEarly: false });
+      // If successful, clear any previous errors
+      setErrors({});
+      return true;
+    } catch (err: any) {
+      // If there are validation errors, build an error object
+      const formErrors: FormErrors = {};
+      if (err.inner && Array.isArray(err.inner)) {
+        err.inner.forEach((validationError: yup.ValidationError) => {
+          // Only set the first error per field
+          if (!formErrors[validationError.path as keyof FormErrors]) {
+            formErrors[validationError.path as keyof FormErrors] = validationError.message;
+          }
+        });
+      }
+      setErrors(formErrors);
+      return false;
     }
-
-    if (!values.password) {
-      newErrors.password = 'Password is required';
-      isValid = false;
-    }
-
-    setErrors(newErrors);
-
-    // Clear server error if validation fails
-    if (!isValid) {
-      setServerError(null);
-    }
-
-    return isValid;
   };
 
   return { values, errors, serverError, setServerError, handleChange, validate };
