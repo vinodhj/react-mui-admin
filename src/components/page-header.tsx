@@ -8,6 +8,7 @@ import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Link from '@mui/material/Link';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import startCase from 'lodash/startCase';
+import { Link as RouterLink } from 'react-router-dom';
 
 interface HeaderProps {
   title: string;
@@ -26,7 +27,7 @@ const PageHeader: FC<HeaderProps> = ({ title, subtitle }) => {
       {title.toLowerCase() !== 'dashboard' && (
         <Box sx={{ mb: 2 }}>
           <Breadcrumbs aria-label="breadcrumb" separator={<NavigateNextIcon fontSize="small" />}>
-            <Link underline="hover" color="inherit" href="/Dashboard">
+            <Link underline="hover" color="inherit" component={RouterLink} to="/dashboard">
               Dashboard
             </Link>
             <Typography color="text.primary"> {startCase(title.toLowerCase())}</Typography>

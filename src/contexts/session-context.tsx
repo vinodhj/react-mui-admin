@@ -74,7 +74,6 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 
   // Define a function that checks for token expiration using isJwtTokenExpired.
   const checkToken = useCallback(() => {
-    console.log('Checking token...', signOutCheckInterval);
     if (session.token && isJwtTokenExpired(session.token)) {
       console.log('Token is expired');
       // Token is expired: clear session data.
