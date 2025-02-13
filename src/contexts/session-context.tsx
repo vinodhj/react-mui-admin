@@ -1,11 +1,14 @@
-import React, { createContext, useState, useCallback, useMemo, ReactNode, useEffect } from 'react';
+import React, { createContext, useState, useCallback, useMemo, ReactNode, useEffect, useContext } from 'react';
 import isJwtTokenExpired from 'jwt-check-expiry';
 import { useLocation } from 'react-router-dom';
+import { ColorModeContext } from './color-mode-context';
 
 export interface SessionData {
-  theme?: string;
+  colorMode?: string;
   token: string;
   sidebarImage?: string;
+  sidebarCollapsed?: string;
+  sidebarRTL?: string;
   adminName: string;
   adminEmail: string;
   adminRole: string;
@@ -16,22 +19,24 @@ export interface SessionContextProps {
   updateSession: (data: SessionData) => void;
 }
 
-const signOutCheckInterval = import.meta.env.VITE_SIGNOUT_CHECK_INTERVAL_MINUTES;
+const signOutCheckInterval = Number(import.meta.env.VITE_SIGNOUT_CHECK_INTERVAL_MINUTES) * 60 * 1000 || 5 * 60 * 1000;
 
 const isBrowser = typeof window !== 'undefined';
 
 const getStorageItem = (storage: Storage, key: string): string => (isBrowser ? storage.getItem(key) ?? '' : '');
 
 const defaultSession: SessionData = {
-  theme: getStorageItem(localStorage, 'theme') || 'dark',
+  colorMode: getStorageItem(localStorage, 'colorMode') || 'dark',
   token: getStorageItem(localStorage, 'access_token'),
   sidebarImage: getStorageItem(localStorage, 'sidebarImage') || 'true',
+  sidebarCollapsed: getStorageItem(localStorage, 'sidebarCollapsed') || 'false',
+  sidebarRTL: getStorageItem(localStorage, 'sidebarRTL') || 'false',
   adminName: getStorageItem(sessionStorage, 'session_admin_name'),
   adminEmail: getStorageItem(sessionStorage, 'session_admin_email'),
   adminRole: getStorageItem(sessionStorage, 'session_admin_role'),
 };
 
-// eslint-disable-next-line react-refresh/only-export-components
+// Create the context
 export const SessionContext = createContext<SessionContextProps | undefined>(undefined);
 
 interface SessionProviderProps {
@@ -41,22 +46,31 @@ interface SessionProviderProps {
 const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
   const [session, setSession] = useState<SessionData>(defaultSession);
   const location = useLocation();
+  const { setDarkMode } = useContext(ColorModeContext);
 
-  const updateSession = useCallback((data: SessionData) => {
-    setSession(data);
-    if (data.token) {
-      localStorage.setItem('access_token', data.token);
-    } else {
-      localStorage.clear();
-      sessionStorage.clear();
-    }
+  const updateSession = useCallback(
+    (data: SessionData) => {
+      setSession(data);
+      if (data.token) {
+        localStorage.setItem('access_token', data.token);
+      } else {
+        localStorage.clear();
+        sessionStorage.clear();
+      }
 
-    localStorage.setItem('theme', data.theme ?? 'dark');
-    localStorage.setItem('sidebarImage', data.sidebarImage?.toString() ?? 'true');
-    sessionStorage.setItem('session_admin_name', data.adminName);
-    sessionStorage.setItem('session_admin_email', data.adminEmail);
-    sessionStorage.setItem('session_admin_role', data.adminRole);
-  }, []);
+      localStorage.setItem('colorMode', data.colorMode ?? 'dark');
+      localStorage.setItem('sidebarImage', data.sidebarImage?.toString() ?? 'true');
+      localStorage.setItem('sidebarCollapsed', data.sidebarCollapsed?.toString() ?? 'false');
+      localStorage.setItem('sidebarRTL', data.sidebarRTL?.toString() ?? 'false');
+      sessionStorage.setItem('session_admin_name', data.adminName);
+      sessionStorage.setItem('session_admin_email', data.adminEmail);
+      sessionStorage.setItem('session_admin_role', data.adminRole);
+
+      // Force theme to dark immediately
+      setDarkMode();
+    },
+    [setDarkMode]
+  );
 
   // Define a function that checks for token expiration using isJwtTokenExpired.
   const checkToken = useCallback(() => {
@@ -84,7 +98,7 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 
   // Also run the check periodically (every 5 minutes)
   useEffect(() => {
-    const intervalId = setInterval(checkToken, signOutCheckInterval * 60 * 1000);
+    const intervalId = setInterval(checkToken, signOutCheckInterval);
     return () => clearInterval(intervalId);
   }, [checkToken]);
   const value = useMemo(() => ({ session, updateSession }), [session, updateSession]);

@@ -8,6 +8,8 @@ export interface SidebarContextProps {
   setSidebarImage: Dispatch<SetStateAction<boolean>>;
   sidebarRTL: boolean;
   setSidebarRTL: Dispatch<SetStateAction<boolean>>;
+  collapsed: boolean;
+  setCollapsed: Dispatch<SetStateAction<boolean>>;
 }
 
 // Create the context
@@ -18,8 +20,13 @@ interface MyProSidebarProviderProps {
 }
 
 export const MyProSidebarProvider: FC<MyProSidebarProviderProps> = ({ children }) => {
-  const [sidebarRTL, setSidebarRTL] = useState<boolean>(false);
   const [sidebarBackgroundColor, setSidebarBackgroundColor] = useState<string | undefined>(undefined);
+
+  // Initialize sidebarRTL from localStorage (default: false)
+  const [sidebarRTL, setSidebarRTL] = useState<boolean>(() => {
+    const stored = localStorage.getItem('sidebarRTL');
+    return stored !== null ? JSON.parse(stored) : false;
+  });
 
   // Initialize sidebarImage from localStorage (default: true)
   const [sidebarImage, setSidebarImage] = useState<boolean>(() => {
@@ -27,10 +34,26 @@ export const MyProSidebarProvider: FC<MyProSidebarProviderProps> = ({ children }
     return stored !== null ? JSON.parse(stored) : true;
   });
 
+  // Initialize collapsed state from localStorage (default: false)
+  const [collapsed, setCollapsed] = useState<boolean>(() => {
+    const stored = localStorage.getItem('sidebarCollapsed');
+    return stored !== null ? JSON.parse(stored) : false;
+  });
+
   // Persist sidebarImage changes to localStorage
   useEffect(() => {
     localStorage.setItem('sidebarImage', JSON.stringify(sidebarImage));
   }, [sidebarImage]);
+
+  // Persist sidebarRTL changes to localStorage
+  useEffect(() => {
+    localStorage.setItem('sidebarRTL', JSON.stringify(sidebarRTL));
+  }, [sidebarRTL]);
+
+  // Persist collapsed changes to localStorage
+  useEffect(() => {
+    localStorage.setItem('sidebarCollapsed', JSON.stringify(collapsed));
+  }, [collapsed]);
 
   const contextValue = useMemo(
     () => ({
@@ -40,8 +63,10 @@ export const MyProSidebarProvider: FC<MyProSidebarProviderProps> = ({ children }
       setSidebarImage,
       sidebarRTL,
       setSidebarRTL,
+      collapsed,
+      setCollapsed,
     }),
-    [sidebarBackgroundColor, sidebarImage, sidebarRTL]
+    [sidebarBackgroundColor, sidebarImage, sidebarRTL, collapsed]
   );
 
   return (

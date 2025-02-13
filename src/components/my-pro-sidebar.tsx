@@ -62,11 +62,9 @@ const MyProSidebar: FC = () => {
   const mode = theme.palette.mode; // "dark" | "light"
   const colors = tokens(mode);
   const [selected, setSelected] = useState<string>('Dashboard');
-  // Manage collapse state locally
-  const [collapsed, setCollapsed] = useState<boolean>(false);
 
   // Context for RTL and sidebar image settings
-  const { sidebarRTL, setSidebarRTL, sidebarImage } = useSidebarContext();
+  const { sidebarRTL, setSidebarRTL, sidebarImage, collapsed, setCollapsed } = useSidebarContext();
 
   const imageUrl = 'https://user-images.githubusercontent.com/25878302/144499035-2911184c-76d3-4611-86e7-bc4e8ff84ff5.jpg';
 

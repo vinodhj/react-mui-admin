@@ -18,7 +18,7 @@ export const ColorModeContext = createContext<ColorModeContextProps>({
 export const useMode = (): [Theme, ColorModeContextProps] => {
   const [mode, setMode] = useState<Mode>(() => {
     // Get the saved mode from localStorage, default to 'dark'
-    const storedMode = localStorage.getItem('theme') as Mode | null;
+    const storedMode = localStorage.getItem('colorMode') as Mode | null;
     return storedMode === 'light' || storedMode === 'dark' ? (storedMode as Mode) : 'dark';
   });
 
@@ -27,13 +27,13 @@ export const useMode = (): [Theme, ColorModeContextProps] => {
       toggleColorMode: () => {
         setMode((prevMode) => {
           const newMode: Mode = prevMode === 'dark' ? 'light' : 'dark';
-          localStorage.setItem('theme', newMode);
+          localStorage.setItem('colorMode', newMode);
           return newMode;
         });
       },
       setDarkMode: () => {
         setMode('dark');
-        localStorage.setItem('theme', 'dark');
+        localStorage.setItem('colorMode', 'dark');
       },
     }),
     []
