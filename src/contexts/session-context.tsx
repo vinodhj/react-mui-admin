@@ -22,7 +22,7 @@ const isBrowser = typeof window !== 'undefined';
 const getStorageItem = (storage: Storage, key: string): string => (isBrowser ? storage.getItem(key) ?? '' : '');
 
 const defaultSession: SessionData = {
-  theme: getStorageItem(localStorage, 'theme'),
+  theme: getStorageItem(localStorage, 'theme') || 'dark',
   token: getStorageItem(localStorage, 'access_token'),
   adminName: getStorageItem(sessionStorage, 'session_admin_name'),
   adminEmail: getStorageItem(sessionStorage, 'session_admin_email'),
@@ -49,7 +49,7 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
       sessionStorage.clear();
     }
 
-    localStorage.setItem('theme', data.theme ?? 'system');
+    localStorage.setItem('theme', data.theme ?? 'dark');
     sessionStorage.setItem('session_admin_name', data.adminName);
     sessionStorage.setItem('session_admin_email', data.adminEmail);
     sessionStorage.setItem('session_admin_role', data.adminRole);

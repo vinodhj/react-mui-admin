@@ -105,7 +105,7 @@ export default function SignIn() {
 
   return (
     <ThemeProvider theme={signInTheme}>
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<>Loading...</>}>
         <Grid container component="main" sx={{ height: '100vh' }}>
           <CssBaseline />
           <Grid
