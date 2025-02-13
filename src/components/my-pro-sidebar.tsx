@@ -6,7 +6,7 @@ import { useHandleLogout } from '../utils/log-out';
 
 import React, { FC, useState } from 'react';
 import { Menu, Sidebar, MenuItem, MenuItemStyles } from 'react-pro-sidebar';
-import { Avatar, useTheme, Menu as MuiMenu, MenuItem as MuiMenuItem, ListItemIcon } from '@mui/material';
+import { Avatar, useTheme, Menu as MuiMenu, MenuItem as MuiMenuItem, ListItemIcon, Divider } from '@mui/material';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
@@ -18,6 +18,7 @@ import SwitchRightOutlinedIcon from '@mui/icons-material/SwitchRightOutlined';
 import SwitchLeftOutlinedIcon from '@mui/icons-material/SwitchLeftOutlined';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import LogoutIcon from '@mui/icons-material/Logout';
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import startCase from 'lodash/startCase';
 
 // Define the props for the sidebar menu item
@@ -262,6 +263,16 @@ const MyProSidebar: FC = () => {
                       My Profile
                     </Typography>
                   </MuiMenuItem>
+                  <Divider />
+                  <MuiMenuItem onClick={handleMenuClose}>
+                    <ListItemIcon sx={{ color: colors.grey[100] }}>
+                      <SettingsOutlinedIcon fontSize="small" />
+                    </ListItemIcon>
+                    <Typography variant="body1" sx={{ color: colors.grey[100] }}>
+                      Settings
+                    </Typography>
+                  </MuiMenuItem>
+                  <Divider />
                   <MuiMenuItem
                     onClick={() => {
                       handleLogout();
@@ -318,9 +329,17 @@ const MyProSidebar: FC = () => {
                   <Typography variant="body1" sx={{ color: colors.grey[100] }}>
                     My Profile
                   </Typography>
-
-                  {/* My Profile &nbsp; <PersonOutlinedIcon /> */}
                 </MuiMenuItem>
+                <Divider />
+                <MuiMenuItem onClick={handleMenuClose}>
+                  <ListItemIcon sx={{ color: colors.grey[100] }}>
+                    <SettingsOutlinedIcon fontSize="small" />
+                  </ListItemIcon>
+                  <Typography variant="body1" sx={{ color: colors.grey[100] }}>
+                    Settings
+                  </Typography>
+                </MuiMenuItem>
+                <Divider />
                 <MuiMenuItem
                   onClick={() => {
                     handleLogout();
