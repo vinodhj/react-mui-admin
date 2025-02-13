@@ -1,4 +1,4 @@
-import { useState, createContext, FC, ReactNode, Dispatch, SetStateAction, useMemo } from 'react';
+import { useState, createContext, FC, ReactNode, Dispatch, SetStateAction, useMemo, useEffect } from 'react';
 import MyProSidebar from '../components/my-pro-sidebar';
 
 export interface SidebarContextProps {
@@ -10,7 +10,7 @@ export interface SidebarContextProps {
   setSidebarRTL: Dispatch<SetStateAction<boolean>>;
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
+// Create the context
 export const SidebarContext = createContext<SidebarContextProps | undefined>(undefined);
 
 interface MyProSidebarProviderProps {
@@ -20,7 +20,17 @@ interface MyProSidebarProviderProps {
 export const MyProSidebarProvider: FC<MyProSidebarProviderProps> = ({ children }) => {
   const [sidebarRTL, setSidebarRTL] = useState<boolean>(false);
   const [sidebarBackgroundColor, setSidebarBackgroundColor] = useState<string | undefined>(undefined);
-  const [sidebarImage, setSidebarImage] = useState<boolean>(true);
+
+  // Initialize sidebarImage from localStorage (default: true)
+  const [sidebarImage, setSidebarImage] = useState<boolean>(() => {
+    const stored = localStorage.getItem('sidebarImage');
+    return stored !== null ? JSON.parse(stored) : true;
+  });
+
+  // Persist sidebarImage changes to localStorage
+  useEffect(() => {
+    localStorage.setItem('sidebarImage', JSON.stringify(sidebarImage));
+  }, [sidebarImage]);
 
   const contextValue = useMemo(
     () => ({

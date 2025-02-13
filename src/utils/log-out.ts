@@ -15,7 +15,6 @@ export const useHandleLogout = () => {
       adminName: '',
       adminEmail: '',
       adminRole: '',
-      theme: '',
     });
 
     localStorage.clear();

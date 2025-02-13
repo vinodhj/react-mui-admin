@@ -5,6 +5,7 @@ import { useLocation } from 'react-router-dom';
 export interface SessionData {
   theme?: string;
   token: string;
+  sidebarImage?: string;
   adminName: string;
   adminEmail: string;
   adminRole: string;
@@ -24,6 +25,7 @@ const getStorageItem = (storage: Storage, key: string): string => (isBrowser ? s
 const defaultSession: SessionData = {
   theme: getStorageItem(localStorage, 'theme') || 'dark',
   token: getStorageItem(localStorage, 'access_token'),
+  sidebarImage: getStorageItem(localStorage, 'sidebarImage') || 'true',
   adminName: getStorageItem(sessionStorage, 'session_admin_name'),
   adminEmail: getStorageItem(sessionStorage, 'session_admin_email'),
   adminRole: getStorageItem(sessionStorage, 'session_admin_role'),
@@ -50,6 +52,7 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
     }
 
     localStorage.setItem('theme', data.theme ?? 'dark');
+    localStorage.setItem('sidebarImage', data.sidebarImage?.toString() ?? 'true');
     sessionStorage.setItem('session_admin_name', data.adminName);
     sessionStorage.setItem('session_admin_email', data.adminEmail);
     sessionStorage.setItem('session_admin_role', data.adminRole);
