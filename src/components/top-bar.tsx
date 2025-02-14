@@ -13,7 +13,6 @@ import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
 import SearchIcon from '@mui/icons-material/Search';
-import LogoutIcon from '@mui/icons-material/Logout';
 import CollectionsIcon from '@mui/icons-material/Collections';
 import UserMenu from './sidebar/user-menu';
 
@@ -64,6 +63,12 @@ const Topbar: FC = () => {
         </Box>
       </Box>
       <Box display="flex">
+        <IconButton onClick={colorMode.toggleColorMode}>
+          {theme.palette.mode === 'dark' ? <LightModeOutlinedIcon /> : <DarkModeOutlinedIcon />}
+        </IconButton>
+        <IconButton onClick={() => sidebarProps?.setSidebarImage((prev) => !prev)}>
+          <CollectionsIcon />
+        </IconButton>
         <IconButton onClick={handleUserMenuOpen}>
           <SettingsOutlinedIcon />
         </IconButton>
@@ -74,15 +79,6 @@ const Topbar: FC = () => {
           handleLogout={handleLogout}
           colors={colors}
         />
-        <IconButton onClick={colorMode.toggleColorMode}>
-          {theme.palette.mode === 'dark' ? <LightModeOutlinedIcon /> : <DarkModeOutlinedIcon />}
-        </IconButton>
-        <IconButton onClick={() => sidebarProps?.setSidebarImage((prev) => !prev)}>
-          <CollectionsIcon />
-        </IconButton>
-        <IconButton onClick={handleLogout} color="inherit">
-          <LogoutIcon />
-        </IconButton>
         {broken && rtl && (
           <IconButton sx={{ margin: '0 6 0 2' }} onClick={toggleSidebar}>
             <MenuOutlinedIcon />
