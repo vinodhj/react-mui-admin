@@ -1,6 +1,5 @@
 import * as React from 'react';
 import CssBaseline from '@mui/material/CssBaseline';
-import Grid from '@mui/material/Grid';
 import { ThemeProvider, useTheme } from '@mui/material/styles';
 import { useLoginMutation } from '../../graphql/graphql-generated';
 import { useValidateSignInForm } from '../../hooks/auth/use-validate-signin';
@@ -9,6 +8,7 @@ import Paper from '@mui/material/Paper';
 import signInTheme from '../../theme/signIn-theme';
 import { Suspense, useCallback } from 'react';
 import { useMediaQuery } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 
 const SignInForm = React.lazy(() => import('../../components/auth/signin-form'));
 
@@ -61,10 +61,11 @@ export default function SignIn() {
         <Grid container component="main" sx={{ height: '100vh' }}>
           <CssBaseline />
           <Grid
-            item
-            xs={false}
-            sm={4}
-            md={7}
+            size={{
+              xs: false,
+              sm: 4,
+              md: 7,
+            }}
             sx={{
               backgroundImage: 'url(https://lh3.googleusercontent.com/p/AF1QipPwaVe8g2KzlvObbHdww9zrw4ZI5CRZ2kkbCfm6=s1360-w1360-h1020)',
               backgroundRepeat: 'no-repeat',
@@ -72,7 +73,7 @@ export default function SignIn() {
               backgroundPosition: 'center',
             }}
           />
-          <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
+          <Grid size={{ xs: 12, sm: 8, md: 5 }} component={Paper} elevation={6} square>
             <SignInForm
               serverError={serverError}
               values={values}
