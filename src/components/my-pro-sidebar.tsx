@@ -82,7 +82,7 @@ const MyProSidebar: FC = () => {
   const handleLogout = useHandleLogout();
   const imageUrl = 'https://user-images.githubusercontent.com/25878302/144499035-2911184c-76d3-4611-86e7-bc4e8ff84ff5.jpg';
   const userAvatar = 'https://i.pravatar.cc/300?img=47';
-  const border = mode === 'dark' ? '1px solid' + colors.blackWhite[200] : '1px dotted' + colors.blackWhite[200];
+  const border = mode === 'dark' ? '1px solid' + colors.blackWhite[200] : '0.2px dotted' + colors.blackWhite[200];
 
   return (
     <Box
@@ -119,14 +119,16 @@ const MyProSidebar: FC = () => {
                 if (collapsed) {
                   return <MenuOutlinedIcon onClick={() => setCollapsed(false)} />;
                 } else if (sidebarRTL) {
-                  return <SwitchLeftOutlinedIcon onClick={() => setSidebarRTL(!sidebarRTL)} />;
+                  return <SwitchLeftOutlinedIcon sx={{ color: colors.greenAccent[400] }} onClick={() => setSidebarRTL(!sidebarRTL)} />;
                 } else {
-                  return <SwitchRightOutlinedIcon onClick={() => setSidebarRTL(!sidebarRTL)} />;
+                  return <SwitchRightOutlinedIcon sx={{ color: colors.greenAccent[400] }} onClick={() => setSidebarRTL(!sidebarRTL)} />;
                 }
               })()}
               style={{
                 margin: '10px 0 20px 0',
                 color: colors.grey[100],
+                borderBottom: '1px solid',
+                borderColor: 'rgba(0, 0, 0, 0.12)',
               }}
             >
               {!collapsed && (
