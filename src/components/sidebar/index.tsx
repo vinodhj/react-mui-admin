@@ -1,6 +1,6 @@
 import React, { FC, useContext, useState } from 'react';
 import { Box, useMediaQuery, useTheme } from '@mui/material';
-import { Sidebar, Menu, sidebarClasses } from 'react-pro-sidebar';
+import { Sidebar, Menu } from 'react-pro-sidebar';
 import { tokens } from '../../theme/main-theme';
 import { useSession } from '../../hooks/use-session';
 import { useHandleLogout } from '../../utils/log-out';
