@@ -1,5 +1,7 @@
 import { tokens } from '../theme/main-theme';
 import { useHandleLogout } from '../utils/log-out';
+import { ColorModeContext } from '../contexts/color-mode-context';
+import { SidebarContext } from '../contexts/sidebar-context';
 
 import { useContext, FC } from 'react';
 import { useTheme } from '@mui/material';
@@ -12,9 +14,7 @@ import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import LogoutIcon from '@mui/icons-material/Logout';
-import { FaRegImages } from 'react-icons/fa6';
-import { ColorModeContext } from '../contexts/color-mode-context';
-import { SidebarContext } from '../contexts/sidebar-context';
+import CollectionsIcon from '@mui/icons-material/Collections';
 
 const Topbar: FC = () => {
   const theme = useTheme();
@@ -57,7 +57,7 @@ const Topbar: FC = () => {
           {theme.palette.mode === 'dark' ? <LightModeOutlinedIcon /> : <DarkModeOutlinedIcon />}
         </IconButton>
         <IconButton onClick={() => sidebarProps?.setSidebarImage((prev) => !prev)}>
-          <FaRegImages />
+          <CollectionsIcon />
         </IconButton>
         <IconButton>
           <SettingsOutlinedIcon />
