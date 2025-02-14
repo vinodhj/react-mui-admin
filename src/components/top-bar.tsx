@@ -3,7 +3,7 @@ import { useHandleLogout } from '../utils/log-out';
 import { ColorModeContext } from '../contexts/color-mode-context';
 import { SidebarContext } from '../contexts/sidebar-context';
 
-import { useContext, FC } from 'react';
+import { useContext, FC, useState } from 'react';
 import { useTheme } from '@mui/material';
 import Box from '@mui/material/Box';
 import InputBase from '@mui/material/InputBase';
@@ -15,6 +15,7 @@ import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import LogoutIcon from '@mui/icons-material/Logout';
 import CollectionsIcon from '@mui/icons-material/Collections';
+import UserMenu from './sidebar/user-menu';
 
 const Topbar: FC = () => {
   const theme = useTheme();
@@ -22,11 +23,21 @@ const Topbar: FC = () => {
   const colorMode = useContext(ColorModeContext);
   const handleLogout: () => void = useHandleLogout();
   const sidebarProps = useContext(SidebarContext);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const toggleSidebar = () => {
     // Replace this with your own sidebar toggle functionality.
     console.log('Sidebar toggle invoked');
   };
+
+  const handleUserMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleUserMenuClose = () => {
+    setAnchorEl(null);
+  };
+
   const broken = false; // Replace with your sidebar break point if needed.
   const rtl = false; // Replace with your RTL setting if needed.
 
@@ -53,14 +64,21 @@ const Topbar: FC = () => {
         </Box>
       </Box>
       <Box display="flex">
+        <IconButton onClick={handleUserMenuOpen}>
+          <SettingsOutlinedIcon />
+        </IconButton>
+        <UserMenu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          handleMenuClose={handleUserMenuClose}
+          handleLogout={handleLogout}
+          colors={colors}
+        />
         <IconButton onClick={colorMode.toggleColorMode}>
           {theme.palette.mode === 'dark' ? <LightModeOutlinedIcon /> : <DarkModeOutlinedIcon />}
         </IconButton>
         <IconButton onClick={() => sidebarProps?.setSidebarImage((prev) => !prev)}>
           <CollectionsIcon />
-        </IconButton>
-        <IconButton>
-          <SettingsOutlinedIcon />
         </IconButton>
         <IconButton onClick={handleLogout} color="inherit">
           <LogoutIcon />

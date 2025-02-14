@@ -1,5 +1,5 @@
 import { useState, createContext, FC, ReactNode, Dispatch, SetStateAction, useMemo, useEffect } from 'react';
-import MyProSidebar from '../components/my-pro-sidebar';
+import MyProSidebar from '../components/sidebar';
 
 export interface SidebarContextProps {
   sidebarBackgroundColor?: string;
