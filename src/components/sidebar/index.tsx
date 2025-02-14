@@ -42,7 +42,6 @@ const MyProSidebar: FC = () => {
         collapsed={sidebarProps?.collapsed}
         toggled={finalToggled}
         onBackdropClick={() => {
-          console.log('onBackdropClick');
           sidebarProps!.setCollapsed(true);
           sidebarProps!.setToggled(false);
         }}
