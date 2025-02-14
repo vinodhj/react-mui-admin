@@ -46,7 +46,7 @@ const SidebarMenuItems: FC<SidebarMenuItemsProps> = ({ collapsed, selected, setS
         <SidebarItem title="Tracker Expense" to="/form" icon={<PersonOutlinedIcon />} selected={selected} setSelected={setSelected} />
 
         {/* Demo: Generate multiple items */}
-        {[...Array(15)].map((_, i) => (
+        {/* {[...Array(15)].map((_, i) => (
           <SidebarItem
             key={i}
             title={`Menu Item ${i + 1}`}
@@ -55,7 +55,7 @@ const SidebarMenuItems: FC<SidebarMenuItemsProps> = ({ collapsed, selected, setS
             selected={selected}
             setSelected={setSelected}
           />
-        ))}
+        ))} */}
       </Box>
     </Box>
   );
