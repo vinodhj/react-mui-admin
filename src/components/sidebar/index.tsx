@@ -1,6 +1,6 @@
 import React, { FC, useContext, useState } from 'react';
 import { Box, useMediaQuery, useTheme } from '@mui/material';
-import { Sidebar, Menu } from 'react-pro-sidebar';
+import { Sidebar, Menu, sidebarClasses } from 'react-pro-sidebar';
 import { tokens } from '../../theme/main-theme';
 import { useSession } from '../../hooks/use-session';
 import { useHandleLogout } from '../../utils/log-out';
@@ -41,9 +41,13 @@ const MyProSidebar: FC = () => {
         image={sidebarProps?.sidebarImage ? sidbarImageUrl : undefined}
         collapsed={sidebarProps?.collapsed}
         toggled={finalToggled}
-        onBackdropClick={() => sidebarProps?.setToggled(false)}
+        onBackdropClick={() => {
+          console.log('onBackdropClick');
+          sidebarProps!.setCollapsed(true);
+          sidebarProps!.setToggled(false);
+        }}
         border-right-width={'2px solid' + colors.blackWhite[200]}
-        rootStyles={{ border }}
+        rootStyles={{ border, zIndex: 2000, position: 'relative' }}
       >
         <Menu menuItemStyles={getMenuItemStyles(mode, colors)}>
           <SidebarHeader
