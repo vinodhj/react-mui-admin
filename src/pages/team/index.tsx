@@ -1,15 +1,11 @@
-import { Box, useTheme } from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid/DataGrid';
-import { GridToolbar, GridColDef } from '@mui/x-data-grid';
+import { Box } from '@mui/material';
+import { GridColDef } from '@mui/x-data-grid';
 
 import mockDataJson from '../../../mock/mock-data-team.json';
-import { tokens } from '../../theme/main-theme';
 import PageHeader from '../../components/page-header';
+import DataTable from '../../components/data-table';
 
 function Team() {
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
-
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'Id', width: 100 },
     { field: 'registrarId', headerName: 'Registrar Id', width: 100 },
@@ -33,7 +29,6 @@ function Team() {
     { field: 'city', headerName: 'City', width: 100 },
     { field: 'zipCode', headerName: 'Zip Code', width: 100 },
   ];
-  const paginationModel = { page: 0, pageSize: 50 };
 
   return (
     <Box m="20px">
@@ -43,63 +38,7 @@ function Team() {
           subtitle="A centralized module for efficient team oversight—add or remove members, assign roles, and monitor performance all in one streamlined interface"
         />
       </Box>
-      <Box
-        m="8px 0 0 0"
-        width="100%"
-        height="80vh"
-        sx={{
-          '& .MuiDataGrid-root': {
-            border: 'none',
-          },
-          '& .MuiDataGrid-cell': {
-            borderBottom: 'none',
-          },
-          '& .name-column--cell': {
-            color: colors.greenAccent[300],
-          },
-          '& .MuiDataGrid-columnHeaders': {
-            backgroundColor: colors.blueAccent[700],
-            borderBottom: 'none',
-          },
-          '& .MuiDataGrid-virtualScroller': {
-            backgroundColor: colors.primary[400],
-          },
-          '& .MuiDataGrid-footerContainer': {
-            borderTop: 'none',
-            backgroundColor: colors.blueAccent[700],
-          },
-          '& .MuiCheckbox-root': {
-            color: `${colors.greenAccent[200]} !important`,
-          },
-          '& .MuiDataGrid-toolbarContainer .MuiButton-text': {
-            color: `${colors.grey[100]} !important`,
-          },
-        }}
-      >
-        <DataGrid
-          rows={mockDataJson}
-          columns={columns}
-          initialState={{ pagination: { paginationModel } }}
-          pageSizeOptions={[50, 100]}
-          slots={{ toolbar: GridToolbar }}
-          checkboxSelection
-          sx={{ border: 0, '--DataGrid-containerBackground': colors.blueAccent[700] }}
-          slotProps={{
-            toolbar: {
-              showQuickFilter: true,
-              quickFilterProps: {
-                debounceMs: 200,
-                sx: {
-                  width: '300px', // Adjust width as needed
-                  fontSize: '1rem', // Adjust font size if desired
-                },
-              },
-              printOptions: { disableToolbarButton: false },
-              csvOptions: { disableToolbarButton: false },
-            },
-          }}
-        />
-      </Box>
+      <DataTable rows={mockDataJson} columns={columns} />
     </Box>
   );
 }
