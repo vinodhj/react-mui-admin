@@ -10,6 +10,8 @@ export interface SidebarContextProps {
   setSidebarRTL: Dispatch<SetStateAction<boolean>>;
   collapsed: boolean;
   setCollapsed: Dispatch<SetStateAction<boolean>>;
+  toggled: boolean;
+  setToggled: (value: boolean) => void;
 }
 
 // Create the context
@@ -40,6 +42,8 @@ export const MyProSidebarProvider: FC<MyProSidebarProviderProps> = ({ children }
     return stored !== null ? JSON.parse(stored) : false;
   });
 
+  const [toggled, setToggled] = useState(false);
+
   // Persist sidebarImage changes to localStorage
   useEffect(() => {
     localStorage.setItem('sidebarImage', JSON.stringify(sidebarImage));
@@ -65,6 +69,8 @@ export const MyProSidebarProvider: FC<MyProSidebarProviderProps> = ({ children }
       setSidebarRTL,
       collapsed,
       setCollapsed,
+      toggled,
+      setToggled,
     }),
     [sidebarBackgroundColor, sidebarImage, sidebarRTL, collapsed]
   );

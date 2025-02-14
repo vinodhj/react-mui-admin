@@ -4,7 +4,7 @@ import { ColorModeContext } from '../contexts/color-mode-context';
 import { SidebarContext } from '../contexts/sidebar-context';
 
 import { useContext, FC, useState } from 'react';
-import { useTheme } from '@mui/material';
+import { useMediaQuery, useTheme } from '@mui/material';
 import Box from '@mui/material/Box';
 import InputBase from '@mui/material/InputBase';
 import IconButton from '@mui/material/IconButton';
@@ -19,14 +19,17 @@ import SettingMenu from './setting-menu';
 const Topbar: FC = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode as 'light' | 'dark');
+  // Determine if the screen is mobile (using MUI breakpoints)
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
   const colorMode = useContext(ColorModeContext);
   const handleLogout: () => void = useHandleLogout();
-  const sidebarProps = useContext(SidebarContext);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const sidebarProps = useContext(SidebarContext);
 
   const toggleSidebar = () => {
-    // Replace this with your own sidebar toggle functionality.
-    console.log('Sidebar toggle invoked');
+    sidebarProps?.setCollapsed(!sidebarProps.collapsed);
+    sidebarProps?.setToggled(!sidebarProps.toggled);
   };
 
   const handleUserMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -37,13 +40,10 @@ const Topbar: FC = () => {
     setAnchorEl(null);
   };
 
-  const broken = false; // Replace with your sidebar break point if needed.
-  const rtl = false; // Replace with your RTL setting if needed.
-
   return (
     <Box display="flex" justifyContent="space-between" p={2}>
       <Box display="flex">
-        {broken && !rtl && (
+        {isMobile && !sidebarProps?.sidebarRTL && (
           <IconButton sx={{ margin: '0 6 0 2' }} onClick={toggleSidebar}>
             <MenuOutlinedIcon />
           </IconButton>
@@ -79,7 +79,7 @@ const Topbar: FC = () => {
           handleLogout={handleLogout}
           colors={colors}
         />
-        {broken && rtl && (
+        {isMobile && sidebarProps?.sidebarRTL && (
           <IconButton sx={{ margin: '0 6 0 2' }} onClick={toggleSidebar}>
             <MenuOutlinedIcon />
           </IconButton>

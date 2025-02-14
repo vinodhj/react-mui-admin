@@ -11,22 +11,54 @@ interface SidebarHeaderProps {
   sidebarRTL: boolean;
   setSidebarRTL: (value: boolean) => void;
   setCollapsed: (value: boolean) => void;
+  setToggled: (value: boolean) => void;
   colors: any; // You can type this more specifically if desired.
 }
 
-const SidebarHeader: FC<SidebarHeaderProps> = ({ collapsed, sidebarRTL, setSidebarRTL, setCollapsed, colors }) => {
+const SidebarHeaderIcon: FC<{
+  collapsed: boolean;
+  sidebarRTL: boolean;
+  setSidebarRTL: (value: boolean) => void;
+  setCollapsed: (value: boolean) => void;
+  setToggled: (value: boolean) => void;
+  colors: any;
+}> = ({ collapsed, sidebarRTL, setSidebarRTL, setCollapsed, setToggled, colors }) => {
+  const handleMenuClick = () => {
+    setToggled(true);
+    setCollapsed(false);
+  };
+
+  const handleSwitchLeftClick = () => {
+    setSidebarRTL(!sidebarRTL);
+  };
+
+  const handleSwitchRightClick = () => {
+    setSidebarRTL(!sidebarRTL);
+  };
+
+  if (collapsed) {
+    return <MenuOutlinedIcon onClick={handleMenuClick} />;
+  } else if (sidebarRTL) {
+    return <SwitchLeftOutlinedIcon sx={{ color: colors.greenAccent[400] }} onClick={handleSwitchLeftClick} />;
+  } else {
+    return <SwitchRightOutlinedIcon sx={{ color: colors.greenAccent[400] }} onClick={handleSwitchRightClick} />;
+  }
+};
+
+const SidebarHeader: FC<SidebarHeaderProps> = ({ collapsed, sidebarRTL, setSidebarRTL, setCollapsed, setToggled, colors }) => {
   return (
     <Box sx={{ position: 'sticky', top: 0, zIndex: 2 }}>
       <MenuItem
-        icon={(() => {
-          if (collapsed) {
-            return <MenuOutlinedIcon onClick={() => setCollapsed(false)} />;
-          } else if (sidebarRTL) {
-            return <SwitchLeftOutlinedIcon sx={{ color: colors.greenAccent[400] }} onClick={() => setSidebarRTL(!sidebarRTL)} />;
-          } else {
-            return <SwitchRightOutlinedIcon sx={{ color: colors.greenAccent[400] }} onClick={() => setSidebarRTL(!sidebarRTL)} />;
-          }
-        })()}
+        icon={
+          <SidebarHeaderIcon
+            collapsed={collapsed}
+            sidebarRTL={sidebarRTL}
+            setSidebarRTL={setSidebarRTL}
+            setCollapsed={setCollapsed}
+            setToggled={setToggled}
+            colors={colors}
+          />
+        }
         style={{
           margin: '10px 0 20px 0',
           color: colors.grey[100],
@@ -45,7 +77,12 @@ const SidebarHeader: FC<SidebarHeaderProps> = ({ collapsed, sidebarRTL, setSideb
             >
               Admin
             </Typography>
-            <IconButton onClick={() => setCollapsed(true)}>
+            <IconButton
+              onClick={() => {
+                setCollapsed(true);
+                setToggled(false);
+              }}
+            >
               <MenuOutlinedIcon />
             </IconButton>
           </Box>

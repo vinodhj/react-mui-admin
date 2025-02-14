@@ -1,18 +1,21 @@
 import * as React from 'react';
 import CssBaseline from '@mui/material/CssBaseline';
 import Grid from '@mui/material/Grid';
-import { ThemeProvider } from '@mui/material/styles';
+import { ThemeProvider, useTheme } from '@mui/material/styles';
 import { useLoginMutation } from '../../graphql/graphql-generated';
 import { useValidateSignInForm } from '../../hooks/auth/use-validate-signin';
 import { useSession } from '../../hooks/use-session';
 import Paper from '@mui/material/Paper';
 import signInTheme from '../../theme/signIn-theme';
 import { Suspense, useCallback } from 'react';
+import { useMediaQuery } from '@mui/material';
 
 const SignInForm = React.lazy(() => import('../../components/auth/signin-form'));
 
 export default function SignIn() {
   const { updateSession } = useSession();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const [login, { loading }] = useLoginMutation();
   const { values, errors, serverError, setServerError, handleChange, validate } = useValidateSignInForm({
@@ -33,6 +36,7 @@ export default function SignIn() {
             adminName: data.login.user?.name ?? '',
             adminEmail: data.login.user?.email ?? '',
             adminRole: data.login.user?.role ?? '',
+            sidebarCollapsed: isMobile ? 'true' : 'false',
           });
         } else {
           setServerError('Login failed');
