@@ -20,6 +20,8 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import LogoutIcon from '@mui/icons-material/Logout';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import startCase from 'lodash/startCase';
+import { styled } from '@mui/material/styles';
+import Badge from '@mui/material/Badge';
 
 // Define the props for the sidebar menu item
 interface ItemProps {
@@ -72,6 +74,35 @@ const MyProSidebar: FC = () => {
   const [selected, setSelected] = useState<string>('Dashboard');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
+  const StyledBadge = styled(Badge)(({ theme }) => ({
+    '& .MuiBadge-badge': {
+      backgroundColor: '#44b700',
+      color: '#44b700',
+      boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
+      '&::after': {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        borderRadius: '50%',
+        animation: 'ripple 1.2s infinite ease-in-out',
+        border: '1px solid currentColor',
+        content: '""',
+      },
+    },
+    '@keyframes ripple': {
+      '0%': {
+        transform: 'scale(.8)',
+        opacity: 1,
+      },
+      '100%': {
+        transform: 'scale(2.4)',
+        opacity: 0,
+      },
+    },
+  }));
+
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -80,8 +111,9 @@ const MyProSidebar: FC = () => {
   };
 
   const handleLogout = useHandleLogout();
-  const imageUrl = 'https://user-images.githubusercontent.com/25878302/144499035-2911184c-76d3-4611-86e7-bc4e8ff84ff5.jpg';
-  const userAvatar = 'https://i.pravatar.cc/300?img=47';
+  const sidbarImageUrl = import.meta.env.VITE_SIDEBAR_IMAGE_URL;
+  const userAvatar = import.meta.env.VITE_AVATAR;
+
   const border = mode === 'dark' ? '1px solid' + colors.blackWhite[200] : '0.2px dotted' + colors.blackWhite[200];
 
   return (
@@ -98,7 +130,7 @@ const MyProSidebar: FC = () => {
         breakPoint="md"
         rtl={sidebarRTL}
         backgroundColor={colors.blackWhite[300]}
-        image={sidebarImage ? imageUrl : undefined}
+        image={sidebarImage ? sidbarImageUrl : undefined}
         collapsed={collapsed}
         border-right-width={'2px solid' + colors.blackWhite[200]}
         rootStyles={{
@@ -215,7 +247,9 @@ const MyProSidebar: FC = () => {
               }}
             >
               <Box display="flex" alignItems="center" gap={1}>
-                <Avatar src={userAvatar} alt="User Avatar" sx={{ width: 40, height: 40 }} />
+                <StyledBadge overlap="circular" anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} variant="dot">
+                  <Avatar src={userAvatar} alt="User Avatar" sx={{ width: 40, height: 40 }} />
+                </StyledBadge>
                 <Box textAlign="left">
                   <Typography variant="subtitle1" sx={{ color: colors.vibrantBlue[500], fontWeight: 'bold' }}>
                     {startCase(session.adminName.toLowerCase())}
@@ -308,7 +342,9 @@ const MyProSidebar: FC = () => {
                 borderColor: 'divider',
               }}
             >
-              <Avatar src={userAvatar} alt="User Avatar" sx={{ width: 40, height: 40, cursor: 'pointer' }} onClick={handleMenuOpen} />
+              <StyledBadge overlap="circular" anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} variant="dot">
+                <Avatar src={userAvatar} alt="User Avatar" sx={{ width: 40, height: 40, cursor: 'pointer' }} onClick={handleMenuOpen} />
+              </StyledBadge>
               <MuiMenu
                 anchorEl={anchorEl}
                 open={Boolean(anchorEl)}

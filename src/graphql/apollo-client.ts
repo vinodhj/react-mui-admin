@@ -3,7 +3,7 @@ import { onError } from '@apollo/client/link/error';
 import { setContext } from '@apollo/client/link/context';
 import { getToken } from '../utils/get-token';
 
-const apiUrl = import.meta.env.DEV ? import.meta.env.VITE_DEV_API_URL : import.meta.env.VITE_PROD_API_URL;
+const graphqlApiUrl = import.meta.env.DEV ? import.meta.env.VITE_DEV_API_URL : import.meta.env.VITE_PROD_API_URL;
 
 const projectToken = import.meta.env.VITE_PROJECT_TOKEN;
 
@@ -23,7 +23,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 });
 
 const httpLink = createHttpLink({
-  uri: `${apiUrl}/graphql`,
+  uri: `${graphqlApiUrl}/graphql`,
   credentials: 'same-origin',
 });
 
