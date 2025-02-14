@@ -14,7 +14,7 @@ import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import CollectionsIcon from '@mui/icons-material/Collections';
-import UserMenu from './sidebar/user-menu';
+import SettingMenu from './setting-menu';
 
 const Topbar: FC = () => {
   const theme = useTheme();
@@ -72,7 +72,7 @@ const Topbar: FC = () => {
         <IconButton onClick={handleUserMenuOpen}>
           <SettingsOutlinedIcon />
         </IconButton>
-        <UserMenu
+        <SettingMenu
           anchorEl={anchorEl}
           open={Boolean(anchorEl)}
           handleMenuClose={handleUserMenuClose}

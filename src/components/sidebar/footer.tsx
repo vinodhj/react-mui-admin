@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 import { Box, Avatar, Typography, IconButton } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import startCase from 'lodash/startCase';
-import UserMenu from './user-menu';
+import SettingMenu from '../setting-menu';
 import StyleBadge from '../style-badge';
 
 interface SidebarFooterProps {
@@ -71,7 +71,7 @@ const SidebarFooter: FC<SidebarFooterProps> = ({
             >
               <MoreVertIcon />
             </IconButton>
-            <UserMenu
+            <SettingMenu
               anchorEl={anchorEl}
               open={Boolean(anchorEl)}
               handleMenuClose={handleMenuClose}
@@ -99,7 +99,7 @@ const SidebarFooter: FC<SidebarFooterProps> = ({
           <StyleBadge overlap="circular" anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} variant="dot">
             <Avatar src={userAvatar} alt="User Avatar" sx={{ width: 40, height: 40, cursor: 'pointer' }} onClick={handleMenuOpen} />
           </StyleBadge>
-          <UserMenu
+          <SettingMenu
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}
             handleMenuClose={handleMenuClose}

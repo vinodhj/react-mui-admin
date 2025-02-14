@@ -1,8 +1,8 @@
 import { FC } from 'react';
 import { Menu as MuiMenu, MenuItem as MuiMenuItem, Divider, ListItemIcon, Typography } from '@mui/material';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
-import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import LogoutIcon from '@mui/icons-material/Logout';
+import RoomPreferencesIcon from '@mui/icons-material/RoomPreferences';
 
 interface UserMenuProps {
   anchorEl: null | HTMLElement;
@@ -12,7 +12,7 @@ interface UserMenuProps {
   colors: any; // You can type this more strictly if desired.
 }
 
-const UserMenu: FC<UserMenuProps> = ({ anchorEl, open, handleMenuClose, handleLogout, colors }) => {
+const SettingMenu: FC<UserMenuProps> = ({ anchorEl, open, handleMenuClose, handleLogout, colors }) => {
   return (
     <MuiMenu
       anchorEl={anchorEl}
@@ -35,10 +35,10 @@ const UserMenu: FC<UserMenuProps> = ({ anchorEl, open, handleMenuClose, handleLo
       <Divider />
       <MuiMenuItem onClick={handleMenuClose}>
         <ListItemIcon sx={{ color: colors.grey[100] }}>
-          <SettingsOutlinedIcon fontSize="small" />
+          <RoomPreferencesIcon fontSize="small" />
         </ListItemIcon>
         <Typography variant="body1" sx={{ color: colors.grey[100] }}>
-          Settings
+          Organization settings
         </Typography>
       </MuiMenuItem>
       <Divider />
@@ -59,4 +59,4 @@ const UserMenu: FC<UserMenuProps> = ({ anchorEl, open, handleMenuClose, handleLo
   );
 };
 
-export default UserMenu;
+export default SettingMenu;
