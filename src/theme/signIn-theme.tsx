@@ -22,7 +22,8 @@ const signInTheme = createTheme({
     },
   },
   typography: {
-    fontFamily: 'Roboto, sans-serif',
+    fontFamily: ['Poppins', 'Roboto', 'sans-serif'].join(','),
+    fontSize: 12,
     h5: {
       // Adjust header style for sign in page titles
       fontWeight: 600,
