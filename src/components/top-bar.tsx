@@ -6,15 +6,14 @@ import { SidebarContext } from '../contexts/sidebar-context';
 import { useContext, FC, useState } from 'react';
 import { useMediaQuery, useTheme } from '@mui/material';
 import Box from '@mui/material/Box';
-import InputBase from '@mui/material/InputBase';
 import IconButton from '@mui/material/IconButton';
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
-import SearchIcon from '@mui/icons-material/Search';
 import CollectionsIcon from '@mui/icons-material/Collections';
 import SettingMenu from './setting-menu';
+import SearchDialog from './search-popover';
 
 const Topbar: FC = () => {
   const theme = useTheme();
@@ -48,19 +47,7 @@ const Topbar: FC = () => {
             <MenuOutlinedIcon />
           </IconButton>
         )}
-        <Box
-          sx={{
-            display: 'flex',
-            backgroundColor: colors.primary[400],
-            p: 0.2,
-            borderRadius: 1,
-          }}
-        >
-          <InputBase sx={{ ml: 1, flex: 1 }} placeholder="Search" />
-          <IconButton type="button">
-            <SearchIcon />
-          </IconButton>
-        </Box>
+        <SearchDialog />
       </Box>
       <Box display="flex">
         <IconButton onClick={colorMode.toggleColorMode}>
