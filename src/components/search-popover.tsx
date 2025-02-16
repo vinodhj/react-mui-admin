@@ -1,19 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  TextField,
-  Box,
-  Typography,
-  Button,
-  List,
-  ListItem,
-  InputAdornment,
-  IconButton,
-  useTheme,
-} from '@mui/material';
+import React, { useEffect, useRef, useState } from 'react';
+import { useTheme } from '@mui/material';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import TextField from '@mui/material/TextField';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import InputAdornment from '@mui/material/InputAdornment';
+import { alpha } from '@mui/material/styles'; // for semi-transparent backgrounds
 import ReadOnlySearchField from './read-only-search-field';
-import { tokens } from '../theme/main-theme';
+import { SearchTokens, tokens } from '../theme/main-theme';
+import { Link as RouterLink, useLocation } from 'react-router-dom';
 
 interface SearchOption {
   label: string;
@@ -22,38 +21,22 @@ interface SearchOption {
 
 const SEARCH_OPTIONS: SearchOption[] = [
   { label: 'App', path: '/dashboard' },
-  { label: 'Ecommerce', path: '/dashboard/ecommerce' },
-  { label: 'Analytics', path: '/dashboard/analytics' },
-  { label: 'Banking', path: '/dashboard/banking' },
-  { label: 'Booking', path: '/dashboard/booking' },
-  { label: 'File', path: '/dashboard/file' },
-  { label: 'App', path: '/dashboard' },
-  { label: 'Ecommerce', path: '/dashboard/ecommerce' },
-  { label: 'Analytics', path: '/dashboard/analytics' },
-  { label: 'Banking', path: '/dashboard/banking' },
-  { label: 'Booking', path: '/dashboard/booking' },
-  { label: 'File', path: '/dashboard/file' },
-  { label: 'App', path: '/dashboard' },
-  { label: 'Ecommerce', path: '/dashboard/ecommerce' },
-  { label: 'Analytics', path: '/dashboard/analytics' },
-  { label: 'Banking', path: '/dashboard/banking' },
-  { label: 'Booking', path: '/dashboard/booking' },
-  { label: 'File', path: '/dashboard/file' },
-  { label: 'App', path: '/dashboard' },
-  { label: 'Ecommerce', path: '/dashboard/ecommerce' },
-  { label: 'Analytics', path: '/dashboard/analytics' },
-  { label: 'Banking', path: '/dashboard/banking' },
-  { label: 'Booking', path: '/dashboard/booking' },
-  { label: 'File', path: '/dashboard/file' },
+  { label: 'Team', path: '/team' },
+  { label: 'Tracker Expense', path: '/form' },
 ];
 
 const SearchDialog: React.FC = () => {
+  const location = useLocation();
   const theme = useTheme();
   const mode = theme.palette.mode;
   const colors = tokens(mode);
+  const searchTokens = SearchTokens(mode);
 
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
+
+  // Ref for the TextField inside the dialog
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleOpen = () => {
     setOpen(true);
@@ -64,26 +47,26 @@ const SearchDialog: React.FC = () => {
     setSearch(''); // clear search on close
   };
 
-  // Add the keyboard shortcut listener (Cmd+K / Ctrl+K)
+  // Cmd+K / Ctrl+K to open
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // For Mac: e.metaKey; for Windows: e.ctrlKey
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
-        setOpen(true);
+        setOpen((prev) => !prev);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Filter the list by the user's input
+  // Filter the list by user input
   const filteredOptions = SEARCH_OPTIONS.filter(
     (option) => option.label.toLowerCase().includes(search.toLowerCase()) || option.path.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
     <>
+      {/* Trigger for opening dialog */}
       <Box onClick={handleOpen} sx={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
         <ReadOnlySearchField />
       </Box>
@@ -97,37 +80,78 @@ const SearchDialog: React.FC = () => {
             sx: {
               p: 0,
               borderRadius: 5,
-              // or any other styles
+            },
+          },
+          transition: {
+            onEntered: () => {
+              inputRef.current && inputRef.current.focus();
             },
           },
         }}
       >
-        <DialogContent sx={{ mb: 1, p: 0 }}>
+        <DialogContent sx={{ mb: 0, p: 0 }}>
           {/* STICKY HEADER */}
           <Box
             sx={{
               position: 'sticky',
               top: 0,
               zIndex: 1,
-              backgroundColor: '#fff',
+              backgroundColor: searchTokens.primary[200],
               p: 2,
-              // If you want a small bottom border:
-              borderBottom: '1px solid #ddd',
+              borderBottom: `1px solid ${theme.palette.divider}`,
             }}
           >
             <TextField
+              inputRef={inputRef}
               autoFocus
               fullWidth
               variant="outlined"
-              label="Search..."
+              label="Search"
+              placeholder="What are you looking for?"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              sx={{
+                // Default (unfocused) label color
+                '& .MuiFormLabel-root': {
+                  color: colors.grey[50],
+                },
+                // Label color when focused or hovered
+                '& .MuiFormLabel-root.Mui-focused': {
+                  color: colors.greenAccent[400],
+                },
+                // If you want to change the input text color too:
+                '& .MuiOutlinedInput-root': {
+                  color: colors.grey[50],
+                },
+                // The border color on hover/focus
+                '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: colors.grey[100],
+                },
+              }}
               slotProps={{
                 input: {
                   endAdornment: (
                     <InputAdornment position="end">
-                      <Button onClick={handleClose} variant="text" size="small" sx={{ backgroundColor: '#eeeff1', borderRadius: 1.5 }}>
-                        <Typography variant="body2">esc</Typography>
+                      <Button
+                        onClick={handleClose}
+                        variant="text"
+                        size="small"
+                        sx={{
+                          color: 'inherit',
+                          backgroundColor: colors.grey[900],
+                          borderRadius: 1.5,
+                        }}
+                      >
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            borderRadius: 1.5,
+                            color: mode === 'dark' ? 'inherit' : colors.grey[100],
+                            backgroundColor: colors.grey[900],
+                          }}
+                        >
+                          ESC
+                        </Typography>
                       </Button>
                     </InputAdornment>
                   ),
@@ -136,11 +160,14 @@ const SearchDialog: React.FC = () => {
             />
           </Box>
 
+          {/* SCROLLABLE LIST AREA */}
           <Box
             sx={{
               maxHeight: '60vh',
               overflowY: 'auto',
               p: 1,
+              backgroundColor: searchTokens.primary[200], // change dynamatically
+              // Example: custom scrollbar colors from tokens
               '&::-webkit-scrollbar': {
                 width: '4px',
               },
@@ -161,34 +188,52 @@ const SearchDialog: React.FC = () => {
                   No results found.
                 </Typography>
               ) : (
-                filteredOptions.map((option) => (
-                  <ListItem
-                    key={option.label}
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      cursor: 'pointer',
-                      // Dotted border is hidden unless hovered:
-                      border: '1px dotted transparent',
-                      '&:hover': {
-                        backgroundColor: '#e0ffe0',
-                        borderColor: 'green',
-                      },
-                      mb: 1, // spacing between items
-                    }}
-                  >
-                    <Box>
-                      <Typography variant="subtitle1">{option.label}</Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {option.path}
-                      </Typography>
-                    </Box>
-                    <Button variant="text" size="small" sx={{ backgroundColor: '#eeeff1', borderRadius: 1.5 }}>
-                      OVERVIEW
-                    </Button>
-                  </ListItem>
-                ))
+                filteredOptions.map((option) => {
+                  // Check if the current path matches option.path
+                  const isActive = location.pathname === option.path;
+                  return (
+                    <ListItem
+                      component={RouterLink}
+                      to={option.path}
+                      onClick={handleClose}
+                      key={option.label}
+                      sx={{
+                        color: 'inherit',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        cursor: 'pointer',
+                        border: `2px dotted transparent`,
+                        '&:hover': {
+                          backgroundColor: alpha(colors.greenAccent[400], 0.2),
+                          borderColor: colors.greenAccent[400],
+                          borderRadius: 2,
+                        },
+                        mb: 0,
+                      }}
+                    >
+                      <Box>
+                        <Typography variant="subtitle1" sx={{ color: isActive ? colors.greenAccent[400] : 'inherit' }}>
+                          {option.label}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary" sx={{ color: isActive ? colors.greenAccent[400] : 'inherit' }}>
+                          {option.path}
+                        </Typography>
+                      </Box>
+                      <Button
+                        variant="text"
+                        size="small"
+                        sx={{
+                          borderRadius: 1.5,
+                          backgroundColor: colors.grey[900],
+                          color: isActive ? colors.greenAccent[400] : 'inherit',
+                        }}
+                      >
+                        OVERVIEW
+                      </Button>
+                    </ListItem>
+                  );
+                })
               )}
             </List>
           </Box>

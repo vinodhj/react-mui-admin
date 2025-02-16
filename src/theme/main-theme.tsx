@@ -20,6 +20,12 @@ interface Tokens {
   vibrantBlue: ColorPalette;
 }
 
+interface SearchTokens {
+  primary: ColorPalette;
+  secondary?: ColorPalette;
+  neutral?: ColorPalette;
+}
+
 // color design tokens export
 export const tokens = (mode: Mode): Tokens => ({
   ...(mode === 'dark'
@@ -44,7 +50,7 @@ export const tokens = (mode: Mode): Tokens => ({
           600: '#525252',
           700: '#3d3d3d',
           800: '#292929',
-          900: '#141414',
+          900: '#4d4d4d',
         },
         primary: {
           100: '#d0d1d5',
@@ -179,6 +185,36 @@ export const tokens = (mode: Mode): Tokens => ({
           700: '#66bbf2',
           800: '#99cdf8',
           900: '#cce0fd', // very light blue
+        },
+      }),
+});
+
+export const SearchTokens = (mode: Mode): SearchTokens => ({
+  ...(mode === 'dark'
+    ? {
+        primary: {
+          100: '#d0d1d5',
+          200: '#141a21cc',
+          300: '#727681',
+          400: '#1F2A40',
+          500: '#141b2d',
+          600: '#101624',
+          700: '#0c101b',
+          800: '#080b12',
+          900: '#040509',
+        },
+      }
+    : {
+        primary: {
+          100: '#040509',
+          200: '#ffffff',
+          300: '#0c101b',
+          400: '#e0dddd',
+          500: '#141b2d',
+          600: '#1F2A40',
+          700: '#727681',
+          800: '#a1a4ab',
+          900: '#d0d1d5',
         },
       }),
 });
