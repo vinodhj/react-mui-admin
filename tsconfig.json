@@ -2,9 +2,12 @@
   "files": [],
   "references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.node.json" }],
   "compilerOptions": {
-    "types": ["@cloudflare/workers-types/2023-07-01"],
+    "types": ["@cloudflare/workers-types"],
     "typeRoots": ["./node_modules/@types", "./@types"],
     "resolveJsonModule": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "jsx": "react-jsx"
   }
+  // "include": ["src/**/*"],
+  // "exclude": ["node_modules", "dist"]
 }
