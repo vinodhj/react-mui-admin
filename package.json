@@ -14,7 +14,8 @@
     "preview": "npm run build && wrangler pages dev ./dist",
     "deploy": "npm run build && wrangler pages deploy ./dist",
     "codegen": "graphql-codegen --config codegen.ts",
-    "test": "jest"
+    "test": "jest",
+    "type-check": "npx tsc --noEmit"
   },
   "dependencies": {
     "@apollo/client": "^3.12.10",

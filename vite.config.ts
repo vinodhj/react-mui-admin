@@ -9,6 +9,9 @@ export default defineConfig({
     chunkSizeWarningLimit: 2000,
     outDir: 'dist',
     minify: 'esbuild', // 'esbuild' or 'terser'
+    rollupOptions: {
+      external: ['**/__tests__/**', '**/*.test.ts', '**/*.test.tsx', '**/*.spec.ts', '**/*.spec.tsx'],
+    },
     // rollupOptions: {
     //   output: {
     //     // Split vendor chunks out of node_modules
