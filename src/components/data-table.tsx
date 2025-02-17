@@ -1,7 +1,14 @@
 import { FC } from 'react';
 import { Box, useTheme } from '@mui/material';
-import { DataGrid, GridColDef, GridToolbar } from '@mui/x-data-grid';
 import { tokens } from '../theme/main-theme';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import {
+  GridToolbarContainer,
+  GridToolbarExport,
+  GridToolbarColumnsButton,
+  GridToolbarFilterButton,
+  GridToolbarDensitySelector,
+} from '@mui/x-data-grid/components';
 
 interface DataTableProps {
   rows: any[];
@@ -10,9 +17,19 @@ interface DataTableProps {
   pageSizeOptions?: number[];
 }
 
+const CustomToolbar = () => (
+  <GridToolbarContainer>
+    <GridToolbarColumnsButton />
+    <GridToolbarFilterButton />
+    <GridToolbarDensitySelector />
+    <GridToolbarExport printOptions={{ disableToolbarButton: true }} /> {/* Disables Print */}
+  </GridToolbarContainer>
+);
+
 const DataTable: FC<DataTableProps> = ({ rows, columns, paginationModel = { page: 0, pageSize: 50 }, pageSizeOptions = [50, 100] }) => {
   const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
+  const colorMode = theme.palette.mode;
+  const colors = tokens(colorMode);
   const { page, pageSize } = paginationModel;
 
   return (
@@ -31,7 +48,7 @@ const DataTable: FC<DataTableProps> = ({ rows, columns, paginationModel = { page
           borderBottom: 'none',
         },
         '& .MuiDataGrid-virtualScroller': {
-          backgroundColor: colors.primary[400],
+          backgroundColor: colorMode === 'dark' ? colors.primary[400] : colors.blackWhite[300],
         },
         '& .MuiDataGrid-footerContainer': {
           borderTop: 'none',
@@ -53,9 +70,14 @@ const DataTable: FC<DataTableProps> = ({ rows, columns, paginationModel = { page
         paginationMode="server" // server or client
         initialState={{ pagination: { paginationModel: { page, pageSize } } }}
         pageSizeOptions={pageSizeOptions}
-        slots={{ toolbar: GridToolbar }}
+        // slots={{ toolbar: GridToolbar }}
+        slots={{ toolbar: CustomToolbar }} // Use the custom toolbar here
         checkboxSelection
-        sx={{ border: 0, '--DataGrid-containerBackground': colors.blueAccent[700] }}
+        sx={{
+          boxShadow: 5,
+          border: 1,
+          '--DataGrid-containerBackground': colors.blueAccent[700],
+        }}
         slotProps={{
           toolbar: {
             showQuickFilter: true,
