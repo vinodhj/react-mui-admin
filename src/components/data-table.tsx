@@ -37,6 +37,9 @@ const DataTable: FC<DataTableProps> = ({ rows, columns, paginationModel = { page
       width="100%"
       height="80vh"
       sx={{
+        '& .MuiDataGrid-cell:focus, & .MuiDataGrid-cell:focus-within': {
+          outline: 'none !important',
+        },
         '& .MuiDataGrid-root': {
           border: 'none',
         },
