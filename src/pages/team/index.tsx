@@ -28,7 +28,9 @@ function Team() {
     []
   );
 
-  const { data, loading, error } = useAllUsersQuery();
+  const { data, loading, error } = useAllUsersQuery({
+    fetchPolicy: 'cache-and-network', // using cached data first while fetching fresh data in the background
+  });
 
   if (loading) {
     return <LoadingSpinner />;
