@@ -47,7 +47,7 @@ const SidebarFooter: FC<SidebarFooterProps> = ({
         >
           <Box display="flex" alignItems="center" gap={1}>
             <StyleBadge overlap="circular" anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} variant="dot">
-              <Avatar src={userAvatar} alt="User Avatar" sx={{ width: 40, height: 40 }} />
+              <Avatar src={userAvatar} alt={session.adminName.toUpperCase()} sx={{ width: 40, height: 40 }} />
             </StyleBadge>
             <Box textAlign="left">
               <Typography variant="subtitle1" sx={{ color: colors.vibrantBlue[500], fontWeight: 'bold' }}>
@@ -97,7 +97,12 @@ const SidebarFooter: FC<SidebarFooterProps> = ({
           }}
         >
           <StyleBadge overlap="circular" anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} variant="dot">
-            <Avatar src={userAvatar} alt="User Avatar" sx={{ width: 40, height: 40, cursor: 'pointer' }} onClick={handleMenuOpen} />
+            <Avatar
+              src={userAvatar}
+              alt={session.adminName.toUpperCase()}
+              sx={{ width: 40, height: 40, cursor: 'pointer' }}
+              onClick={handleMenuOpen}
+            />
           </StyleBadge>
           <SettingMenu
             anchorEl={anchorEl}
