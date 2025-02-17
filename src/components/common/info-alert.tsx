@@ -7,7 +7,9 @@ interface InfoAlertProps {
 
 const InfoAlert: React.FC<InfoAlertProps> = ({ message }) => (
   <Box sx={{ m: 2 }}>
-    <Alert severity="info">{message}</Alert>
+    <Alert severity="info" color="info">
+      {message}
+    </Alert>
   </Box>
 );
 
