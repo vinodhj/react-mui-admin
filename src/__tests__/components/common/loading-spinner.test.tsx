@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import LoadingSpinner from '../components/common/loading-spinner';
+import LoadingSpinner from '../../../components/common/loading-spinner';
 import '@testing-library/jest-dom';
 
 test('renders LoadingSpinner with CircularProgress', () => {

@@ -1,4 +1,3 @@
-// src/components/DataTable.tsx
 import { FC } from 'react';
 import { Box, useTheme } from '@mui/material';
 import { DataGrid, GridColDef, GridToolbar } from '@mui/x-data-grid';
@@ -14,6 +13,7 @@ interface DataTableProps {
 const DataTable: FC<DataTableProps> = ({ rows, columns, paginationModel = { page: 0, pageSize: 50 }, pageSizeOptions = [50, 100] }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const { page, pageSize } = paginationModel;
 
   return (
     <Box
@@ -45,10 +45,13 @@ const DataTable: FC<DataTableProps> = ({ rows, columns, paginationModel = { page
         },
       }}
     >
+      {/* paginationMode -> need to check and tweaks */}
       <DataGrid
+        rowCount={rows.length} // -> If you're using server-side pagination, you must pass the total row count (rowCount).
         rows={rows}
         columns={columns}
-        initialState={{ pagination: { paginationModel } }}
+        paginationMode="server" // server or client
+        initialState={{ pagination: { paginationModel: { page, pageSize } } }}
         pageSizeOptions={pageSizeOptions}
         slots={{ toolbar: GridToolbar }}
         checkboxSelection

@@ -2,12 +2,13 @@
   "files": [],
   "references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.node.json" }],
   "compilerOptions": {
-    "types": ["@cloudflare/workers-types"],
+    "types": ["@cloudflare/workers-types", "jest", "node"],
     "typeRoots": ["./node_modules/@types", "./@types"],
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "jsx": "react-jsx"
-  }
+  },
+  "setupFilesAfterEnv": ["@testing-library/jest-dom"]
   // "include": ["src/**/*"],
   // "exclude": ["node_modules", "dist"]
 }
