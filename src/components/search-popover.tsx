@@ -119,7 +119,7 @@ const SearchDialog: React.FC = () => {
                 '& .MuiFormLabel-root.Mui-focused': {
                   color: colors.greenAccent[400],
                 },
-                // If you want to change the input text color too:
+                //input text color:
                 '& .MuiOutlinedInput-root': {
                   color: colors.grey[50],
                 },
