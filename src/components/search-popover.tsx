@@ -166,7 +166,7 @@ const SearchDialog: React.FC = () => {
               maxHeight: '60vh',
               overflowY: 'auto',
               p: 1,
-              backgroundColor: searchTokens.primary[200], // change dynamatically
+              backgroundColor: searchTokens.primary[200],
               // Example: custom scrollbar colors from tokens
               '&::-webkit-scrollbar': {
                 width: '4px',

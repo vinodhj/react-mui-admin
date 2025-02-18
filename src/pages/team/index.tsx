@@ -112,7 +112,7 @@ function Team() {
   }));
 
   return (
-    <Box sx={{ m: 2 }}>
+    <Box sx={{ m: 1 }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <PageHeader
           title="MANAGE TEAM"
