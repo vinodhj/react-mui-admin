@@ -8,6 +8,7 @@ export default defineConfig({
     emptyOutDir: true,
     chunkSizeWarningLimit: 2000,
     outDir: 'dist',
+    manifest: true,
     minify: 'esbuild', // 'esbuild' or 'terser'
     rollupOptions: {
       external: ['**/__tests__/**', '**/*.test.ts', '**/*.test.tsx', '**/*.spec.ts', '**/*.spec.tsx'],
