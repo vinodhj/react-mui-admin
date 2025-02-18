@@ -12,7 +12,7 @@ import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import Link from '@mui/material/Link';
 import Box from '@mui/material/Box';
 import { GridColDef } from '@mui/x-data-grid';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { useTheme } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -20,10 +20,12 @@ import NewUserButton from '../../components/pages/new-user-button';
 import { useDeleteUser } from '../../hooks/use-delete-user';
 import Snackbar from '@mui/material/Snackbar';
 import CustomAlert from '../../components/common/custom-alert';
+import { SessionContext } from '../../contexts/session-context';
 
 function Team() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { session } = useContext(SessionContext) ?? {};
   const theme = useTheme();
   const mode = theme.palette.mode;
   const colors = tokens(mode);
@@ -68,6 +70,9 @@ function Team() {
     onError: (err) => {
       console.error('Delete failed:', err);
       setOpenDialog(false);
+      setSnackbarMessage(err.message || 'Failed to delete user');
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
     },
   });
 
@@ -219,6 +224,12 @@ function Team() {
         }}
         onDelete={() => {
           handleClose();
+          if (session?.adminRole !== 'ADMIN') {
+            setSnackbarMessage("You don't have permission to delete users.");
+            setSnackbarSeverity('error');
+            setOpenSnackbar(true);
+            return;
+          }
           setOpenDialog(true);
         }}
       />

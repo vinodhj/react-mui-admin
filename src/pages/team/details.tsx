@@ -1,4 +1,4 @@
-import { useParams, Link as RouterLink, useNavigate } from 'react-router-dom';
+import { useParams, Link as RouterLink, useNavigate, useLocation } from 'react-router-dom';
 import { ColumnName, useUserByFieldQuery } from '../../graphql/graphql-generated';
 import ErrorAlert from '../../components/common/error-alert';
 import LoadingSpinner from '../../components/common/loading-spinner';
@@ -20,18 +20,50 @@ import PageHeader from '../../components/pages/page-header';
 import NewUserButton from '../../components/pages/new-user-button';
 import startCase from 'lodash/startCase';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import Snackbar from '@mui/material/Snackbar';
+import CustomAlert from '../../components/common/custom-alert';
+
 import DeleteConfirmationDialog from '../../components/pages/delete-confirmation-dialog';
 import { useDeleteUser } from '../../hooks/use-delete-user';
 import InfoRow from '../../components/pages/info-row';
+import { SessionContext } from '../../contexts/session-context';
 
 function TeamDetails() {
+  const { session } = useContext(SessionContext) ?? {};
+  const location = useLocation();
   const navigate = useNavigate();
   const { id } = useParams();
   const theme = useTheme();
   const mode = theme.palette.mode;
   const colors = tokens(mode);
   const [openDialog, setOpenDialog] = useState(false);
+
+  // Snackbar state
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState<string | undefined>(undefined);
+  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error' | 'info' | 'warning'>('success');
+
+  const alertType = location.state?.alertType as string | undefined;
+  const alertMessage = location.state?.alertMessage as string | undefined;
+
+  // Show Snackbar if there's an alertMessage
+  useEffect(() => {
+    if (alertMessage) {
+      setSnackbarMessage(alertMessage);
+      setSnackbarSeverity((alertType as 'success' | 'error' | 'info' | 'warning') || 'success');
+      setOpenSnackbar(true);
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [alertMessage, alertType, navigate, location.pathname]);
+
+  // Snackbar close handler
+  const handleSnackbarClose = (_: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnackbar(false);
+  };
 
   const {
     handleDeleteUser,
@@ -43,8 +75,11 @@ function TeamDetails() {
       navigate('/team', { state: { alertType: 'error', alertMessage: 'User deleted successfully' } });
     },
     onError: (err) => {
-      console.error('Delete failed:', err); // Log the error
+      console.error('Delete failed:', err);
       setOpenDialog(false);
+      setSnackbarMessage(err.message || 'Failed to delete user');
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
     },
   });
 
@@ -87,6 +122,17 @@ function TeamDetails() {
 
   return (
     <Box sx={{ m: 1 }}>
+      {/* Snackbar Alert */}
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <CustomAlert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </CustomAlert>
+      </Snackbar>
       <DeleteConfirmationDialog
         openDialog={openDialog}
         handleDelete={handleDelete}
@@ -125,6 +171,12 @@ function TeamDetails() {
                   <IconButton
                     size="small"
                     onClick={() => {
+                      if (session?.adminRole !== 'ADMIN') {
+                        setSnackbarMessage("You don't have permission to delete users.");
+                        setSnackbarSeverity('error');
+                        setOpenSnackbar(true);
+                        return;
+                      }
                       setOpenDialog(true);
                     }}
                   >
