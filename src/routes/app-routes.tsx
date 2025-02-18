@@ -24,18 +24,14 @@ const AppRoutes: React.FC = () => {
       <Route element={<ProtectedRoute element={<MainLayout />} />}>
         <Route path="/dashboard" element={<Dashboard />} />
         {/* Team routes */}
-        <Route path="/team" element={<Team />} />
-        <Route path="/team/create" element={<CreateTeam />} />
-        <Route path="/team/:id" element={<TeamDetails />} />
-        <Route path="/team/edit/:id" element={<EditTeam />} />
-        {/* Add more protected routes here if you want */}
+        <Route path="/team" element={<ProtectedRoute element={<Team />} allowedRoles={['ADMIN']} />} />
+        <Route path="/team/create" element={<ProtectedRoute element={<CreateTeam />} allowedRoles={['ADMIN']} />} />
+        <Route path="/team/:id" element={<ProtectedRoute element={<TeamDetails />} allowedRoles={['ADMIN']} />} />
+        <Route path="/team/edit/:id" element={<ProtectedRoute element={<EditTeam />} allowedRoles={['ADMIN']} />} />
 
         {/* Catch-all: Not Found */}
         <Route path="*" element={<NotFoundPage />} />
       </Route>
-
-      {/* Catch-all: Not Found
-      <Route path="*" element={<NotFoundPage />} /> */}
     </Routes>
   );
 };
