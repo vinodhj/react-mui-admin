@@ -35,3 +35,4 @@ local
 
 coverage
 jest-report
+bundle-report

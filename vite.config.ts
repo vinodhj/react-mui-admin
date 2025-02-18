@@ -29,7 +29,7 @@ export default defineConfig({
     react(),
     visualizer({
       open: false,
-      filename: 'local/bundle-analysis.html',
+      filename: 'bundle-report/bundle-analysis.html',
       gzipSize: true,
       brotliSize: true,
     }),
