@@ -1,6 +1,9 @@
 import { FC } from 'react';
 import { MenuItem } from 'react-pro-sidebar';
-import { Box, Typography, IconButton } from '@mui/material';
+import Box from '@mui/material/Box';
+import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
+
 import { Link as RouterLink } from 'react-router-dom';
 import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
 import SwitchRightOutlinedIcon from '@mui/icons-material/SwitchRightOutlined';

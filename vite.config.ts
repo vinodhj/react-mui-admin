@@ -12,14 +12,14 @@ export default defineConfig({
     minify: 'esbuild', // 'esbuild' or 'terser'
     rollupOptions: {
       external: ['**/__tests__/**', '**/*.test.ts', '**/*.test.tsx', '**/*.spec.ts', '**/*.spec.tsx'],
-      output: {
-        // Split vendor chunks out of node_modules
-        manualChunks(id) {
-          if (id.includes('node_modules')) {
-            return id.toString().split('node_modules/')[1].split('/')[0];
-          }
-        },
-      },
+      // output: {
+      //   // Split vendor chunks out of node_modules
+      //   manualChunks(id) {
+      //     if (id.includes('node_modules')) {
+      //       return id.toString().split('node_modules/')[1].split('/')[0];
+      //     }
+      //   },
+      // },
     },
   },
   plugins: [

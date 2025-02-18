@@ -5,7 +5,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { alpha } from '@mui/material/styles';
+import { alpha } from '@mui/material/styles/';
 import SearchIcon from '@mui/icons-material/Search';
 // If you have custom tokens:
 import { tokens } from '../theme/main-theme';

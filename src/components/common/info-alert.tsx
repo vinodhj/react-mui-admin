@@ -1,5 +1,6 @@
 import React from 'react';
-import { Box, Alert } from '@mui/material';
+import Alert from '@mui/material/Alert';
+import Box from '@mui/material/Box';
 
 interface InfoAlertProps {
   message: string;

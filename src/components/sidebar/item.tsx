@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import { MenuItem } from 'react-pro-sidebar';
-import { Typography } from '@mui/material';
+import Typography from '@mui/material/Typography';
 import { Link as RouterLink } from 'react-router-dom';
 
 interface SidebarItemProps {
