@@ -1,31 +1,48 @@
-import { useAllUsersQuery } from '../../graphql/graphql-generated';
-import PageHeader from '../../components/page-header';
-import DataTable from '../../components/data-table';
+import { useAllUsersQuery, useDeleteUserMutation } from '../../graphql/graphql-generated';
+import PageHeader from '../../components/pages/page-header';
+import DataTable from '../../components/pages/data-table';
 import LoadingSpinner from '../../components/common/loading-spinner';
 import ErrorAlert from '../../components/common/error-alert';
 import InfoAlert from '../../components/common/info-alert';
-import { Link as RouterLink } from 'react-router-dom';
 import { tokens } from '../../theme/main-theme';
+import SuccessAlert from '../../components/common/success-alert';
+import UserActionsMenu from '../../components/pages/user-actions-menu';
+import DeleteConfirmationDialog from '../../components/pages/delete-confirmation-dialog';
 
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import Link from '@mui/material/Link';
 import Box from '@mui/material/Box';
 import { GridColDef } from '@mui/x-data-grid';
 import { useMemo, useState } from 'react';
-import { Button, useTheme } from '@mui/material';
+import { useTheme } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import NewUserButton from '../../components/pages/new-user-button';
 
 function Team() {
+  const navigate = useNavigate();
   const theme = useTheme();
   const mode = theme.palette.mode;
   const colors = tokens(mode);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [deleteSuccess, setDeleteSuccess] = useState(false);
+
+  // GraphQL mutation for deleting a user
+  const [deleteUser, { loading: deleteLoading, error: deleteError }] = useDeleteUserMutation({
+    onCompleted: () => {
+      // Refetch data after deletion
+      refetch();
+      setOpenDialog(false); // Close the confirmation dialog
+      setDeleteSuccess(true); // Set success state to true
+      setTimeout(() => setDeleteSuccess(false), 3000);
+    },
+  });
+
+  const { data, loading, error, refetch } = useAllUsersQuery({
+    fetchPolicy: 'cache-and-network', // using cached data first while fetching fresh data in the background
+  });
 
   const handleClick = (event: React.MouseEvent<HTMLElement, MouseEvent>, userId: string) => {
     setAnchorEl(event.currentTarget as unknown as HTMLElement);
@@ -35,6 +52,13 @@ function Team() {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  const handleDelete = () => {
+    if (selectedUserId) {
+      deleteUser({ variables: { id: selectedUserId } });
+    }
+  };
+
   const columns: GridColDef[] = useMemo(
     () => [
       { field: 'id', headerName: 'Id', width: 50 },
@@ -43,11 +67,7 @@ function Team() {
         headerName: 'Registered Id',
         width: 200,
         renderCell: (params) => (
-          <Link
-            component={RouterLink}
-            to={`/team/${params.value}`}
-            style={{ color: colors.greenAccent[400], fontWeight: 'bold', textDecoration: 'none' }}
-          >
+          <Link component={RouterLink} to={`/team/${params.value}`} style={{ color: 'inherit', textDecoration: 'none' }}>
             {params.value}
           </Link>
         ),
@@ -85,16 +105,16 @@ function Team() {
     []
   );
 
-  const { data, loading, error } = useAllUsersQuery({
-    fetchPolicy: 'cache-and-network', // using cached data first while fetching fresh data in the background
-  });
-
   if (loading) {
     return <LoadingSpinner />;
   }
 
   if (error) {
     return <ErrorAlert message={error.message} />;
+  }
+
+  if (deleteError) {
+    return <ErrorAlert message={deleteError.message} />;
   }
 
   if (!data?.users) {
@@ -118,57 +138,36 @@ function Team() {
           title="MANAGE TEAM"
           subtitle="A centralized module for efficient team oversight—add or remove members, assign roles, and monitor performance all in one streamlined interface"
         />
-        <Button
-          variant="contained"
-          component={RouterLink}
-          to="/team/create"
-          sx={{
-            borderRadius: '8px',
-            backgroundColor: colors.primary[100],
-            color: colors.blackWhite[100],
-            textTransform: 'none',
-            '&:hover': {
-              backgroundColor: colors.greenAccent[300],
-            },
-          }}
-        >
-          + New User
-        </Button>
+
+        <NewUserButton to="/team/create" label="+ New User" />
       </Box>
+      {deleteSuccess && <SuccessAlert message="User deleted successfully!" />}
+
       <DataTable rows={usersData} columns={columns} />
-      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
-        <MenuItem>
-          <Link
-            component={RouterLink}
-            to={`/team/${selectedUserId}`}
-            style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: colors.primary[100], width: '100%' }}
-            onClick={handleClose}
-          >
-            <VisibilityIcon sx={{ color: colors.primary[100], mr: 1 }} />
-            View
-          </Link>
-        </MenuItem>
-        <MenuItem>
-          <Link
-            component={RouterLink}
-            to={`/team/edit/${selectedUserId}`}
-            style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: colors.primary[100], width: '100%' }}
-            onClick={handleClose}
-          >
-            <EditIcon sx={{ color: colors.primary[100], mr: 1 }} /> Edit
-          </Link>
-        </MenuItem>
-        <MenuItem>
-          <Link
-            component={RouterLink}
-            to={`/team/delete/${selectedUserId}`}
-            style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: colors.redAccent[600], width: '100%' }}
-            onClick={handleClose}
-          >
-            <DeleteIcon sx={{ color: colors.redAccent[600], mr: 1 }} /> Delete
-          </Link>
-        </MenuItem>
-      </Menu>
+
+      <UserActionsMenu
+        anchorEl={anchorEl}
+        handleClose={handleClose}
+        onView={() => {
+          handleClose();
+          navigate(`/team/${selectedUserId}`);
+        }}
+        onEdit={() => {
+          handleClose();
+          navigate(`/team/edit/${selectedUserId}`);
+        }}
+        onDelete={() => {
+          handleClose();
+          setOpenDialog(true);
+        }}
+      />
+
+      <DeleteConfirmationDialog
+        openDialog={openDialog}
+        handleDelete={handleDelete}
+        handleCloseDialog={() => setOpenDialog(false)}
+        deleteLoading={deleteLoading}
+      />
     </Box>
   );
 }

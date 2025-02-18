@@ -11,7 +11,6 @@ import NotFoundPage from '../pages/not-found';
 import Team from '../pages/team';
 import TeamDetails from '../pages/team/details';
 import EditTeam from '../pages/team/edit';
-import DeleteTeam from '../pages/team/delete';
 import CreateTeam from '../pages/team/create';
 
 const AppRoutes: React.FC = () => {
@@ -29,7 +28,6 @@ const AppRoutes: React.FC = () => {
         <Route path="/team/create" element={<CreateTeam />} />
         <Route path="/team/:id" element={<TeamDetails />} />
         <Route path="/team/edit/:id" element={<EditTeam />} />
-        <Route path="/team/delete/:id" element={<DeleteTeam />} />
         {/* Add more protected routes here if you want */}
 
         {/* Catch-all: Not Found */}

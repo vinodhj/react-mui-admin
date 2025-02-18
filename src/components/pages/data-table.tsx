@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { Box, useTheme } from '@mui/material';
-import { tokens } from '../theme/main-theme';
+import { tokens } from '../../theme/main-theme';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import {
   GridToolbarContainer,

@@ -1,5 +1,5 @@
 import { tokens } from '../../theme/main-theme';
-import PageHeader from '../../components/page-header';
+import PageHeader from '../../components/pages/page-header';
 import StatBox from '../../components/stat-box';
 
 import { useTheme } from '@mui/material';

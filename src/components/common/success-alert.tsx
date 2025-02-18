@@ -1,0 +1,16 @@
+import React from 'react';
+import { Box, Alert } from '@mui/material';
+
+interface AlertProps {
+  message: string;
+}
+
+const SuccessAlert: React.FC<AlertProps> = ({ message }) => (
+  <Box sx={{ m: 2 }}>
+    <Alert severity="success" color="success">
+      {message}
+    </Alert>
+  </Box>
+);
+
+export default SuccessAlert;

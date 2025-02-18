@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import DataTable from '../../components/data-table';
+import DataTable from '../../components/pages/data-table';
 import { GridColDef } from '@mui/x-data-grid';
 import '@testing-library/jest-dom';
 

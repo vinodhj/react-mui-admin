@@ -1,0 +1,4 @@
+mutation DeleteUser($id: ID!) {
+  __typename
+  deleteUser(input: {id: $id})
+}

@@ -1,4 +1,4 @@
-import { tokens } from '../theme/main-theme';
+import { tokens } from '../../theme/main-theme';
 
 import { FC } from 'react';
 import { useTheme } from '@mui/material';
