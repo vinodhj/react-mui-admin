@@ -17,12 +17,14 @@ import { Link as RouterLink, useLocation } from 'react-router-dom';
 interface SearchOption {
   label: string;
   path: string;
+  tags: string;
 }
 
 const SEARCH_OPTIONS: SearchOption[] = [
-  { label: 'App', path: '/dashboard' },
-  { label: 'Team', path: '/team' },
-  { label: 'Tracker Expense', path: '/form' },
+  { label: 'App', path: '/dashboard', tags: 'OVERVIEW' },
+  { label: 'Team', path: '/team', tags: 'LIST' },
+  { label: 'Create Team', path: '/team/create', tags: 'Create' },
+  { label: 'Tracker Expense', path: '/form', tags: 'LIST' },
 ];
 
 const SearchDialog: React.FC = () => {
@@ -61,7 +63,10 @@ const SearchDialog: React.FC = () => {
 
   // Filter the list by user input
   const filteredOptions = SEARCH_OPTIONS.filter(
-    (option) => option.label.toLowerCase().includes(search.toLowerCase()) || option.path.toLowerCase().includes(search.toLowerCase())
+    (option) =>
+      option.label.toLowerCase().includes(search.toLowerCase()) ||
+      option.path.toLowerCase().includes(search.toLowerCase()) ||
+      option.tags.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -229,7 +234,7 @@ const SearchDialog: React.FC = () => {
                           color: isActive ? colors.greenAccent[400] : 'inherit',
                         }}
                       >
-                        OVERVIEW
+                        {option.tags}
                       </Button>
                     </ListItem>
                   );
