@@ -1,22 +1,69 @@
-import { useParams } from 'react-router-dom';
+import { useParams, Link as RouterLink, useNavigate } from 'react-router-dom';
 import { ColumnName, useUserByFieldQuery } from '../../graphql/graphql-generated';
 import ErrorAlert from '../../components/common/error-alert';
 import LoadingSpinner from '../../components/common/loading-spinner';
 import { formatDate } from '../../utils/date-utils';
+import { tokens } from '../../theme/main-theme';
+
+import { useTheme } from '@mui/material';
+import Avatar from '@mui/material/Avatar';
+import Box from '@mui/material/Box';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
+import Chip from '@mui/material/Chip';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
+import Grid from '@mui/material/Grid2';
+import EditIcon from '@mui/icons-material/Edit';
+import PageHeader from '../../components/pages/page-header';
+import NewUserButton from '../../components/pages/new-user-button';
+import startCase from 'lodash/startCase';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { useState } from 'react';
+import DeleteConfirmationDialog from '../../components/pages/delete-confirmation-dialog';
+import { useDeleteUser } from '../../hooks/use-delete-user';
+import InfoRow from '../../components/pages/info-row';
 
 function TeamDetails() {
+  const navigate = useNavigate();
   const { id } = useParams();
+  const theme = useTheme();
+  const mode = theme.palette.mode;
+  const colors = tokens(mode);
+  const [openDialog, setOpenDialog] = useState(false);
 
-  if (!id) {
-    return <ErrorAlert message="Invalid Registered ID" />;
-  }
+  const {
+    handleDeleteUser,
+    loading: deleteLoading,
+    error: deleteError,
+  } = useDeleteUser({
+    onCompleted: () => {
+      setOpenDialog(false);
+      navigate('/team', { state: { alertType: 'error', alertMessage: 'User deleted successfully' } });
+    },
+    onError: (err) => {
+      console.error('Delete failed:', err); // Log the error
+      setOpenDialog(false);
+    },
+  });
+
+  const handleDelete = () => {
+    if (id) {
+      handleDeleteUser(id);
+    }
+  };
 
   const { data, loading, error } = useUserByFieldQuery({
     variables: {
       field: ColumnName.Id,
-      value: id,
+      value: id ?? '',
     },
   });
+
+  if (!id) {
+    return <ErrorAlert message="Invalid Registered ID" />;
+  }
 
   if (loading) {
     return <LoadingSpinner />;
@@ -24,6 +71,10 @@ function TeamDetails() {
 
   if (error) {
     return <ErrorAlert message={error.message} />;
+  }
+
+  if (deleteError) {
+    return <ErrorAlert message={deleteError.message} />;
   }
 
   const user = data?.userByfield?.[0];
@@ -35,15 +86,84 @@ function TeamDetails() {
   const { name, email, role, created_at, updated_at } = user;
 
   return (
-    <div>
-      <h1>Team Member Details</h1>
-      <p>ID: {id}</p>
-      <p>Name: {name ?? 'N/A'}</p>
-      <p>Email: {email ?? 'N/A'}</p>
-      <p>Role: {role ?? 'N/A'}</p>
-      <p>Created At: {formatDate(created_at)}</p>
-      <p>Last Updated At: {formatDate(updated_at)}</p>
-    </div>
+    <Box sx={{ m: 1 }}>
+      <DeleteConfirmationDialog
+        openDialog={openDialog}
+        handleDelete={handleDelete}
+        handleCloseDialog={() => setOpenDialog(false)}
+        deleteLoading={deleteLoading}
+      />
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        <PageHeader title="TEAM DETAILS" Breadcrumbs_level1="TEAM" Breadcrumbs_level1_url="/team" />
+
+        <NewUserButton to="/team/create" label="+ New User" />
+      </Box>
+      <Box sx={{ maxWidth: 600, mx: 'auto', mt: 4, p: 2 }}>
+        {/* User Header */}
+        <Box display="flex" alignItems="center" gap={2} mb={2}>
+          <Avatar sx={{ width: 56, height: 56 }} alt={user.name.toUpperCase()} src="/path-to-avatar.jpg" />
+          <Box>
+            <Typography variant="h5" fontWeight="bold">
+              {startCase(name)}
+            </Typography>
+            <Typography variant="body2" color="textSecondary">
+              {email}
+            </Typography>
+          </Box>
+          <Chip label="Active" color="success" sx={{ ml: 'auto', fontWeight: 'bold' }} />
+        </Box>
+
+        {/* Details Card */}
+        <Card variant="outlined">
+          <CardContent>
+            <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ borderBottom: 1, borderColor: 'divider' }}>
+              <Typography variant="h6" fontWeight="bold">
+                Team Basic Details
+              </Typography>
+              <Box>
+                <Tooltip title="Delete" placement="bottom">
+                  <IconButton
+                    size="small"
+                    onClick={() => {
+                      setOpenDialog(true);
+                    }}
+                  >
+                    <DeleteIcon sx={{ color: colors.redAccent[400], mr: 1 }} />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Edit" placement="bottom">
+                  <IconButton size="small" component={RouterLink} to={`/team/edit/${id}`}>
+                    <EditIcon />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            </Box>
+
+            {/* User Info */}
+            <Grid container spacing={2} mt={1}>
+              <Grid size={{ xs: 12 }} sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                <InfoRow label="Customer ID" value={id} />
+              </Grid>
+              <Grid size={{ xs: 12 }} sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                <InfoRow label="Name" value={name} />
+              </Grid>
+              <Grid size={{ xs: 12 }} sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                <InfoRow label="Email" value={email} />
+              </Grid>
+              <Grid size={{ xs: 12 }} sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                <InfoRow label="Role" value={role} />
+              </Grid>
+              <Grid size={{ xs: 12 }} sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                <InfoRow label="Created At" value={formatDate(created_at)} />
+              </Grid>
+              <Grid size={{ xs: 12 }}>
+                <InfoRow label="Last Updated At" value={formatDate(updated_at)} />
+              </Grid>
+            </Grid>
+          </CardContent>
+        </Card>
+      </Box>
+    </Box>
   );
 }
 

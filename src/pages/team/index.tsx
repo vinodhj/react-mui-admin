@@ -1,42 +1,73 @@
-import { useAllUsersQuery, useDeleteUserMutation } from '../../graphql/graphql-generated';
+import { useAllUsersQuery } from '../../graphql/graphql-generated';
 import PageHeader from '../../components/pages/page-header';
 import DataTable from '../../components/pages/data-table';
 import LoadingSpinner from '../../components/common/loading-spinner';
 import ErrorAlert from '../../components/common/error-alert';
 import InfoAlert from '../../components/common/info-alert';
 import { tokens } from '../../theme/main-theme';
-import SuccessAlert from '../../components/common/success-alert';
 import UserActionsMenu from '../../components/pages/user-actions-menu';
 import DeleteConfirmationDialog from '../../components/pages/delete-confirmation-dialog';
 
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import Link from '@mui/material/Link';
 import Box from '@mui/material/Box';
 import { GridColDef } from '@mui/x-data-grid';
-import { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTheme } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import NewUserButton from '../../components/pages/new-user-button';
+import { useDeleteUser } from '../../hooks/use-delete-user';
+import Snackbar from '@mui/material/Snackbar';
+import CustomAlert from '../../components/common/custom-alert';
 
 function Team() {
   const navigate = useNavigate();
+  const location = useLocation();
   const theme = useTheme();
   const mode = theme.palette.mode;
   const colors = tokens(mode);
+
+  // Snackbar state
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState<string | undefined>(undefined);
+  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error' | 'info' | 'warning'>('success');
+
+  // Action menu and dialog states
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
-  const [deleteSuccess, setDeleteSuccess] = useState(false);
 
-  // GraphQL mutation for deleting a user
-  const [deleteUser, { loading: deleteLoading, error: deleteError }] = useDeleteUserMutation({
+  const alertType = location.state?.alertType as string | undefined;
+  const alertMessage = location.state?.alertMessage as string | undefined;
+
+  // Show Snackbar if there's an alertMessage
+  useEffect(() => {
+    if (alertMessage) {
+      setSnackbarMessage(alertMessage);
+      setSnackbarSeverity((alertType as 'success' | 'error' | 'info' | 'warning') || 'success');
+      setOpenSnackbar(true);
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [alertMessage, alertType, navigate, location.pathname]);
+
+  // Delete user mutation hook
+  const {
+    handleDeleteUser,
+    loading: deleteLoading,
+    error: deleteError,
+  } = useDeleteUser({
     onCompleted: () => {
       // Refetch data after deletion
       refetch();
       setOpenDialog(false); // Close the confirmation dialog
-      setDeleteSuccess(true); // Set success state to true
-      setTimeout(() => setDeleteSuccess(false), 3000);
+      setSnackbarMessage('User deleted successfully!');
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
+    },
+    onError: (err) => {
+      console.error('Delete failed:', err);
+      setOpenDialog(false);
     },
   });
 
@@ -55,8 +86,16 @@ function Team() {
 
   const handleDelete = () => {
     if (selectedUserId) {
-      deleteUser({ variables: { id: selectedUserId } });
+      handleDeleteUser(selectedUserId);
     }
+  };
+
+  // Snackbar close handler
+  const handleSnackbarClose = (_: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnackbar(false);
   };
 
   const columns: GridColDef[] = useMemo(
@@ -131,6 +170,7 @@ function Team() {
     return <InfoAlert message="No data available" />;
   }
 
+  // Map the fetched data into the format required by DataTable
   const usersData = data.users?.map((user, index) => ({
     id: index + 1,
     registeredId: user!.id,
@@ -151,7 +191,18 @@ function Team() {
 
         <NewUserButton to="/team/create" label="+ New User" />
       </Box>
-      {deleteSuccess && <SuccessAlert message="User deleted successfully!" />}
+
+      {/* Snackbar Alert */}
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <CustomAlert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </CustomAlert>
+      </Snackbar>
 
       <DataTable rows={usersData} columns={columns} />
 
