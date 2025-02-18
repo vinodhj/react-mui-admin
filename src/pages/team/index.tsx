@@ -66,11 +66,11 @@ function Team() {
         field: 'registeredId',
         headerName: 'Registered Id',
         width: 200,
-        renderCell: (params) => (
-          <Link component={RouterLink} to={`/team/${params.value}`} style={{ color: 'inherit', textDecoration: 'none' }}>
-            {params.value}
-          </Link>
-        ),
+        // renderCell: (params) => (
+        //   <Link component={RouterLink} to={`/team/${params.value}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+        //     {params.value}
+        //   </Link>
+        // ),
       },
       {
         field: 'name',
@@ -150,11 +150,11 @@ function Team() {
         handleClose={handleClose}
         onView={() => {
           handleClose();
-          navigate(`/team/${selectedUserId}`);
+          // navigate(`/team/${selectedUserId}`);
         }}
         onEdit={() => {
           handleClose();
-          navigate(`/team/edit/${selectedUserId}`);
+          // navigate(`/team/edit/${selectedUserId}`);
         }}
         onDelete={() => {
           handleClose();

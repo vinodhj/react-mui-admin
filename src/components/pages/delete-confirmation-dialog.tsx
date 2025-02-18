@@ -16,7 +16,7 @@ const DeleteConfirmationDialog = ({ openDialog, handleDelete, handleCloseDialog,
     <DialogTitle>Confirm Deletion</DialogTitle>
     <Divider />
     <DialogContent>
-      <p>Are you sure you want to delete?</p>
+      <span> Are you sure you want to delete?</span>
     </DialogContent>
     <DialogActions>
       <Button onClick={handleDelete} disabled={deleteLoading} variant="contained" sx={{ backgroundColor: 'red', borderRadius: 2 }}>
