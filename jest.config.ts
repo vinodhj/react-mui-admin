@@ -15,5 +15,17 @@ export default async (): Promise<Config.InitialOptions> => {
       '\\.(css|scss)$': 'identity-obj-proxy',
       '\\.svg$': '<rootDir>/__mocks__/svgMock.tsx',
     },
+    reporters: [
+      'default',
+      [
+        'jest-html-reporters',
+        {
+          publicPath: './jest-report',
+          inlineSource: true,
+          hideIcon: true,
+          expand: true,
+        },
+      ],
+    ],
   };
 };

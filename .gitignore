@@ -32,3 +32,6 @@ dist-ssr
 
 backup-dnd
 local
+
+coverage
+jest-report
