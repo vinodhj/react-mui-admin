@@ -170,6 +170,24 @@ export type LoginMutation = {
   };
 };
 
+export type UserByFieldQueryVariables = Exact<{
+  field: ColumnName;
+  value: Scalars['String']['input'];
+}>;
+
+export type UserByFieldQuery = {
+  __typename?: 'Query';
+  userByfield?: Array<{
+    __typename: 'UserResponse';
+    id: string;
+    name: string;
+    email: string;
+    role: Role;
+    created_at: string;
+    updated_at: string;
+  } | null> | null;
+};
+
 export type AllUsersQueryVariables = Exact<{ [key: string]: never }>;
 
 export type AllUsersQuery = {
@@ -259,6 +277,58 @@ export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginM
 export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
 export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
 export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
+export const UserByFieldDocument = gql`
+  query UserByField($field: ColumnName!, $value: String!) {
+    userByfield(input: { field: $field, value: $value }) {
+      __typename
+      id
+      name
+      email
+      role
+      created_at
+      updated_at
+    }
+  }
+`;
+
+/**
+ * __useUserByFieldQuery__
+ *
+ * To run a query within a React component, call `useUserByFieldQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUserByFieldQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUserByFieldQuery({
+ *   variables: {
+ *      field: // value for 'field'
+ *      value: // value for 'value'
+ *   },
+ * });
+ */
+export function useUserByFieldQuery(
+  baseOptions: Apollo.QueryHookOptions<UserByFieldQuery, UserByFieldQueryVariables> &
+    ({ variables: UserByFieldQueryVariables; skip?: boolean } | { skip: boolean })
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<UserByFieldQuery, UserByFieldQueryVariables>(UserByFieldDocument, options);
+}
+export function useUserByFieldLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<UserByFieldQuery, UserByFieldQueryVariables>) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<UserByFieldQuery, UserByFieldQueryVariables>(UserByFieldDocument, options);
+}
+export function useUserByFieldSuspenseQuery(
+  baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<UserByFieldQuery, UserByFieldQueryVariables>
+) {
+  const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<UserByFieldQuery, UserByFieldQueryVariables>(UserByFieldDocument, options);
+}
+export type UserByFieldQueryHookResult = ReturnType<typeof useUserByFieldQuery>;
+export type UserByFieldLazyQueryHookResult = ReturnType<typeof useUserByFieldLazyQuery>;
+export type UserByFieldSuspenseQueryHookResult = ReturnType<typeof useUserByFieldSuspenseQuery>;
+export type UserByFieldQueryResult = Apollo.QueryResult<UserByFieldQuery, UserByFieldQueryVariables>;
 export const AllUsersDocument = gql`
   query AllUsers {
     users {

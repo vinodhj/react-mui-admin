@@ -1,0 +1,11 @@
+query UserByField($field: ColumnName!, $value: String!) {
+  userByfield(input: {field : $field, value: $value}) {
+    __typename
+    id
+    name
+    email
+    role
+    created_at
+    updated_at
+  }
+}
