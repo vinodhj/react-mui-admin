@@ -24,7 +24,10 @@ const SEARCH_OPTIONS: SearchOption[] = [
   { label: 'App', path: '/dashboard', tags: 'OVERVIEW' },
   { label: 'Team', path: '/team', tags: 'LIST' },
   { label: 'Create Team', path: '/team/create', tags: 'Create' },
-  { label: 'Tracker Expense', path: '/form', tags: 'LIST' },
+  { label: 'My Profile', path: '/profile', tags: 'Settings' },
+  { label: 'Edit Profile', path: '/edit-profile', tags: 'Settings' },
+  { label: 'Change Password', path: '/change-password', tags: 'Settings' },
+  // { label: 'Tracker Expense', path: '/form', tags: 'LIST' },
 ];
 
 const SearchDialog: React.FC = () => {

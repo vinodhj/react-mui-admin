@@ -29,7 +29,7 @@ function Dashboard() {
           subtitle="A streamlined interface designed specifically for administrators, the admin dashboard provides real-time insights into system performance, user activity, and key metrics."
         />
 
-        <Box>
+        <Box sx={{ m: '10px' }}>
           <Button
             sx={{
               backgroundColor: colors.blueAccent[700],
@@ -37,6 +37,7 @@ function Dashboard() {
               fontSize: '13px',
               fontWeight: 'bold',
               padding: '10px 10px',
+              whiteSpace: 'nowrap',
             }}
           >
             <DownloadOutlinedIcon sx={{ mr: '4px' }} />

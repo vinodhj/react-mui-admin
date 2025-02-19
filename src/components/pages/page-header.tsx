@@ -24,7 +24,7 @@ const PageHeader: FC<HeaderProps> = ({ title, subtitle, Breadcrumbs_level1, Brea
   return (
     <Box mb="20px">
       <Typography variant="h3" color={colors.grey[100]} fontWeight="bold" sx={{ mb: '5px' }}>
-        {title}
+        {title.toUpperCase()}
       </Typography>
       {title.toLowerCase() !== 'dashboard' && (
         <Box sx={{ mb: 2 }}>
