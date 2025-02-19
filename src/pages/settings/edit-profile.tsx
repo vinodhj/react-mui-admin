@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Card from '@mui/material/Card';
@@ -16,6 +16,9 @@ import { SessionContext } from '../../contexts/session-context';
 import { useTheme } from '@mui/material';
 import { tokens } from '../../theme/main-theme';
 import { useNavigate } from 'react-router-dom';
+import { useEditUserMutation } from '../../graphql/graphql-generated';
+import LoadingSpinner from '../../components/common/loading-spinner';
+import CustomSnackbar from '../../components/common/custom-snackbar';
 
 const validationSchema = yup.object({
   name: yup.string().required('Name is required'),
@@ -30,6 +33,11 @@ const EditProfile: React.FC = () => {
   const mode = theme.palette.mode;
   const colors = tokens(mode);
 
+  // Snackbar state
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState<string | undefined>(undefined);
+  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error' | 'info' | 'warning'>('success');
+
   const user = {
     id: session?.adminID ?? '',
     name: session?.adminName ?? '',
@@ -37,18 +45,60 @@ const EditProfile: React.FC = () => {
     role: session?.adminRole === 'ADMIN' ? 'Administrator' : 'User',
   };
 
+  const [updateUserMutation, { data: updateData, loading, error }] = useEditUserMutation();
+
+  // Initialize Formik before any early returns
   const formik = useFormik({
     initialValues: {
       name: user.name,
       email: user.email,
     },
     validationSchema: validationSchema,
-    onSubmit: (values, { resetForm }) => {
-      // Implement Edit logic here (e.g., API call)
-      console.log('Edit Profile', values);
+    enableReinitialize: true, // Formik will automatically update its state with the new initial values
+    onSubmit: async (values, { resetForm }) => {
+      try {
+        await updateUserMutation({ variables: { input: { id: user.id, ...values } } });
+      } catch (err) {
+        console.error('Error updating team member', err);
+      }
       resetForm();
     },
   });
+
+  // Handle error side-effect (ideally, use an effect for this)
+  useEffect(() => {
+    if (error) {
+      setSnackbarMessage(error?.message);
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
+    }
+  }, [error]);
+
+  useEffect(() => {
+    if (updateData?.editUser?.success) {
+      const { user } = updateData.editUser;
+      const { session, updateSession } = sessionDetails ?? {};
+
+      setSnackbarMessage('Profile updated successfully!');
+      setSnackbarSeverity('success');
+      setOpenSnackbar(true);
+
+      // update session if data
+      if (session && updateSession && session.adminID === user?.id && user?.name) {
+        updateSession({
+          ...session,
+          adminName: user.name ?? '',
+          // need to update once super role or some other setting to update email and role
+          // adminEmail: user.email ?? '',
+          // adminRole: user.role ?? ''
+        });
+      }
+    }
+  }, [updateData]);
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
 
   const handleChangePassword = () => {
     navigate('/change-password');
@@ -66,6 +116,7 @@ const EditProfile: React.FC = () => {
           mt: 4,
         }}
       >
+        <CustomSnackbar open={openSnackbar} message={snackbarMessage} severity={snackbarSeverity} onClose={() => setOpenSnackbar(false)} />
         <ProfileSidebar user={user} onChangePasswordClick={handleChangePassword} />
         <Card
           sx={{
@@ -108,7 +159,7 @@ const EditProfile: React.FC = () => {
 
               <TextField label="Role" variant="outlined" fullWidth margin="normal" name="role" value={user.role} disabled />
               <Button variant="contained" color="secondary" type="submit" sx={{ mt: 3, borderRadius: 2 }}>
-                Update
+                {loading ? 'Updating...' : 'Update'}
               </Button>
             </form>
           </CardContent>
