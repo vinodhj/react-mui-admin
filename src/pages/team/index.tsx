@@ -18,9 +18,8 @@ import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import NewUserButton from '../../components/pages/new-user-button';
 import { useDeleteUser } from '../../hooks/use-delete-user';
-import Snackbar from '@mui/material/Snackbar';
-import CustomAlert from '../../components/common/custom-alert';
 import { SessionContext } from '../../contexts/session-context';
+import CustomSnackbar from '../../components/common/custom-snackbar';
 
 function Team() {
   const navigate = useNavigate();
@@ -93,14 +92,6 @@ function Team() {
     if (selectedUserId) {
       handleDeleteUser(selectedUserId);
     }
-  };
-
-  // Snackbar close handler
-  const handleSnackbarClose = (_: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setOpenSnackbar(false);
   };
 
   const columns: GridColDef[] = useMemo(
@@ -198,19 +189,9 @@ function Team() {
       </Box>
 
       {/* Snackbar Alert */}
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={3000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      >
-        <CustomAlert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
-          {snackbarMessage}
-        </CustomAlert>
-      </Snackbar>
+      <CustomSnackbar open={openSnackbar} message={snackbarMessage} severity={snackbarSeverity} onClose={() => setOpenSnackbar(false)} />
 
       <DataTable rows={usersData} columns={columns} />
-
       <UserActionsMenu
         anchorEl={anchorEl}
         handleClose={handleClose}
@@ -233,7 +214,6 @@ function Team() {
           setOpenDialog(true);
         }}
       />
-
       <DeleteConfirmationDialog
         openDialog={openDialog}
         handleDelete={handleDelete}

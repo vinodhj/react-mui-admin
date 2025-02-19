@@ -21,13 +21,12 @@ import NewUserButton from '../../components/pages/new-user-button';
 import startCase from 'lodash/startCase';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useContext, useEffect, useState } from 'react';
-import Snackbar from '@mui/material/Snackbar';
-import CustomAlert from '../../components/common/custom-alert';
 
 import DeleteConfirmationDialog from '../../components/pages/delete-confirmation-dialog';
 import { useDeleteUser } from '../../hooks/use-delete-user';
 import InfoRow from '../../components/pages/info-row';
 import { SessionContext } from '../../contexts/session-context';
+import CustomSnackbar from '../../components/common/custom-snackbar';
 
 function TeamDetails() {
   const { session } = useContext(SessionContext) ?? {};
@@ -56,14 +55,6 @@ function TeamDetails() {
       navigate(location.pathname, { replace: true, state: {} });
     }
   }, [alertMessage, alertType, navigate, location.pathname]);
-
-  // Snackbar close handler
-  const handleSnackbarClose = (_: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setOpenSnackbar(false);
-  };
 
   const {
     handleDeleteUser,
@@ -123,22 +114,15 @@ function TeamDetails() {
   return (
     <Box sx={{ m: 1 }}>
       {/* Snackbar Alert */}
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={3000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      >
-        <CustomAlert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
-          {snackbarMessage}
-        </CustomAlert>
-      </Snackbar>
+      <CustomSnackbar open={openSnackbar} message={snackbarMessage} severity={snackbarSeverity} onClose={() => setOpenSnackbar(false)} />
+
       <DeleteConfirmationDialog
         openDialog={openDialog}
         handleDelete={handleDelete}
         handleCloseDialog={() => setOpenDialog(false)}
         deleteLoading={deleteLoading}
       />
+
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <PageHeader title="TEAM DETAILS" Breadcrumbs_level1="TEAM" Breadcrumbs_level1_url="/team" />
 
