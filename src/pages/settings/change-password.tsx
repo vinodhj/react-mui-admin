@@ -49,6 +49,7 @@ const ChangePassword: React.FC = () => {
   const colors = tokens(mode);
 
   const user = {
+    id: session?.adminID ?? '',
     name: session?.adminName ?? '',
     email: session?.adminEmail ?? '',
     role: session?.adminRole === 'ADMIN' ? 'Administrator' : 'User',

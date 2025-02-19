@@ -192,7 +192,7 @@ export type LoginMutation = {
     __typename: 'LoginResponse';
     success: boolean;
     token?: string | null;
-    user?: { __typename: 'UserSuccessResponse'; name: string; email: string; role: Role } | null;
+    user?: { __typename: 'UserSuccessResponse'; id: string; name: string; email: string; role: Role } | null;
   };
 };
 
@@ -352,6 +352,7 @@ export const LoginDocument = gql`
       token
       user {
         __typename
+        id
         name
         email
         role

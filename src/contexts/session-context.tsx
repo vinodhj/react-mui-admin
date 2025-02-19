@@ -12,6 +12,7 @@ export interface SessionData {
   adminName: string;
   adminEmail: string;
   adminRole: string;
+  adminID: string;
 }
 
 export interface SessionContextProps {
@@ -34,6 +35,7 @@ const defaultSession: SessionData = {
   adminName: getStorageItem(sessionStorage, 'session_admin_name'),
   adminEmail: getStorageItem(sessionStorage, 'session_admin_email'),
   adminRole: getStorageItem(sessionStorage, 'session_admin_role'),
+  adminID: getStorageItem(sessionStorage, 'session_admin_id'),
 };
 
 // Create the context
@@ -65,6 +67,7 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
       sessionStorage.setItem('session_admin_name', data.adminName);
       sessionStorage.setItem('session_admin_email', data.adminEmail);
       sessionStorage.setItem('session_admin_role', data.adminRole);
+      sessionStorage.setItem('session_admin_id', data.adminID);
 
       // Force theme to dark immediately
       setDarkMode();
@@ -83,6 +86,7 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
         adminName: '',
         adminEmail: '',
         adminRole: '',
+        adminID: '',
       });
       localStorage.clear();
       sessionStorage.clear();

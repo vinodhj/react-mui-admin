@@ -52,10 +52,13 @@ function EditTeam() {
       setOpenSnackbar(true);
 
       // update session if data
-      if (session && updateSession && session.adminEmail === user?.email && user?.name) {
+      if (session && updateSession && session.adminID === user?.id && user?.name) {
         updateSession({
           ...session,
           adminName: user.name ?? '',
+          // need to update once super role or some other setting to update email and role
+          // adminEmail: user.email ?? '',
+          // adminRole: user.role ?? ''
         });
       }
     }

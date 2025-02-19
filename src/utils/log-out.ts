@@ -10,6 +10,7 @@ export const useHandleLogout = () => {
       adminName: '',
       adminEmail: '',
       adminRole: '',
+      adminID: '',
     });
 
     localStorage.clear();

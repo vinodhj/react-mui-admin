@@ -5,6 +5,7 @@ mutation login($email: String!, $password: String!) {
     token
     user {
       __typename
+      id
       name
       email
       role
