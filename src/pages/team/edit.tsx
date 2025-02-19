@@ -1,6 +1,7 @@
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
 import { useTheme } from '@mui/material/styles';
+import Typography from '@mui/material/Typography';
 import { useParams } from 'react-router-dom';
 import { useContext, useEffect, useState } from 'react';
 import PageHeader from '../../components/pages/page-header';
@@ -84,6 +85,11 @@ function EditTeam() {
       >
         <EditTeamForm user={user} updateUserMutation={updateUserMutation} loading={updateLoading} />
       </Container>
+
+      {/* Note about admin role update */}
+      <Typography variant="body2" color="textSecondary" mt={2} textAlign="center">
+        Note: To update role and email, please contact the admin.
+      </Typography>
     </Box>
   );
 }

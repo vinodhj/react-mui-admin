@@ -201,7 +201,7 @@ function Team() {
         }}
         onEdit={() => {
           handleClose();
-          // navigate(`/team/edit/${selectedUserId}`);
+          navigate(`/team/edit/${selectedUserId}`);
         }}
         onDelete={() => {
           handleClose();
