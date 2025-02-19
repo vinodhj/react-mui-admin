@@ -1,0 +1,14 @@
+mutation CreateUser($input: SignUpInput!) {
+  __typename
+  signUp(input: $input) {
+    success
+    __typename
+    user {
+      __typename
+      email
+      id
+      name
+      role
+    }
+  }
+}
