@@ -25,7 +25,51 @@ const CustomToolbar = () => (
     <GridToolbarColumnsButton />
     <GridToolbarFilterButton />
     <GridToolbarDensitySelector />
-    <GridToolbarExport printOptions={{ disableToolbarButton: true }} /> {/* Disables Print */}
+    <GridToolbarExport
+      printOptions={{
+        disableToolbarButton: true,
+        hideFooter: true,
+        hideToolbar: true,
+        pageStyle: `
+          @media print {
+            @page {
+              size: A4 landscape;
+              margin: 1cm;
+            }
+
+            /* Force black text on white background */
+            body,
+            .MuiDataGrid-root,
+            .MuiDataGrid-root * {
+              color: #000 !important;
+              background-color: #fff !important;
+            }
+
+            /* Expand the grid so all rows/columns appear */
+            .MuiDataGrid-main,
+            .MuiDataGrid-virtualScroller {
+              overflow: visible !important;
+              height: auto !important;
+              max-height: none !important;
+            }
+
+            /* Avoid splitting a row across pages */
+            .MuiDataGrid-row {
+              break-inside: avoid !important;
+              page-break-inside: avoid !important;
+            }
+
+            /* Optionally scale down to fit all columns on one page */
+            .MuiDataGrid-main {
+              transform: scale(0.85);
+              transform-origin: top left;
+              width: 100%;
+            }
+          }
+        `,
+      }}
+    />
+
     <GridToolbarQuickFilter debounceMs={200} sx={{ width: '300px', fontSize: '1rem' }} />
   </GridToolbarContainer>
 );
@@ -83,6 +127,8 @@ const DataTable: FC<DataTableProps> = ({ rows, columns, paginationModel = { page
           slots={{ toolbar: CustomToolbar }} // Use the custom toolbar here
           disableRowSelectionOnClick
           checkboxSelection
+          // Disabling virtualization is fine for smaller data sets, but if you have hundreds or thousands of rows, it can impact performance in normal usage
+          // disableVirtualization
           sx={{
             maxWidth: 1300,
             height: '80vh',
