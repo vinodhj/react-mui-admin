@@ -4,7 +4,7 @@ import { useTheme } from '@mui/material/styles';
 import { useCreateUserMutation } from '../../graphql/graphql-generated';
 import PageHeader from '../../components/pages/page-header';
 import { SearchTokens } from '../../theme/main-theme';
-import CreateTeamForm from './create-team-form';
+import CreateTeamForm from './form/create-team-form';
 import { useEffect, useState } from 'react';
 import CustomSnackbar from '../../components/common/custom-snackbar';
 
