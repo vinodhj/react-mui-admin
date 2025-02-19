@@ -12,6 +12,9 @@ import Team from '../pages/team';
 import TeamDetails from '../pages/team/details';
 import EditTeam from '../pages/team/edit';
 import CreateTeam from '../pages/team/create';
+import Profile from '../pages/settings';
+import ChangePassword from '../pages/settings/change-password';
+import EditProfile from '../pages/settings/edit-profile';
 
 const AppRoutes: React.FC = () => {
   return (
@@ -23,13 +26,19 @@ const AppRoutes: React.FC = () => {
       {/* Main Layout (Dashboard, other protected pages) */}
       <Route element={<ProtectedRoute element={<MainLayout />} />}>
         <Route path="/dashboard" element={<Dashboard />} />
+
         {/* Team routes */}
         <Route path="/team" element={<ProtectedRoute element={<Team />} allowedRoles={['ADMIN']} />} />
         <Route path="/team/create" element={<ProtectedRoute element={<CreateTeam />} allowedRoles={['ADMIN']} />} />
         <Route path="/team/:id" element={<ProtectedRoute element={<TeamDetails />} allowedRoles={['ADMIN']} />} />
         <Route path="/team/edit/:id" element={<ProtectedRoute element={<EditTeam />} allowedRoles={['ADMIN']} />} />
 
-        {/* Catch-all: Not Found */}
+        {/* Settings */}
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/edit-profile" element={<EditProfile />} />
+        <Route path="/change-password" element={<ChangePassword />} />
+
+        {/* Catch-all: 404 Not Found */}
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>

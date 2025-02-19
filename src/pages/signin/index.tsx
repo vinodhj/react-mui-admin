@@ -36,6 +36,7 @@ export default function SignIn() {
             adminName: data.login.user?.name ?? '',
             adminEmail: data.login.user?.email ?? '',
             adminRole: data.login.user?.role ?? '',
+            adminID: data.login.user?.id ?? '',
             sidebarCollapsed: isMobile ? 'true' : 'false',
           });
         } else {

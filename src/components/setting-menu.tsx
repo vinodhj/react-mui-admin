@@ -7,7 +7,8 @@ import Typography from '@mui/material/Typography';
 
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import LogoutIcon from '@mui/icons-material/Logout';
-import RoomPreferencesIcon from '@mui/icons-material/RoomPreferences';
+import LockIcon from '@mui/icons-material/Lock';
+import { useNavigate } from 'react-router-dom';
 
 interface UserMenuProps {
   anchorEl: null | HTMLElement;
@@ -18,6 +19,7 @@ interface UserMenuProps {
 }
 
 const SettingMenu: FC<UserMenuProps> = ({ anchorEl, open, handleMenuClose, handleLogout, colors }) => {
+  const navigate = useNavigate();
   return (
     <Menu
       anchorEl={anchorEl}
@@ -29,7 +31,12 @@ const SettingMenu: FC<UserMenuProps> = ({ anchorEl, open, handleMenuClose, handl
         paper: { sx: { minWidth: 160, p: 0, border: '1px solid', borderColor: 'divider' } },
       }}
     >
-      <MenuItem onClick={handleMenuClose}>
+      <MenuItem
+        onClick={() => {
+          handleMenuClose();
+          navigate('/profile');
+        }}
+      >
         <ListItemIcon sx={{ color: colors.grey[100] }}>
           <PersonOutlinedIcon fontSize="small" />
         </ListItemIcon>
@@ -38,14 +45,21 @@ const SettingMenu: FC<UserMenuProps> = ({ anchorEl, open, handleMenuClose, handl
         </Typography>
       </MenuItem>
       <Divider />
-      <MenuItem onClick={handleMenuClose}>
+
+      <MenuItem
+        onClick={() => {
+          handleMenuClose();
+          navigate('/change-password');
+        }}
+      >
         <ListItemIcon sx={{ color: colors.grey[100] }}>
-          <RoomPreferencesIcon fontSize="small" />
+          <LockIcon fontSize="small" />
         </ListItemIcon>
         <Typography variant="body1" sx={{ color: colors.grey[100] }}>
-          Organization settings
+          Change Password
         </Typography>
       </MenuItem>
+
       <Divider />
       <MenuItem
         onClick={() => {
