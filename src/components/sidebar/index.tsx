@@ -26,7 +26,7 @@ const MyProSidebar: FC = () => {
   const handleMenuClose = () => setAnchorEl(null);
   const handleLogout = useHandleLogout();
 
-  const sidbarImageUrl = import.meta.env.VITE_SIDEBAR_IMAGE_URL;
+  const sidebarImageUrl = import.meta.env.VITE_SIDEBAR_IMAGE_URL;
   const userAvatar = import.meta.env.VITE_AVATAR;
   const border = mode === 'dark' ? '1px solid' + colors.blackWhite[200] : '0.2px dotted' + colors.blackWhite[200];
 
@@ -38,7 +38,7 @@ const MyProSidebar: FC = () => {
         breakPoint="md"
         rtl={sidebarProps?.sidebarRTL}
         backgroundColor={colors.blackWhite[300]}
-        image={sidebarProps?.sidebarImage ? sidbarImageUrl : undefined}
+        image={sidebarProps?.sidebarImage ? sidebarImageUrl : undefined}
         collapsed={sidebarProps?.collapsed}
         toggled={finalToggled}
         onBackdropClick={() => {
