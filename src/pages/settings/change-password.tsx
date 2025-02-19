@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Card from '@mui/material/Card';
@@ -16,9 +16,11 @@ import { SessionContext } from '../../contexts/session-context';
 import { useTheme } from '@mui/material';
 import { tokens } from '../../theme/main-theme';
 import { useNavigate } from 'react-router-dom';
+import { useChangePasswordMutation } from '../../graphql/graphql-generated';
+import CustomSnackbar from '../../components/common/custom-snackbar';
 
 const validationSchema = yup.object({
-  currentPassword: yup
+  current_password: yup
     .string()
     .required('Current Password is required')
     .min(6, 'New Password should be of minimum 6 characters length')
@@ -26,7 +28,7 @@ const validationSchema = yup.object({
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).+$/,
       'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
     ),
-  newPassword: yup
+  new_password: yup
     .string()
     .required('New Password is required')
     .min(6, 'New Password should be of minimum 6 characters length')
@@ -34,9 +36,9 @@ const validationSchema = yup.object({
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).+$/,
       'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
     ),
-  confirmPassword: yup
+  confirm_password: yup
     .string()
-    .oneOf([yup.ref('newPassword'), undefined], 'Passwords must match')
+    .oneOf([yup.ref('new_password'), undefined], 'Passwords must match')
     .required('Confirm Password is required'),
 });
 
@@ -48,6 +50,11 @@ const ChangePassword: React.FC = () => {
   const mode = theme.palette.mode;
   const colors = tokens(mode);
 
+  // Snackbar state
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState<string | undefined>(undefined);
+  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error' | 'info' | 'warning'>('success');
+
   const user = {
     id: session?.adminID ?? '',
     name: session?.adminName ?? '',
@@ -55,19 +62,41 @@ const ChangePassword: React.FC = () => {
     role: session?.adminRole === 'ADMIN' ? 'Administrator' : 'User',
   };
 
+  const [changePasswordMutation, { data: updateData, loading, error }] = useChangePasswordMutation();
+
   const formik = useFormik({
     initialValues: {
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: '',
+      current_password: '',
+      new_password: '',
+      confirm_password: '',
     },
     validationSchema: validationSchema,
-    onSubmit: (values, { resetForm }) => {
-      // Implement change password logic here (e.g., API call)
-      console.log('Password changed', values);
+    onSubmit: async (values, { resetForm }) => {
+      try {
+        await changePasswordMutation({ variables: { input: { id: user.id, ...values } } });
+      } catch (err) {
+        console.error('Error changing password', err);
+      }
       resetForm();
     },
   });
+
+  // Handle error side-effect (ideally, use an effect for this)
+  useEffect(() => {
+    if (error) {
+      setSnackbarMessage(error?.message);
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
+    }
+  }, [error]);
+
+  useEffect(() => {
+    if (updateData?.changePassword) {
+      setSnackbarMessage('Password updated successfully!');
+      setSnackbarSeverity('success');
+      setOpenSnackbar(true);
+    }
+  }, [updateData]);
 
   // Callbacks for sidebar actions
   const handleEditProfile = () => {
@@ -86,6 +115,7 @@ const ChangePassword: React.FC = () => {
           mt: 4,
         }}
       >
+        <CustomSnackbar open={openSnackbar} message={snackbarMessage} severity={snackbarSeverity} onClose={() => setOpenSnackbar(false)} />
         <ProfileSidebar user={user} onEditProfileClick={handleEditProfile} />
         <Card
           sx={{
@@ -102,10 +132,13 @@ const ChangePassword: React.FC = () => {
             </Typography>
             <Divider sx={{ mb: 3 }} />
             <form onSubmit={formik.handleSubmit}>
-              {(['currentPassword', 'newPassword', 'confirmPassword'] as const).map((field) => (
+              {(['current_password', 'new_password', 'confirm_password'] as const).map((field) => (
                 <TextField
                   key={field}
-                  label={field.charAt(0).toUpperCase() + field.slice(1)}
+                  label={field
+                    .split('_')
+                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(' ')}
                   type="password"
                   variant="outlined"
                   fullWidth
@@ -125,7 +158,7 @@ const ChangePassword: React.FC = () => {
                 />
               ))}
               <Button variant="contained" color="secondary" type="submit" sx={{ mt: 3, borderRadius: 2 }}>
-                Change Password
+                {loading ? 'Updating...' : 'Change Password'}
               </Button>
             </form>
           </CardContent>
