@@ -125,8 +125,8 @@ function Team() {
       },
       { field: 'email', headerName: 'Email', width: 200 },
       { field: 'role', headerName: 'Role', width: 100 },
-      { field: 'created_at', headerName: 'Created At', width: 250 },
-      { field: 'updated_at', headerName: 'Updated At', width: 250 },
+      { field: 'created_at', headerName: 'Created At', width: 200 },
+      { field: 'updated_at', headerName: 'Updated At', width: 200 },
       {
         field: 'actions',
         headerName: 'Actions',
@@ -178,7 +178,7 @@ function Team() {
   }));
 
   return (
-    <Box sx={{ m: 1 }}>
+    <Box m="20px" sx={{ p: '0 15px' }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <PageHeader
           title="MANAGE TEAM"

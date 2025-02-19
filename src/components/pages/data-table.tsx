@@ -10,6 +10,7 @@ import {
   GridToolbarColumnsButton,
   GridToolbarFilterButton,
   GridToolbarDensitySelector,
+  GridToolbarQuickFilter,
 } from '@mui/x-data-grid/components';
 
 interface DataTableProps {
@@ -25,6 +26,7 @@ const CustomToolbar = () => (
     <GridToolbarFilterButton />
     <GridToolbarDensitySelector />
     <GridToolbarExport printOptions={{ disableToolbarButton: true }} /> {/* Disables Print */}
+    <GridToolbarQuickFilter debounceMs={200} sx={{ width: '300px', fontSize: '1rem' }} />
   </GridToolbarContainer>
 );
 
@@ -38,6 +40,7 @@ const DataTable: FC<DataTableProps> = ({ rows, columns, paginationModel = { page
     <Box
       width="100%"
       height="80vh"
+      overflow={'auto'}
       sx={{
         '& .MuiDataGrid-cell:focus, & .MuiDataGrid-cell:focus-within': {
           outline: 'none !important',
@@ -68,34 +71,27 @@ const DataTable: FC<DataTableProps> = ({ rows, columns, paginationModel = { page
       }}
     >
       {/* paginationMode -> need to check and tweaks */}
-      <DataGrid
-        rowCount={rows.length} // -> If you're using server-side pagination, you must pass the total row count (rowCount).
-        rows={rows}
-        columns={columns}
-        paginationMode="server" // server or client
-        initialState={{ pagination: { paginationModel: { page, pageSize } } }}
-        pageSizeOptions={pageSizeOptions}
-        // slots={{ toolbar: GridToolbar }}
-        slots={{ toolbar: CustomToolbar }} // Use the custom toolbar here
-        checkboxSelection
-        sx={{
-          boxShadow: 5,
-          border: 1,
-          '--DataGrid-containerBackground': colors.blueAccent[700],
-        }}
-        slotProps={{
-          toolbar: {
-            showQuickFilter: true,
-            quickFilterProps: {
-              debounceMs: 200,
-              sx: {
-                width: '300px',
-                fontSize: '1rem',
-              },
-            },
-          },
-        }}
-      />
+      <Box sx={{ minWidth: 1300, height: '100%' }}>
+        <DataGrid
+          rowCount={rows.length} // -> If you're using server-side pagination, you must pass the total row count (rowCount).
+          rows={rows}
+          columns={columns}
+          paginationMode="server" // server or client
+          initialState={{ pagination: { paginationModel: { page, pageSize } } }}
+          pageSizeOptions={pageSizeOptions}
+          // slots={{ toolbar: GridToolbar }}
+          slots={{ toolbar: CustomToolbar }} // Use the custom toolbar here
+          disableRowSelectionOnClick
+          checkboxSelection
+          sx={{
+            maxWidth: 1300,
+            height: '80vh',
+            boxShadow: 5,
+            border: 1,
+            '--DataGrid-containerBackground': colors.blueAccent[700],
+          }}
+        />
+      </Box>
     </Box>
   );
 };

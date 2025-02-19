@@ -112,7 +112,7 @@ function TeamDetails() {
   const { name, email, role, created_at, updated_at } = user;
 
   return (
-    <Box sx={{ m: 1 }}>
+    <Box m="20px" sx={{ p: '0 15px' }}>
       {/* Snackbar Alert */}
       <CustomSnackbar open={openSnackbar} message={snackbarMessage} severity={snackbarSeverity} onClose={() => setOpenSnackbar(false)} />
 

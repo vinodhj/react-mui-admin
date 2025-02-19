@@ -105,7 +105,7 @@ const EditProfile: React.FC = () => {
   };
 
   return (
-    <Box sx={{ m: 1 }}>
+    <Box m="20px" sx={{ p: '0 15px' }}>
       <PageHeader title="CHANGE PASSWORD" Breadcrumbs_level1="Profile" Breadcrumbs_level1_url="/profile" />
       <Container
         maxWidth="lg"

@@ -37,7 +37,7 @@ function CreateTeam() {
   }, [data]); // Runs only when `data` changes
 
   return (
-    <Box sx={{ m: 1 }}>
+    <Box m="20px" sx={{ p: '0 15px' }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <PageHeader title="CREATE TEAM" Breadcrumbs_level1="TEAM" Breadcrumbs_level1_url="/team" />
       </Box>

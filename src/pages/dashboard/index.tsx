@@ -16,7 +16,7 @@ function Dashboard() {
   const colors = tokens(theme.palette.mode);
 
   return (
-    <Box m="20px">
+    <Box m="20px" sx={{ p: '0 15px' }}>
       <Box
         display={smScreen ? 'flex' : 'block'}
         flexDirection={smScreen ? 'row' : 'column'}

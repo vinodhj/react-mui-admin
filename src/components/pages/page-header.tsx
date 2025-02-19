@@ -22,7 +22,7 @@ const PageHeader: FC<HeaderProps> = ({ title, subtitle, Breadcrumbs_level1, Brea
   const colors = tokens(theme.palette.mode);
 
   return (
-    <Box mb="20px" sx={{ p: '0 20px' }}>
+    <Box mb="20px">
       <Typography variant="h3" color={colors.grey[100]} fontWeight="bold" sx={{ mb: '5px' }}>
         {title}
       </Typography>
