@@ -8,6 +8,7 @@ const config: CodegenConfig = {
     ['http://localhost:7787/graphql']: {
       headers: {
         'X-Project-Token': process.env.VITE_PROJECT_TOKEN || '',
+        'x-allow-arbitrary-operations': 'true',
       },
     },
   },
@@ -25,6 +26,15 @@ const config: CodegenConfig = {
     },
     './graphql.schema.json': {
       plugins: ['introspection'],
+    },
+    'src/persisted-queries/': {
+      preset: 'client',
+      presetConfig: {
+        persistedDocuments: {
+          hashAlgorithm: 'sha256',
+        },
+      },
+      config: { federation: true },
     },
   },
 };

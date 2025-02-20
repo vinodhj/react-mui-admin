@@ -1,0 +1,10 @@
+{
+  "b71997bdb2cee8b9b73900d61cd376d4d1ebc42c845f2e2ffc4970107955c2b1": "mutation ChangePassword($input: ChangePasswordInput!) { changePassword(input: $input) }",
+  "9ff05cfb067190a2e514386a8495a6571d438bcf7109e3a37cdb28b38fa19595": "mutation CreateUser($input: SignUpInput!) { __typename signUp(input: $input) { __typename success user { __typename email id name role } } }",
+  "1f948686ec1aba4d12bbcd5925496d10fe264228686e24ecccc772adb6c3e685": "mutation DeleteUser($id: ID!) { __typename deleteUser(input: {id: $id}) }",
+  "75d5bc5842e2f04c56d9f474b18fd2efcdfd87b8c9b9ac2eb963ad65e9b52c67": "mutation EditUser($input: EditUserInput!) { editUser(input: $input) { __typename success user { __typename email id name role } } }",
+  "a7eb43b1c099d43d0035cf3d672fe73a66921563f64bddbdca10e577db555031": "mutation LogOut { logout { success } }",
+  "236baa363f3c0d6dc3c8dda2df5a0b51420b4a2d204f00db1e4d90eb3d6f4377": "mutation login($email: String!, $password: String!) { login(input: {email: $email, password: $password}) { __typename success token user { __typename email id name role } } }",
+  "bd504d7f9958d079c0bae4e1a95f2b59e388425820ed590f5f58e1c781f20c94": "query UserByField($field: ColumnName!, $value: String!) { userByfield(input: {field: $field, value: $value}) { __typename created_at email id name role updated_at } }",
+  "f52e45cbccb38c96baa61d37785e4ec9472e8566181d2b93bbc3921d6ff755a9": "query AllUsers { users { __typename created_at email id name role updated_at } }"
+}

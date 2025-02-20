@@ -1,4 +1,3 @@
-import { useAllUsersQuery } from '../../graphql/graphql-generated';
 import PageHeader from '../../components/pages/page-header';
 import DataTable from '../../components/pages/data-table';
 import LoadingSpinner from '../../components/common/loading-spinner';
@@ -20,6 +19,8 @@ import NewUserButton from '../../components/pages/new-user-button';
 import { useDeleteUser } from '../../hooks/use-delete-user';
 import { SessionContext } from '../../contexts/session-context';
 import CustomSnackbar from '../../components/common/custom-snackbar';
+import { useQuery } from '@apollo/client';
+import { AllUsersDocument } from '../../persisted-queries/graphql';
 
 function Team() {
   const navigate = useNavigate();
@@ -75,7 +76,7 @@ function Team() {
     },
   });
 
-  const { data, loading, error, refetch } = useAllUsersQuery({
+  const { data, loading, error, refetch } = useQuery(AllUsersDocument, {
     fetchPolicy: 'cache-and-network', // using cached data first while fetching fresh data in the background
   });
 
