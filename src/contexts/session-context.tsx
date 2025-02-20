@@ -2,6 +2,7 @@ import React, { createContext, useState, useCallback, useMemo, ReactNode, useEff
 import isJwtTokenExpired from 'jwt-check-expiry';
 import { useLocation } from 'react-router-dom';
 import { ColorModeContext } from './color-mode-context';
+import client from '../graphql/apollo-client';
 
 export interface SessionData {
   colorMode?: string;
@@ -88,6 +89,8 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
         adminRole: '',
         adminID: '',
       });
+
+      client.resetStore();
       localStorage.clear();
       sessionStorage.clear();
       window['location'].reload();

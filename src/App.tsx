@@ -6,6 +6,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import CssBaseline from '@mui/material/CssBaseline';
 import { ColorModeContext, useMode } from './contexts/color-mode-context';
+import ErrorBoundary from './error-boundary';
 
 const AppRoutes = lazy(() => import('./routes/app-routes'));
 
@@ -17,22 +18,24 @@ function App() {
         <ThemeProvider theme={theme}>
           <CssBaseline />
           <SessionProvider>
-            <Suspense
-              fallback={
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    height: '100vh',
-                  }}
-                >
-                  <CircularProgress />
-                </div>
-              }
-            >
-              <AppRoutes />
-            </Suspense>
+            <ErrorBoundary>
+              <Suspense
+                fallback={
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      height: '100vh',
+                    }}
+                  >
+                    <CircularProgress />
+                  </div>
+                }
+              >
+                <AppRoutes />
+              </Suspense>
+            </ErrorBoundary>
           </SessionProvider>
         </ThemeProvider>
       </ColorModeContext.Provider>
