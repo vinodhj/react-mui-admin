@@ -84,6 +84,10 @@ const Faq: React.FC = () => {
                         '& .MuiAccordionSummary-content': {
                           marginLeft: 2, // space between icon and text
                         },
+                        // Push the icon to the left consistently
+                        '& .MuiAccordionSummary-expandIconWrapper': {
+                          marginRight: 'auto',
+                        },
                       }}
                     >
                       <Typography>{item.question}</Typography>
