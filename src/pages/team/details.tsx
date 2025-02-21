@@ -85,6 +85,8 @@ function TeamDetails() {
       field: ColumnName.Id,
       value: id ?? '',
     },
+    notifyOnNetworkStatusChange: true,
+    fetchPolicy: 'network-only',
   });
 
   if (!id) {

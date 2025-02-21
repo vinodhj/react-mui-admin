@@ -76,6 +76,7 @@ function Team() {
   });
 
   const { data, loading, error, refetch } = useAllUsersQuery({
+    notifyOnNetworkStatusChange: true,
     fetchPolicy: 'cache-and-network', // using cached data first while fetching fresh data in the background
   });
 
@@ -179,7 +180,7 @@ function Team() {
 
   return (
     <Box m="20px" sx={{ p: '0 15px' }}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+      <Box display="flex" flexWrap="wrap" justifyContent="space-between" alignItems="center" mb={2}>
         <PageHeader
           title="MANAGE TEAM"
           subtitle="A centralized module for efficient team oversight—add or remove members, assign roles, and monitor performance all in one streamlined interface"

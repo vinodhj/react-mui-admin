@@ -15,7 +15,7 @@ import CreateTeam from '../pages/team/create';
 import Profile from '../pages/settings';
 import ChangePassword from '../pages/settings/change-password';
 import EditProfile from '../pages/settings/edit-profile';
-import Faq from '../pages/faq';
+import Faq from '../pages/settings/faq';
 
 const AppRoutes: React.FC = () => {
   return (

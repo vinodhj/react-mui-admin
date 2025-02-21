@@ -14,7 +14,6 @@ import ReadOnlySearchField from './read-only-search-field';
 import { SearchTokens, tokens } from '../theme/main-theme';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { useAdminKvAssetQuery } from '../graphql/graphql-generated';
-import LoadingSpinner from './common/loading-spinner';
 import ErrorAlert from './common/error-alert';
 
 interface SearchOption {
@@ -54,10 +53,12 @@ const SearchDialog: React.FC = () => {
         kv_key: 'SEARCH_OPTIONS',
       },
     },
+    fetchPolicy: 'cache-and-network',
+    nextFetchPolicy: 'cache-first',
   });
 
   if (loading) {
-    return <LoadingSpinner />;
+    return <div>Loading...</div>;
   }
 
   if (error) {

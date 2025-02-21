@@ -22,6 +22,11 @@ const NewUserButton = ({ to, label }: NewUserButtonProps) => {
         backgroundColor: colors.primary[100],
         color: colors.blackWhite[100],
         textTransform: 'none',
+        [theme.breakpoints.down('sm')]: {
+          // Example: smaller padding & shorter text on mobile
+          padding: '4px 8px',
+          fontSize: '0.8rem',
+        },
         '&:hover': {
           backgroundColor: colors.greenAccent[300],
         },

@@ -25,9 +25,14 @@ function EditTeam() {
       field: ColumnName.Id,
       value: id ?? '',
     },
+    notifyOnNetworkStatusChange: true,
+    fetchPolicy: 'network-only',
   });
 
-  const [updateUserMutation, { data: updateData, loading: updateLoading, error: updateError }] = useEditUserMutation();
+  const [updateUserMutation, { data: updateData, loading: updateLoading, error: updateError }] = useEditUserMutation({
+    notifyOnNetworkStatusChange: true,
+    fetchPolicy: 'network-only',
+  });
 
   // Snackbar state
   const [openSnackbar, setOpenSnackbar] = useState(false);

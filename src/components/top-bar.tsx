@@ -22,7 +22,7 @@ const Topbar: FC = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const colorMode = useContext(ColorModeContext);
-  const handleLogout: () => void = useHandleLogout();
+  const handleLogout = useHandleLogout();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const sidebarProps = useContext(SidebarContext);
 

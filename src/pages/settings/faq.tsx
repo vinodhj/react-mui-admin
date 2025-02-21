@@ -30,6 +30,8 @@ const Faq: React.FC = () => {
         kv_key: 'FAQ',
       },
     },
+    fetchPolicy: 'cache-and-network',
+    nextFetchPolicy: 'cache-first',
   });
 
   if (loading) {
@@ -139,6 +141,9 @@ const Faq: React.FC = () => {
                         // Push the icon to the left consistently
                         '& .MuiAccordionSummary-expandIconWrapper': {
                           marginRight: 'auto',
+                        },
+                        '& .Mui-expanded': {
+                          marginRight: '10px',
                         },
                       }}
                     >
