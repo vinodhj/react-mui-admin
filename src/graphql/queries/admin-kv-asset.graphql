@@ -1,0 +1,7 @@
+query AdminKVAsset($input: AdminKvAssetInput!) {
+  adminKvAsset(input:$input){
+    __typename
+    kv_key
+    kv_value
+  }
+}

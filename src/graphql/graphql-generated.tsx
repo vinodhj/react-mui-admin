@@ -16,6 +16,17 @@ export type Scalars = {
   Int: { input: number; output: number };
   Float: { input: number; output: number };
   DateTime: { input: string; output: string };
+  JSON: { input: any; output: any };
+};
+
+export type AdminKvAsset = {
+  __typename?: 'AdminKvAsset';
+  kv_key: Scalars['String']['output'];
+  kv_value?: Maybe<Scalars['JSON']['output']>;
+};
+
+export type AdminKvAssetInput = {
+  kv_key: Scalars['String']['input'];
 };
 
 export type ChangePasswordInput = {
@@ -98,9 +109,14 @@ export type MutationSignUpArgs = {
 
 export type Query = {
   __typename?: 'Query';
+  adminKvAsset?: Maybe<AdminKvAsset>;
   userByEmail?: Maybe<UserResponse>;
   userByfield?: Maybe<Array<Maybe<UserResponse>>>;
   users?: Maybe<Array<Maybe<UserResponse>>>;
+};
+
+export type QueryAdminKvAssetArgs = {
+  input?: InputMaybe<AdminKvAssetInput>;
 };
 
 export type QueryUserByEmailArgs = {
@@ -222,6 +238,15 @@ export type LoginMutation = {
     token?: string | null;
     user?: { __typename: 'UserSuccessResponse'; id: string; name: string; email: string; role: Role } | null;
   };
+};
+
+export type AdminKvAssetQueryVariables = Exact<{
+  input: AdminKvAssetInput;
+}>;
+
+export type AdminKvAssetQuery = {
+  __typename?: 'Query';
+  adminKvAsset?: { __typename: 'AdminKvAsset'; kv_key: string; kv_value?: any | null } | null;
 };
 
 export type UserByFieldQueryVariables = Exact<{
@@ -480,6 +505,53 @@ export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginM
 export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
 export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
 export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
+export const AdminKvAssetDocument = gql`
+  query AdminKVAsset($input: AdminKvAssetInput!) {
+    adminKvAsset(input: $input) {
+      __typename
+      kv_key
+      kv_value
+    }
+  }
+`;
+
+/**
+ * __useAdminKvAssetQuery__
+ *
+ * To run a query within a React component, call `useAdminKvAssetQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAdminKvAssetQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAdminKvAssetQuery({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useAdminKvAssetQuery(
+  baseOptions: Apollo.QueryHookOptions<AdminKvAssetQuery, AdminKvAssetQueryVariables> &
+    ({ variables: AdminKvAssetQueryVariables; skip?: boolean } | { skip: boolean })
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<AdminKvAssetQuery, AdminKvAssetQueryVariables>(AdminKvAssetDocument, options);
+}
+export function useAdminKvAssetLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<AdminKvAssetQuery, AdminKvAssetQueryVariables>) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<AdminKvAssetQuery, AdminKvAssetQueryVariables>(AdminKvAssetDocument, options);
+}
+export function useAdminKvAssetSuspenseQuery(
+  baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<AdminKvAssetQuery, AdminKvAssetQueryVariables>
+) {
+  const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<AdminKvAssetQuery, AdminKvAssetQueryVariables>(AdminKvAssetDocument, options);
+}
+export type AdminKvAssetQueryHookResult = ReturnType<typeof useAdminKvAssetQuery>;
+export type AdminKvAssetLazyQueryHookResult = ReturnType<typeof useAdminKvAssetLazyQuery>;
+export type AdminKvAssetSuspenseQueryHookResult = ReturnType<typeof useAdminKvAssetSuspenseQuery>;
+export type AdminKvAssetQueryResult = Apollo.QueryResult<AdminKvAssetQuery, AdminKvAssetQueryVariables>;
 export const UserByFieldDocument = gql`
   query UserByField($field: ColumnName!, $value: String!) {
     userByfield(input: { field: $field, value: $value }) {

@@ -4,6 +4,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Divider from '@mui/material/Divider';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import Typography from '@mui/material/Typography';
+import QuizIcon from '@mui/icons-material/Quiz';
 
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -45,6 +46,20 @@ const SettingMenu: FC<UserMenuProps> = ({ anchorEl, open, handleMenuClose, handl
         </Typography>
       </MenuItem>
       <Divider />
+
+      <MenuItem
+        onClick={() => {
+          handleMenuClose();
+          navigate('/faq');
+        }}
+      >
+        <ListItemIcon sx={{ color: colors.grey[100] }}>
+          <QuizIcon fontSize="small" />
+        </ListItemIcon>
+        <Typography variant="body1" sx={{ color: colors.grey[100] }}>
+          FAQ
+        </Typography>
+      </MenuItem>
 
       <MenuItem
         onClick={() => {

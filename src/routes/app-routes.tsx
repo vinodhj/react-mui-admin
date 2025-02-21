@@ -15,6 +15,7 @@ import CreateTeam from '../pages/team/create';
 import Profile from '../pages/settings';
 import ChangePassword from '../pages/settings/change-password';
 import EditProfile from '../pages/settings/edit-profile';
+import Faq from '../pages/faq';
 
 const AppRoutes: React.FC = () => {
   return (
@@ -37,6 +38,9 @@ const AppRoutes: React.FC = () => {
         <Route path="/profile" element={<Profile />} />
         <Route path="/edit-profile" element={<EditProfile />} />
         <Route path="/change-password" element={<ChangePassword />} />
+
+        {/* FAQ */}
+        <Route path="/faq" element={<ProtectedRoute element={<Faq />} />} />
 
         {/* Catch-all: 404 Not Found */}
         <Route path="*" element={<NotFoundPage />} />
