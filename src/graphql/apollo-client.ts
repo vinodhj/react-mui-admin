@@ -47,17 +47,23 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 
+// its work fine when we use backend with apollo server.
 const persistedQueriesLink = createPersistedQueryLink({
-  generateHash: (document: DocumentNode) => {
-    console.log(document);
-    const persistedDocument = document as PersistedDocumentNode;
-    if (persistedDocument.__meta__?.hash) {
-      return persistedDocument.__meta__.hash;
-    }
-    //return "236baa363f3c0d6dc3c8dda2df5a0b51420b4a2d204f00db1e4d90eb3d6f4377"
-    return sha256(print(document)).then((hash) => hash);
-  },
+  sha256,
+  useGETForHashedQueries: true,
 });
+
+// codegen will need to handle "__meta__.hash" field as well, so we need to manually move this field to under document using script - WIP
+// const persistedQueriesLink = createPersistedQueryLink({
+//   generateHash: (document: DocumentNode) => {
+//     console.log(document);
+//     const persistedDocument = document as PersistedDocumentNode;
+//     if (persistedDocument.__meta__?.hash) {
+//       return persistedDocument.__meta__.hash;
+//     }
+//     return sha256(print(document)).then((hash) => hash);
+//   },
+// });
 
 const client = new ApolloClient({
   connectToDevTools: import.meta.env.DEV,
