@@ -23,10 +23,11 @@ interface SearchOption {
 const SEARCH_OPTIONS: SearchOption[] = [
   { label: 'App', path: '/dashboard', tags: 'OVERVIEW' },
   { label: 'Team', path: '/team', tags: 'LIST' },
-  { label: 'Create Team', path: '/team/create', tags: 'Create' },
-  { label: 'My Profile', path: '/profile', tags: 'Settings' },
-  { label: 'Edit Profile', path: '/edit-profile', tags: 'Settings' },
-  { label: 'Change Password', path: '/change-password', tags: 'Settings' },
+  { label: 'Create Team', path: '/team/create', tags: 'CREATE' },
+  { label: 'My Profile', path: '/profile', tags: 'SETTINGS' },
+  { label: 'Edit Profile', path: '/edit-profile', tags: 'SETTINGS' },
+  { label: 'Change Password', path: '/change-password', tags: 'SETTINGS' },
+  { label: 'FAQ', path: '/faq', tags: 'SETTINGS' },
   // { label: 'Tracker Expense', path: '/form', tags: 'LIST' },
 ];
 
