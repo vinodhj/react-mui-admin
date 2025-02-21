@@ -13,9 +13,21 @@ if (!projectToken) {
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors) {
-    graphQLErrors.forEach(({ message, locations, path }) =>
-      console.log(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`)
-    );
+    graphQLErrors.forEach(({ message, locations, path, extensions }) => {
+      console.log(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`);
+      // Handle revoke token error
+      if (extensions?.code === 'REVOKE_TOKEN_ERROR') {
+        console.warn('Revoke token error encountered. Clearing storage and redirecting.');
+        localStorage.removeItem('access_token');
+        sessionStorage.removeItem('session_admin_id');
+        sessionStorage.removeItem('session_admin_name');
+        sessionStorage.removeItem('session_admin_email');
+        sessionStorage.removeItem('session_admin_role');
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.href = '/revoke?revokeError=true';
+      }
+    });
   }
   if (networkError) {
     console.log(`[Network error]: ${networkError}`);

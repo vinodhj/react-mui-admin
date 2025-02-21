@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { lazy } from 'react';
 
 import AuthLayout from '../layouts/auth-layout';
 import MainLayout from '../layouts/main-layout';
@@ -17,11 +17,14 @@ import ChangePassword from '../pages/settings/change-password';
 import EditProfile from '../pages/settings/edit-profile';
 import Faq from '../pages/settings/faq';
 
+const RevokeError = lazy(() => import('../pages/revoke'));
+
 const AppRoutes: React.FC = () => {
   return (
     <Routes>
       <Route element={<PublicRoute element={<AuthLayout />} />}>
         <Route path="/" element={<SignIn />} />
+        <Route path="/revoke" element={<RevokeError />} />
       </Route>
 
       {/* Main Layout (Dashboard, other protected pages) */}
