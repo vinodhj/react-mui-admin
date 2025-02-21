@@ -13,22 +13,15 @@ import { alpha } from '@mui/material/styles'; // for semi-transparent background
 import ReadOnlySearchField from './read-only-search-field';
 import { SearchTokens, tokens } from '../theme/main-theme';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
+import { useAdminKvAssetQuery } from '../graphql/graphql-generated';
+import LoadingSpinner from './common/loading-spinner';
+import ErrorAlert from './common/error-alert';
 
 interface SearchOption {
   label: string;
   path: string;
   tags: string;
 }
-
-const SEARCH_OPTIONS: SearchOption[] = [
-  { label: 'App', path: '/dashboard', tags: 'OVERVIEW' },
-  { label: 'Team', path: '/team', tags: 'LIST' },
-  { label: 'Create Team', path: '/team/create', tags: 'CREATE' },
-  { label: 'My Profile', path: '/profile', tags: 'SETTINGS' },
-  { label: 'Edit Profile', path: '/edit-profile', tags: 'SETTINGS' },
-  { label: 'Change Password', path: '/change-password', tags: 'SETTINGS' },
-  { label: 'FAQ', path: '/faq', tags: 'SETTINGS' },
-];
 
 const SearchDialog: React.FC = () => {
   const location = useLocation();
@@ -43,15 +36,6 @@ const SearchDialog: React.FC = () => {
   // Ref for the TextField inside the dialog
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-    setSearch(''); // clear search on close
-  };
-
   // Cmd+K / Ctrl+K to open
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -63,6 +47,33 @@ const SearchDialog: React.FC = () => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
+
+  const { data, loading, error } = useAdminKvAssetQuery({
+    variables: {
+      input: {
+        kv_key: 'SEARCH_OPTIONS',
+      },
+    },
+  });
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
+
+  if (error) {
+    return <ErrorAlert message={error.message} />;
+  }
+
+  const SEARCH_OPTIONS: SearchOption[] = data?.adminKvAsset?.kv_value || [];
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setSearch(''); // clear search on close
+  };
 
   // Filter the list by user input
   const filteredOptions = SEARCH_OPTIONS.filter(

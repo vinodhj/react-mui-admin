@@ -10,24 +10,58 @@ import Box from '@mui/material/Box';
 // Icons
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
-
-import faqGroups from './faqData.json';
 import PageHeader from '../../components/pages/page-header';
+import { useAdminKvAssetQuery } from '../../graphql/graphql-generated';
+import LoadingSpinner from '../../components/common/loading-spinner';
+import ErrorAlert from '../../components/common/error-alert';
+import { useTheme } from '@mui/material';
+import { tokens } from '../../theme/main-theme';
 
 const Faq: React.FC = () => {
+  const theme = useTheme();
+  const mode = theme.palette.mode;
+  const colors = tokens(mode);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [expanded, setExpanded] = useState<string | false>(false);
 
+  const { data, loading, error } = useAdminKvAssetQuery({
+    variables: {
+      input: {
+        kv_key: 'FAQ',
+      },
+    },
+  });
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
+
+  if (error) {
+    return <ErrorAlert message={error.message} />;
+  }
+
+  const faqGroups = data?.adminKvAsset?.kv_value || [];
+
   // Filter each group based on the search query.
-  const filteredGroups = faqGroups
-    .map((group) => {
-      const filteredItems = group.items.filter(
-        (item) => item.question.toLowerCase().includes(searchQuery.toLowerCase())
+  interface FaqItem {
+    question: string;
+    answer: string;
+  }
+
+  interface FaqGroup {
+    heading: string;
+    items: FaqItem[];
+  }
+
+  const filteredGroups: FaqGroup[] = faqGroups
+    .map((group: FaqGroup) => {
+      const filteredItems: FaqItem[] = group.items.filter(
+        (item: FaqItem) => item.question.toLowerCase().includes(searchQuery.toLowerCase())
         /* enable this line to include answer in search  -> || item.answer.toLowerCase().includes(searchQuery.toLowerCase()) */
       );
       return { ...group, items: filteredItems };
     })
-    .filter((group) => group.items.length > 0);
+    .filter((group: FaqGroup) => group.items.length > 0);
 
   return (
     <Box m="20px" sx={{ p: '0 15px' }}>
@@ -48,6 +82,24 @@ const Faq: React.FC = () => {
             placeholder="Ask a question..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            sx={{
+              // Default (unfocused) label color
+              '& .MuiFormLabel-root': {
+                color: colors.grey[50],
+              },
+              // Label color when focused or hovered
+              '& .MuiFormLabel-root.Mui-focused': {
+                color: colors.greenAccent[400],
+              },
+              //input text color:
+              '& .MuiOutlinedInput-root': {
+                color: colors.grey[50],
+              },
+              // The border color on hover/focus
+              '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: colors.grey[100],
+              },
+            }}
           />
         </Box>
 
