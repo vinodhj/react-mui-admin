@@ -125,7 +125,7 @@ function TeamDetails() {
         deleteLoading={deleteLoading}
       />
 
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+      <Box display="flex" flexWrap="wrap" justifyContent="space-between" alignItems="center" mb={2}>
         <PageHeader title="TEAM DETAILS" Breadcrumbs_level1="TEAM" Breadcrumbs_level1_url="/team" />
 
         <NewUserButton to="/team/create" label="+ New User" />

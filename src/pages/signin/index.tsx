@@ -27,7 +27,6 @@ export default function SignIn() {
     login({
       variables: { email: values.email, password: values.password },
       notifyOnNetworkStatusChange: false,
-      fetchPolicy: 'no-cache',
       onCompleted: (data) => {
         setServerError(null);
         if (data?.login?.token) {
