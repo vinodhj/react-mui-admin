@@ -17,7 +17,6 @@ interface SidebarItemProps {
 const SidebarItem: FC<SidebarItemProps> = ({ title, to, icon, selected, setSelected, setCollapsed, setToggled, isMobile }) => {
   const handleClick = () => {
     setSelected(title);
-    console.log('isMobile', isMobile);
     if (isMobile) {
       setCollapsed(true);
       setToggled(false); // Close sidebar only on mobile
