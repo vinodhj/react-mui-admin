@@ -11,9 +11,12 @@ interface SidebarMenuItemsProps {
   selected: string;
   setSelected: React.Dispatch<React.SetStateAction<string>>;
   colors: any;
+  setCollapsed: (value: boolean) => void;
+  setToggled: (value: boolean) => void;
+  isMobile: boolean;
 }
 
-const SidebarMenuItems: FC<SidebarMenuItemsProps> = ({ collapsed, selected, setSelected, colors }) => {
+const SidebarMenuItems: FC<SidebarMenuItemsProps> = ({ collapsed, selected, setSelected, colors, setCollapsed, setToggled, isMobile }) => {
   return (
     <Box
       sx={{
@@ -34,17 +37,44 @@ const SidebarMenuItems: FC<SidebarMenuItemsProps> = ({ collapsed, selected, setS
       }}
     >
       <Box paddingLeft={collapsed ? undefined : '2%'}>
-        <SidebarItem title="Dashboard" to="/dashboard" icon={<HomeOutlinedIcon />} selected={selected} setSelected={setSelected} />
+        <SidebarItem
+          title="Dashboard"
+          to="/dashboard"
+          icon={<HomeOutlinedIcon />}
+          selected={selected}
+          setSelected={setSelected}
+          setCollapsed={setCollapsed}
+          setToggled={setToggled}
+          isMobile={isMobile}
+        />
 
         <Typography variant="h6" color={colors.grey[300]} sx={{ m: '15px 20px 5px 20px' }}>
           Data
         </Typography>
-        <SidebarItem title="Manage Team" to="/team" icon={<PeopleOutlinedIcon />} selected={selected} setSelected={setSelected} />
+        <SidebarItem
+          title="Manage Team"
+          to="/team"
+          icon={<PeopleOutlinedIcon />}
+          selected={selected}
+          setSelected={setSelected}
+          setCollapsed={setCollapsed}
+          setToggled={setToggled}
+          isMobile={isMobile}
+        />
 
         <Typography variant="h6" color={colors.grey[300]} sx={{ m: '15px 20px 5px 20px' }}>
           Pages
         </Typography>
-        <SidebarItem title="Tracker Expense" to="/form" icon={<PersonOutlinedIcon />} selected={selected} setSelected={setSelected} />
+        <SidebarItem
+          title="Tracker Expense"
+          to="/form"
+          icon={<PersonOutlinedIcon />}
+          selected={selected}
+          setSelected={setSelected}
+          setCollapsed={setCollapsed}
+          setToggled={setToggled}
+          isMobile={isMobile}
+        />
 
         {/* Demo: Generate multiple items */}
         {/* {[...Array(15)].map((_, i) => (

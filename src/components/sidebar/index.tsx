@@ -58,7 +58,15 @@ const MyProSidebar: FC = () => {
             setToggled={sidebarProps!.setToggled}
             colors={colors}
           />
-          <SidebarMenuItems collapsed={sidebarProps!.collapsed} selected={selected} setSelected={setSelected} colors={colors} />
+          <SidebarMenuItems
+            collapsed={sidebarProps!.collapsed}
+            selected={selected}
+            setSelected={setSelected}
+            colors={colors}
+            setCollapsed={sidebarProps!.setCollapsed}
+            setToggled={sidebarProps!.setToggled}
+            isMobile={isMobile}
+          />
           <SidebarFooter
             collapsed={sidebarProps!.collapsed}
             userAvatar={userAvatar}

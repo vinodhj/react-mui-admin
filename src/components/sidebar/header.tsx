@@ -3,8 +3,7 @@ import { MenuItem } from 'react-pro-sidebar';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-
-import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
 import SwitchRightOutlinedIcon from '@mui/icons-material/SwitchRightOutlined';
 import SwitchLeftOutlinedIcon from '@mui/icons-material/SwitchLeftOutlined';
@@ -88,7 +87,7 @@ const SidebarHeader: FC<SidebarHeaderProps> = ({ collapsed, sidebarRTL, setSideb
             colors={colors}
           />
         }
-        component={<RouterLink to="/" replace />}
+        // component={<RouterLink to="/" replace />}
         style={{
           margin: '10px 0 20px 0',
           color: colors.grey[100],

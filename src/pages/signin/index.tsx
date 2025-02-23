@@ -8,6 +8,8 @@ import signInTheme from '../../theme/signIn-theme';
 import { Suspense, useCallback, useContext } from 'react';
 import { useMediaQuery } from '@mui/material';
 import Grid from '@mui/material/Grid2';
+import CircularProgress from '@mui/material/CircularProgress';
+
 import { SessionContext } from '../../contexts/session-context';
 
 const SignInForm = React.lazy(() => import('../../components/auth/signin-form'));
@@ -59,7 +61,20 @@ export default function SignIn() {
 
   return (
     <ThemeProvider theme={signInTheme}>
-      <Suspense fallback={<>Loading...</>}>
+      <Suspense
+        fallback={
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: '100vh',
+            }}
+          >
+            <CircularProgress />
+          </div>
+        }
+      >
         <Grid container component="main" sx={{ height: '100vh' }}>
           <CssBaseline />
           <Grid

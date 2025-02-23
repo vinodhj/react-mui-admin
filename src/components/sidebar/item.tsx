@@ -9,11 +9,22 @@ interface SidebarItemProps {
   icon: React.ReactNode;
   selected: string;
   setSelected: React.Dispatch<React.SetStateAction<string>>;
+  setCollapsed: (value: boolean) => void;
+  setToggled: (value: boolean) => void;
+  isMobile: boolean;
 }
 
-const SidebarItem: FC<SidebarItemProps> = ({ title, to, icon, selected, setSelected }) => {
+const SidebarItem: FC<SidebarItemProps> = ({ title, to, icon, selected, setSelected, setCollapsed, setToggled, isMobile }) => {
+  const handleClick = () => {
+    setSelected(title);
+    console.log('isMobile', isMobile);
+    if (isMobile) {
+      setCollapsed(true);
+      setToggled(false); // Close sidebar only on mobile
+    }
+  };
   return (
-    <MenuItem active={selected === title} icon={icon} component={<RouterLink to={to} />} onClick={() => setSelected(title)}>
+    <MenuItem active={selected === title} icon={icon} component={<RouterLink to={to} />} onClick={handleClick}>
       <Typography>{title}</Typography>
     </MenuItem>
   );
