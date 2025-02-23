@@ -1,6 +1,5 @@
 import React, { useContext } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useSession } from '../hooks/use-session';
 import { SessionContext } from '../contexts/session-context';
 import AccessDenied from '../pages/access-denied';
 
@@ -35,6 +34,6 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 };
 
 export const PublicRoute = ({ element }: { element: React.ReactNode }) => {
-  const { session } = useSession();
-  return session.token ? <Navigate to="/dashboard" replace /> : element;
+  const { session } = useContext(SessionContext) ?? {};
+  return session?.token ? <Navigate to="/dashboard" replace /> : element;
 };

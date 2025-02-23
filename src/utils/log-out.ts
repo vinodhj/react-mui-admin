@@ -1,9 +1,11 @@
+import { useContext } from 'react';
+import { SessionContext } from '../contexts/session-context';
 import client from '../graphql/apollo-client';
 import { useLogOutMutation } from '../graphql/graphql-generated';
-import { useSession } from '../hooks/use-session';
 
 export const useHandleLogout = () => {
-  const { updateSession } = useSession();
+  const sessionDetails = useContext(SessionContext);
+  const { updateSession } = sessionDetails ?? {};
 
   const [logOutMutation] = useLogOutMutation();
 
@@ -16,7 +18,7 @@ export const useHandleLogout = () => {
     }
 
     // Update the session context to clear the token and user data.
-    updateSession({
+    updateSession?.({
       token: '',
       adminName: '',
       adminEmail: '',

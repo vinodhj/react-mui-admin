@@ -3,17 +3,18 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider, useTheme } from '@mui/material/styles';
 import { useLoginMutation } from '../../graphql/graphql-generated';
 import { useValidateSignInForm } from '../../hooks/auth/use-validate-signin';
-import { useSession } from '../../hooks/use-session';
 import Paper from '@mui/material/Paper';
 import signInTheme from '../../theme/signIn-theme';
-import { Suspense, useCallback } from 'react';
+import { Suspense, useCallback, useContext } from 'react';
 import { useMediaQuery } from '@mui/material';
 import Grid from '@mui/material/Grid2';
+import { SessionContext } from '../../contexts/session-context';
 
 const SignInForm = React.lazy(() => import('../../components/auth/signin-form'));
 
 export default function SignIn() {
-  const { updateSession } = useSession();
+  const sessionDetails = useContext(SessionContext);
+  const { updateSession } = sessionDetails ?? {};
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -31,7 +32,7 @@ export default function SignIn() {
         setServerError(null);
         if (data?.login?.token) {
           // Update the session state
-          updateSession({
+          updateSession?.({
             token: data.login.token,
             adminName: data.login.user?.name ?? '',
             adminEmail: data.login.user?.email ?? '',

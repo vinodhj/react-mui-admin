@@ -2,19 +2,20 @@ import React, { FC, useContext, useState } from 'react';
 import { Box, useMediaQuery, useTheme } from '@mui/material';
 import { Sidebar, Menu } from 'react-pro-sidebar';
 import { tokens } from '../../theme/main-theme';
-import { useSession } from '../../hooks/use-session';
 import { useHandleLogout } from '../../utils/log-out';
 import SidebarHeader from './header';
 import SidebarMenuItems from './sidebar-menu-items';
 import SidebarFooter from './footer';
 import { getMenuItemStyles } from './menu-item-styles';
 import { SidebarContext } from '../../contexts/sidebar-context';
+import { SessionContext } from '../../contexts/session-context';
 
 const MyProSidebar: FC = () => {
   const theme = useTheme();
   const mode = theme.palette.mode;
   const colors = tokens(mode);
-  const { session } = useSession();
+  const sessionDetails = useContext(SessionContext);
+  const { session } = sessionDetails ?? {};
   const sidebarProps = useContext(SidebarContext);
   const [selected, setSelected] = useState<string>('Dashboard');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -61,7 +62,7 @@ const MyProSidebar: FC = () => {
           <SidebarFooter
             collapsed={sidebarProps!.collapsed}
             userAvatar={userAvatar}
-            session={session}
+            session={session ?? { adminName: '', adminEmail: '' }}
             colors={colors}
             anchorEl={anchorEl}
             handleMenuOpen={handleMenuOpen}
