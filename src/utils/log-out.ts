@@ -22,6 +22,7 @@ export const useHandleLogout = () => {
       adminEmail: '',
       adminRole: '',
       adminID: '',
+      colorMode: '',
     });
 
     try {

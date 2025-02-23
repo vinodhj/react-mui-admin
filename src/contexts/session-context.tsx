@@ -3,6 +3,7 @@ import isJwtTokenExpired from 'jwt-check-expiry';
 import { useLocation } from 'react-router-dom';
 import { ColorModeContext } from './color-mode-context';
 import client from '../graphql/apollo-client';
+import getStoredOrPreferredColorMode from '../utils/preferred-color-mode';
 
 export interface SessionData {
   colorMode?: string;
@@ -28,7 +29,7 @@ const isBrowser = typeof window !== 'undefined';
 const getStorageItem = (storage: Storage, key: string): string => (isBrowser ? storage.getItem(key) ?? '' : '');
 
 const defaultSession: SessionData = {
-  colorMode: getStorageItem(localStorage, 'colorMode') || 'dark',
+  colorMode: getStorageItem(localStorage, 'colorMode') || getStoredOrPreferredColorMode(),
   token: getStorageItem(localStorage, 'access_token'),
   sidebarImage: getStorageItem(localStorage, 'sidebarImage') || 'true',
   sidebarCollapsed: getStorageItem(localStorage, 'sidebarCollapsed') || 'false',
@@ -49,8 +50,8 @@ interface SessionProviderProps {
 const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
   const [session, setSession] = useState<SessionData>(defaultSession);
   const location = useLocation();
-  const { setDarkMode } = useContext(ColorModeContext);
-
+  const { setSystemMode } = useContext(ColorModeContext);
+  console.log('session', session);
   const updateSession = useCallback(
     (data: SessionData) => {
       setSession(data);
@@ -60,8 +61,7 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
         localStorage.clear();
         sessionStorage.clear();
       }
-
-      localStorage.setItem('colorMode', data.colorMode ?? 'dark');
+      localStorage.setItem('colorMode', data.colorMode ?? getStoredOrPreferredColorMode());
       localStorage.setItem('sidebarImage', data.sidebarImage?.toString() ?? 'true');
       localStorage.setItem('sidebarCollapsed', data.sidebarCollapsed?.toString() ?? 'false');
       localStorage.setItem('sidebarRTL', data.sidebarRTL?.toString() ?? 'false');
@@ -70,10 +70,10 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
       sessionStorage.setItem('session_admin_role', data.adminRole);
       sessionStorage.setItem('session_admin_id', data.adminID);
 
-      // Force theme to dark immediately
-      setDarkMode();
+      // Force theme to system theme immediately
+      setSystemMode();
     },
-    [setDarkMode]
+    [setSystemMode]
   );
 
   // Define a function that checks for token expiration using isJwtTokenExpired.
@@ -88,6 +88,7 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
         adminEmail: '',
         adminRole: '',
         adminID: '',
+        colorMode: '',
       });
 
       client.resetStore();
@@ -107,6 +108,7 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
     const intervalId = setInterval(checkToken, signOutCheckInterval);
     return () => clearInterval(intervalId);
   }, [checkToken]);
+
   const value = useMemo(() => ({ session, updateSession }), [session, updateSession]);
 
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;

@@ -1,10 +1,10 @@
-import { FC } from 'react';
+import { FC, memo, useCallback } from 'react';
 import { MenuItem } from 'react-pro-sidebar';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
 import SwitchRightOutlinedIcon from '@mui/icons-material/SwitchRightOutlined';
 import SwitchLeftOutlinedIcon from '@mui/icons-material/SwitchLeftOutlined';
@@ -12,7 +12,7 @@ import SwitchLeftOutlinedIcon from '@mui/icons-material/SwitchLeftOutlined';
 interface SidebarHeaderProps {
   collapsed: boolean;
   sidebarRTL: boolean;
-  setSidebarRTL: (value: boolean) => void;
+  setSidebarRTL: (value: boolean | ((prev: boolean) => boolean)) => void;
   setCollapsed: (value: boolean) => void;
   setToggled: (value: boolean) => void;
   colors: any; // You can type this more specifically if desired.
@@ -21,34 +21,60 @@ interface SidebarHeaderProps {
 const SidebarHeaderIcon: FC<{
   collapsed: boolean;
   sidebarRTL: boolean;
-  setSidebarRTL: (value: boolean) => void;
+  setSidebarRTL: (value: boolean | ((prev: boolean) => boolean)) => void;
   setCollapsed: (value: boolean) => void;
   setToggled: (value: boolean) => void;
   colors: any;
 }> = ({ collapsed, sidebarRTL, setSidebarRTL, setCollapsed, setToggled, colors }) => {
-  const handleMenuClick = () => {
+  const handleMenuClick = useCallback(() => {
     setToggled(true);
     setCollapsed(false);
-  };
+  }, [setToggled, setCollapsed]);
 
-  const handleSwitchLeftClick = () => {
-    setSidebarRTL(!sidebarRTL);
-  };
-
-  const handleSwitchRightClick = () => {
-    setSidebarRTL(!sidebarRTL);
-  };
+  const toggleSidebarDirection = useCallback(() => {
+    setSidebarRTL((prev: boolean) => !prev);
+  }, [setSidebarRTL]);
 
   if (collapsed) {
     return <MenuOutlinedIcon onClick={handleMenuClick} />;
-  } else if (sidebarRTL) {
-    return <SwitchLeftOutlinedIcon sx={{ color: colors.greenAccent[400] }} onClick={handleSwitchLeftClick} />;
-  } else {
-    return <SwitchRightOutlinedIcon sx={{ color: colors.greenAccent[400] }} onClick={handleSwitchRightClick} />;
   }
+  return (
+    <>
+      {sidebarRTL ? (
+        <SwitchLeftOutlinedIcon sx={{ color: colors.greenAccent[400] }} onClick={toggleSidebarDirection} />
+      ) : (
+        <SwitchRightOutlinedIcon sx={{ color: colors.greenAccent[400] }} onClick={toggleSidebarDirection} />
+      )}
+    </>
+  );
 };
 
 const SidebarHeader: FC<SidebarHeaderProps> = ({ collapsed, sidebarRTL, setSidebarRTL, setCollapsed, setToggled, colors }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleAdminClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      if (location.pathname !== '/') {
+        navigate('/', { replace: true }); // Prevents duplicate re-renders
+      }
+    },
+    [location.pathname, navigate]
+  );
+
+  // ✅ Prevent unnecessary state updates
+  const handleCollapse = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      if (!collapsed) {
+        setCollapsed(true);
+        setToggled(false);
+      }
+    },
+    [collapsed, setCollapsed, setToggled]
+  );
+
   return (
     <Box sx={{ position: 'sticky', top: 0, zIndex: 2 }}>
       <MenuItem
@@ -62,6 +88,7 @@ const SidebarHeader: FC<SidebarHeaderProps> = ({ collapsed, sidebarRTL, setSideb
             colors={colors}
           />
         }
+        component={<RouterLink to="/" replace />}
         style={{
           margin: '10px 0 20px 0',
           color: colors.grey[100],
@@ -74,18 +101,12 @@ const SidebarHeader: FC<SidebarHeaderProps> = ({ collapsed, sidebarRTL, setSideb
             <Typography
               variant="h4"
               color={colors.vibrantBlue[500]}
-              component={RouterLink}
-              to="/"
               sx={{ textDecoration: 'none', fontWeight: 'bold' }}
+              onClick={handleAdminClick}
             >
               Admin
             </Typography>
-            <IconButton
-              onClick={() => {
-                setCollapsed(true);
-                setToggled(false);
-              }}
-            >
+            <IconButton onClick={handleCollapse}>
               <MenuOutlinedIcon />
             </IconButton>
           </Box>
@@ -95,4 +116,4 @@ const SidebarHeader: FC<SidebarHeaderProps> = ({ collapsed, sidebarRTL, setSideb
   );
 };
 
-export default SidebarHeader;
+export default memo(SidebarHeader);
