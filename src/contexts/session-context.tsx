@@ -51,7 +51,6 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
   const [session, setSession] = useState<SessionData>(defaultSession);
   const location = useLocation();
   const { setSystemMode } = useContext(ColorModeContext);
-  console.log('session', session);
   const updateSession = useCallback(
     (data: SessionData) => {
       setSession(data);

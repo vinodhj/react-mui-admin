@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "sideEffects": false,
   "scripts": {
     "clean": "rm -rf ./dist ./node_modules",
     "dev": "(kill -9 $(lsof -t -i:1878) || true) && vite --port 1878",
