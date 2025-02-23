@@ -55,7 +55,7 @@ const SidebarHeader: FC<SidebarHeaderProps> = ({ collapsed, sidebarRTL, setSideb
   const handleAdminClick = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault();
-      if (location.pathname !== '/') {
+      if (location.pathname !== '/dashboard') {
         navigate('/', { replace: true }); // Prevents duplicate re-renders
       }
     },
