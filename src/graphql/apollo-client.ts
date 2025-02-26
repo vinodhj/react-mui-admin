@@ -36,7 +36,8 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 
 const httpLink = createHttpLink({
   uri: `${graphqlApiUrl}/graphql`,
-  credentials: 'same-origin',
+  // credentials: 'same-origin',
+  credentials: 'include',
 });
 
 const authLink = setContext((_, { headers }) => {
