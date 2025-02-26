@@ -125,6 +125,7 @@ const DataTable: FC<DataTableProps> = ({ rows, columns, paginationModel = { page
           pageSizeOptions={pageSizeOptions}
           // slots={{ toolbar: GridToolbar }}
           slots={{ toolbar: CustomToolbar }} // Use the custom toolbar here
+          // disableColumnFilter -> to disable column filter
           disableRowSelectionOnClick
           checkboxSelection
           // Disabling virtualization is fine for smaller data sets, but if you have hundreds or thousands of rows, it can impact performance in normal usage
