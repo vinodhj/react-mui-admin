@@ -186,7 +186,7 @@ function TeamDetails() {
                 <InfoRow label="Customer ID" value={isMobile ? `${id.substring(0, 8)}...` : id} />
               </Grid>
               <Grid size={{ xs: 12 }} sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <InfoRow label="Name" value={isMobile ? `${name.substring(0, 15)}...` : id} />
+                <InfoRow label="Name" value={isMobile ? `${name.substring(0, 15)}...` : name} />
               </Grid>
               <Grid size={{ xs: 12 }} sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <InfoRow label="Email" value={email} />
