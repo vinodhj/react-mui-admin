@@ -18,6 +18,9 @@ interface SidebarFooterProps {
   handleMenuOpen: (event: React.MouseEvent<HTMLElement>) => void;
   handleMenuClose: () => void;
   handleLogout: () => void;
+  setCollapsed: (value: boolean) => void;
+  setToggled: (value: boolean) => void;
+  isMobile: boolean;
 }
 
 const SidebarFooter: FC<SidebarFooterProps> = ({
@@ -29,6 +32,9 @@ const SidebarFooter: FC<SidebarFooterProps> = ({
   handleMenuOpen,
   handleMenuClose,
   handleLogout,
+  setCollapsed,
+  setToggled,
+  isMobile,
 }) => {
   return (
     <>
@@ -81,6 +87,9 @@ const SidebarFooter: FC<SidebarFooterProps> = ({
               handleMenuClose={handleMenuClose}
               handleLogout={handleLogout}
               colors={colors}
+              setCollapsed={setCollapsed}
+              setToggled={setToggled}
+              isMobile={isMobile}
             />
           </Box>
         </Box>
@@ -114,6 +123,9 @@ const SidebarFooter: FC<SidebarFooterProps> = ({
             handleMenuClose={handleMenuClose}
             handleLogout={handleLogout}
             colors={colors}
+            setCollapsed={setCollapsed}
+            setToggled={setToggled}
+            isMobile={isMobile}
           />
         </Box>
       )}

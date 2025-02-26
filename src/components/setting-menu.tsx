@@ -17,9 +17,12 @@ interface UserMenuProps {
   handleMenuClose: () => void;
   handleLogout: () => void;
   colors: any; // You can type this more strictly if desired.
+  setCollapsed?: (value: boolean) => void;
+  setToggled?: (value: boolean) => void;
+  isMobile?: boolean;
 }
 
-const SettingMenu: FC<UserMenuProps> = ({ anchorEl, open, handleMenuClose, handleLogout, colors }) => {
+const SettingMenu: FC<UserMenuProps> = ({ anchorEl, open, handleMenuClose, handleLogout, colors, setCollapsed, setToggled, isMobile }) => {
   const navigate = useNavigate();
   return (
     <Menu
@@ -35,6 +38,11 @@ const SettingMenu: FC<UserMenuProps> = ({ anchorEl, open, handleMenuClose, handl
       <MenuItem
         onClick={() => {
           handleMenuClose();
+          // Close sidebar only on mobile
+          if (isMobile && setCollapsed && setToggled) {
+            setCollapsed(true);
+            setToggled(false);
+          }
           navigate('/profile');
         }}
       >
@@ -50,6 +58,11 @@ const SettingMenu: FC<UserMenuProps> = ({ anchorEl, open, handleMenuClose, handl
       <MenuItem
         onClick={() => {
           handleMenuClose();
+          // Close sidebar only on mobile
+          if (isMobile && setCollapsed && setToggled) {
+            setCollapsed(true);
+            setToggled(false);
+          }
           navigate('/faq');
         }}
       >
@@ -64,6 +77,11 @@ const SettingMenu: FC<UserMenuProps> = ({ anchorEl, open, handleMenuClose, handl
       <MenuItem
         onClick={() => {
           handleMenuClose();
+          // Close sidebar only on mobile
+          if (isMobile && setCollapsed && setToggled) {
+            setCollapsed(true);
+            setToggled(false);
+          }
           navigate('/change-password');
         }}
       >

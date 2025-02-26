@@ -76,6 +76,9 @@ const MyProSidebar: FC = () => {
             handleMenuOpen={handleMenuOpen}
             handleMenuClose={handleMenuClose}
             handleLogout={handleLogout}
+            setCollapsed={sidebarProps!.setCollapsed}
+            setToggled={sidebarProps!.setToggled}
+            isMobile={isMobile}
           />
         </Menu>
       </Sidebar>
