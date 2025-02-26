@@ -183,10 +183,10 @@ function TeamDetails() {
             {/* User Info */}
             <Grid container spacing={2} mt={1}>
               <Grid size={{ xs: 12 }} sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <InfoRow label="Customer ID" value={isMobile ? `${id.substring(0, 8)}...` : id} />
+                <InfoRow label="Customer ID" value={isMobile && id.length > 10 ? `${id.substring(0, 10)}...` : id} />
               </Grid>
               <Grid size={{ xs: 12 }} sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <InfoRow label="Name" value={isMobile ? `${name.substring(0, 15)}...` : name} />
+                <InfoRow label="Name" value={isMobile && name.length > 20 ? `${name.substring(0, 20)}...` : name} />
               </Grid>
               <Grid size={{ xs: 12 }} sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <InfoRow label="Email" value={email} />
