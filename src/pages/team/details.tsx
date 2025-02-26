@@ -5,7 +5,7 @@ import LoadingSpinner from '../../components/common/loading-spinner';
 import { formatDate } from '../../utils/date-utils';
 import { tokens } from '../../theme/main-theme';
 
-import { useTheme } from '@mui/material';
+import { useMediaQuery, useTheme } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -73,6 +73,9 @@ function TeamDetails() {
       setOpenSnackbar(true);
     },
   });
+
+  // Use media query to determine mobile view
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const handleDelete = () => {
     if (id) {
@@ -180,10 +183,10 @@ function TeamDetails() {
             {/* User Info */}
             <Grid container spacing={2} mt={1}>
               <Grid size={{ xs: 12 }} sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <InfoRow label="Customer ID" value={id} />
+                <InfoRow label="Customer ID" value={isMobile ? `${id.substring(0, 8)}...` : id} />
               </Grid>
               <Grid size={{ xs: 12 }} sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <InfoRow label="Name" value={name} />
+                <InfoRow label="Name" value={isMobile ? `${name.substring(0, 15)}...` : id} />
               </Grid>
               <Grid size={{ xs: 12 }} sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <InfoRow label="Email" value={email} />
@@ -192,10 +195,10 @@ function TeamDetails() {
                 <InfoRow label="Role" value={role} />
               </Grid>
               <Grid size={{ xs: 12 }} sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <InfoRow label="Created At" value={formatDate(created_at)} />
+                <InfoRow label="Created At" value={isMobile ? formatDate(created_at, 'MMM dd, yyyy') : formatDate(created_at)} />
               </Grid>
               <Grid size={{ xs: 12 }}>
-                <InfoRow label="Last Updated At" value={formatDate(updated_at)} />
+                <InfoRow label="Updated At" value={isMobile ? formatDate(updated_at, 'MMM dd, yyyy') : formatDate(updated_at)} />
               </Grid>
             </Grid>
           </CardContent>

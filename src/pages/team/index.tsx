@@ -13,13 +13,14 @@ import Link from '@mui/material/Link';
 import Box from '@mui/material/Box';
 import { GridColDef } from '@mui/x-data-grid';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
-import { useTheme } from '@mui/material';
+import { useMediaQuery, useTheme } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import NewUserButton from '../../components/pages/new-user-button';
 import { useDeleteUser } from '../../hooks/use-delete-user';
 import { SessionContext } from '../../contexts/session-context';
 import CustomSnackbar from '../../components/common/custom-snackbar';
+import { formatDate } from '../../utils/date-utils';
 
 function Team() {
   const navigate = useNavigate();
@@ -95,6 +96,9 @@ function Team() {
     }
   };
 
+  // Use media query to determine mobile view
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
   const columns: GridColDef[] = useMemo(
     () => [
       { field: 'id', headerName: 'Id', width: 50 },
@@ -168,22 +172,31 @@ function Team() {
   }
 
   // Map the fetched data into the format required by DataTable
-  const usersData = data.users?.map((user, index) => ({
-    id: index + 1,
-    registeredId: user!.id,
-    name: user!.name,
-    email: user!.email,
-    role: user!.role,
-    created_at: user!.created_at,
-    updated_at: user!.updated_at,
-  }));
+  const usersData = data.users
+    ?.map((user, index) => {
+      if (!user) return null;
+      return {
+        id: index + 1,
+        registeredId: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        created_at: formatDate(user.created_at),
+        updated_at: formatDate(user.updated_at),
+      };
+    })
+    .filter((user) => user !== null);
 
   return (
     <Box m="20px" sx={{ p: '0 15px' }}>
       <Box display="flex" flexWrap="wrap" justifyContent="space-between" alignItems="center" mb={2}>
         <PageHeader
           title="MANAGE TEAM"
-          subtitle="A centralized module for efficient team oversight—add or remove members, assign roles, and monitor performance all in one streamlined interface"
+          subtitle={
+            isMobile
+              ? ''
+              : 'A centralized module for efficient team oversight—add or remove members, assign roles, and monitor performance all in one streamlined interface'
+          }
         />
 
         <NewUserButton to="/team/create" label="+ New User" />

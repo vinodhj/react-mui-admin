@@ -12,21 +12,25 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 
 function Dashboard() {
   const theme = useTheme();
-  const smScreen = useMediaQuery(theme.breakpoints.up('sm'));
+  const isMobile = useMediaQuery(theme.breakpoints.up('sm'));
   const colors = tokens(theme.palette.mode);
 
   return (
     <Box m="20px" sx={{ p: '0 15px' }}>
       <Box
-        display={smScreen ? 'flex' : 'block'}
-        flexDirection={smScreen ? 'row' : 'column'}
-        justifyContent={smScreen ? 'space-between' : 'start'}
-        alignItems={smScreen ? 'center' : 'start'}
+        display={isMobile ? 'flex' : 'block'}
+        flexDirection={isMobile ? 'row' : 'column'}
+        justifyContent={isMobile ? 'space-between' : 'start'}
+        alignItems={isMobile ? 'center' : 'start'}
         m="10px 0"
       >
         <PageHeader
           title="DASHBOARD"
-          subtitle="A streamlined interface designed specifically for administrators, the admin dashboard provides real-time insights into system performance, user activity, and key metrics."
+          subtitle={
+            !isMobile
+              ? ''
+              : 'A streamlined interface designed specifically for administrators, the admin dashboard provides real-time insights into system performance, user activity, and key metrics.'
+          }
         />
 
         <Box sx={{ m: '10px' }}>
