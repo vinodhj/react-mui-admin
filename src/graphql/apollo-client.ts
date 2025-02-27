@@ -2,6 +2,7 @@ import { ApolloClient, ApolloLink, InMemoryCache, createHttpLink } from '@apollo
 import { onError } from '@apollo/client/link/error';
 import { setContext } from '@apollo/client/link/context';
 import { getToken } from '../utils/get-token';
+import { setIsRevoked } from './authEvents';
 
 const graphqlApiUrl = import.meta.env.DEV ? import.meta.env.VITE_DEV_API_URL : import.meta.env.VITE_PROD_API_URL;
 
@@ -24,8 +25,12 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
         localStorage.removeItem('session_admin_email');
         localStorage.removeItem('session_admin_role');
         localStorage.clear();
+
+        // Update the state so that the app can react (e.g., by navigating)
+        setIsRevoked(true);
+
         // sessionStorage.clear();
-        window.location.href = '/revoke?revokeError=true';
+        // window.location.href = '/revoke?revokeError=true';
       }
     });
   }

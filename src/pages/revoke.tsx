@@ -6,19 +6,12 @@ import Grid from '@mui/material/Grid2';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import { Navigate, useLocation } from 'react-router-dom';
 
 export default function RevokeError() {
-  const location = useLocation();
-  // If we didn't navigate here with an actual revoke error state, redirect to the sign-in page
-  if (location.search !== '?revokeError=true') {
-    return <Navigate to="/" replace />;
-  }
   const theme = useTheme();
 
   const handleSignIn = () => {
-    // Redirect to the sign-in page. Adjust the URL if necessary.
-    window.location.href = '/signin';
+    window.location.href = '/';
   };
 
   return (

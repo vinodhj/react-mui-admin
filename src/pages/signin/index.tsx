@@ -11,10 +11,12 @@ import Grid from '@mui/material/Grid2';
 import CircularProgress from '@mui/material/CircularProgress';
 
 import { SessionContext } from '../../contexts/session-context';
+import { useAuth } from '../../contexts/auth';
 
 const SignInForm = React.lazy(() => import('../../components/auth/signin-form'));
 
 export default function SignIn() {
+  const { setAccessToken } = useAuth();
   const sessionDetails = useContext(SessionContext);
   const { updateSession } = sessionDetails ?? {};
   const theme = useTheme();
@@ -42,6 +44,7 @@ export default function SignIn() {
             adminID: data.login.user?.id ?? '',
             sidebarCollapsed: isMobile ? 'true' : 'false',
           });
+          setAccessToken(data.login.token);
         } else {
           setServerError('Login failed');
         }
