@@ -15,6 +15,8 @@ const AuthenticatedApp = lazy(() => import('./AuthenticatedApp'));
 const UnAuthenticatedApp = lazy(() => import('./UnAuthenticatedApp'));
 const RevokeError = lazy(() => import('./pages/revoke'));
 
+const UNDER_MAINTENANCE = false;
+
 function App() {
   const [accessToken, setAccessToken] = useLocalStorage('access_token');
   const [theme, colorMode] = useMode();
@@ -25,6 +27,14 @@ function App() {
       setRevoked(newState);
     });
     return unsubscribe;
+  }, []);
+
+  useEffect(() => {
+    if (UNDER_MAINTENANCE) {
+      setRevoked(false);
+      setAccessToken('');
+      localStorage.clear();
+    }
   }, []);
 
   const authContextValue = useMemo(() => ({ accessToken, setAccessToken, revoke, setRevoked }), [accessToken, setAccessToken, revoke]);
@@ -39,7 +49,8 @@ function App() {
               <ErrorBoundary>
                 <Suspense fallback={<LoadingFallback />}>
                   {(() => {
-                    if (revoke) return <RevokeError />;
+                    if (UNDER_MAINTENANCE) return <RevokeError isRevoked={false} />;
+                    if (revoke) return <RevokeError isRevoked={revoke} />;
                     if (accessToken) return <AuthenticatedApp />;
                     return <UnAuthenticatedApp />;
                   })()}
