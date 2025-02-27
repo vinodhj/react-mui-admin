@@ -19,12 +19,12 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
       if (extensions?.code === 'REVOKE_TOKEN_ERROR') {
         console.warn('Revoke token error encountered. Clearing storage and redirecting.');
         localStorage.removeItem('access_token');
-        sessionStorage.removeItem('session_admin_id');
-        sessionStorage.removeItem('session_admin_name');
-        sessionStorage.removeItem('session_admin_email');
-        sessionStorage.removeItem('session_admin_role');
+        localStorage.removeItem('session_admin_id');
+        localStorage.removeItem('session_admin_name');
+        localStorage.removeItem('session_admin_email');
+        localStorage.removeItem('session_admin_role');
         localStorage.clear();
-        sessionStorage.clear();
+        // sessionStorage.clear();
         window.location.href = '/revoke?revokeError=true';
       }
     });
