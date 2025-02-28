@@ -48,6 +48,7 @@ interface SessionProviderProps {
 }
 
 const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
+  const [tokenExpired, setTokenExpired] = useState(false);
   const [session, setSession] = useState<SessionData>(defaultSession);
   const location = useLocation();
   const { setSystemMode } = useContext(ColorModeContext);
@@ -77,9 +78,10 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 
   // Define a function that checks for token expiration using isJwtTokenExpired.
   const checkToken = useCallback(() => {
-    if (session.token && isJwtTokenExpired(session.token)) {
+    if (!tokenExpired && session.token && isJwtTokenExpired(session.token)) {
       console.log('Token is expired');
       // Token is expired: clear session data.
+      setTokenExpired(true);
       updateSession({
         ...session,
         token: '',
@@ -95,20 +97,18 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
       // sessionStorage.clear();
       window['location'].reload();
     }
-  }, [session, updateSession]);
-
-  const checkTokenRef = useRef(checkToken);
+  }, [session, tokenExpired, updateSession]);
 
   // Run the check on every route change.
   useEffect(() => {
-    checkTokenRef.current();
-  }, [location.pathname]);
+    checkToken();
+  }, [location.pathname, checkToken]);
 
   // Also run the check periodically (every 5 minutes)
   useEffect(() => {
-    const intervalId = setInterval(() => checkTokenRef.current(), signOutCheckInterval);
+    const intervalId = setInterval(checkToken, 1000);
     return () => clearInterval(intervalId);
-  }, []);
+  }, [checkToken]);
 
   const value = useMemo(() => ({ session, updateSession }), [session, updateSession]);
 
