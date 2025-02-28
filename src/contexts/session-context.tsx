@@ -4,13 +4,22 @@ import { useLocation } from 'react-router-dom';
 import { ColorModeContext } from './color-mode-context';
 import client from '../graphql/apollo-client';
 import getStoredOrPreferredColorMode from '../utils/preferred-color-mode';
+import { setIsRevoked } from '../graphql/authEvents';
+import useLocalStorage from 'react-use-localstorage';
 
+export interface UpdateSessionData {
+  session: SessionData;
+  sessionAdmin: SessionAdmin;
+}
 export interface SessionData {
   colorMode?: string;
   token: string;
   sidebarImage?: string;
   sidebarCollapsed?: string;
   sidebarRTL?: string;
+}
+
+export interface SessionAdmin {
   adminName: string;
   adminEmail: string;
   adminRole: string;
@@ -19,7 +28,8 @@ export interface SessionData {
 
 export interface SessionContextProps {
   session: SessionData;
-  updateSession: (data: SessionData) => void;
+  sessionAdmin: SessionAdmin;
+  updateSession: (data: UpdateSessionData) => void;
 }
 
 const signOutCheckInterval = Number(import.meta.env.VITE_SIGNOUT_CHECK_INTERVAL_MINUTES) * 60 * 1000 || 5 * 60 * 1000;
@@ -34,6 +44,9 @@ const defaultSession: SessionData = {
   sidebarImage: getStorageItem(localStorage, 'sidebarImage') || 'true',
   sidebarCollapsed: getStorageItem(localStorage, 'sidebarCollapsed') || 'false',
   sidebarRTL: getStorageItem(localStorage, 'sidebarRTL') || 'false',
+};
+
+const defaultSessionAdmin: SessionAdmin = {
   adminName: getStorageItem(localStorage, 'session_admin_name'),
   adminEmail: getStorageItem(localStorage, 'session_admin_email'),
   adminRole: getStorageItem(localStorage, 'session_admin_role'),
@@ -50,25 +63,31 @@ interface SessionProviderProps {
 const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
   const [tokenExpired, setTokenExpired] = useState(false);
   const [session, setSession] = useState<SessionData>(defaultSession);
+  const [sessionAdmin, setSessionAdmin] = useLocalStorage('session_admin', JSON.stringify(defaultSessionAdmin));
+  const parsedSessionAdmin = useMemo(() => JSON.parse(sessionAdmin), [sessionAdmin]);
   const location = useLocation();
   const { setSystemMode } = useContext(ColorModeContext);
   const updateSession = useCallback(
-    (data: SessionData) => {
-      setSession(data);
-      if (data.token) {
-        localStorage.setItem('access_token', data.token);
+    (data: UpdateSessionData) => {
+      setSession(data.session);
+      setSessionAdmin(
+        JSON.stringify({
+          adminName: data.sessionAdmin.adminName,
+          adminEmail: data.sessionAdmin.adminEmail,
+          adminRole: data.sessionAdmin.adminRole,
+          adminID: data.sessionAdmin.adminID,
+        })
+      );
+      if (data.session.token) {
+        localStorage.setItem('access_token', data.session.token);
       } else {
         localStorage.clear();
         // sessionStorage.clear();
       }
-      localStorage.setItem('colorMode', data.colorMode ?? getStoredOrPreferredColorMode());
-      localStorage.setItem('sidebarImage', data.sidebarImage?.toString() ?? 'true');
-      localStorage.setItem('sidebarCollapsed', data.sidebarCollapsed?.toString() ?? 'false');
-      localStorage.setItem('sidebarRTL', data.sidebarRTL?.toString() ?? 'false');
-      localStorage.setItem('session_admin_name', data.adminName);
-      localStorage.setItem('session_admin_email', data.adminEmail);
-      localStorage.setItem('session_admin_role', data.adminRole);
-      localStorage.setItem('session_admin_id', data.adminID);
+      localStorage.setItem('colorMode', data.session.colorMode ?? getStoredOrPreferredColorMode());
+      localStorage.setItem('sidebarImage', data.session.sidebarImage?.toString() ?? 'true');
+      localStorage.setItem('sidebarCollapsed', data.session.sidebarCollapsed?.toString() ?? 'false');
+      localStorage.setItem('sidebarRTL', data.session.sidebarRTL?.toString() ?? 'false');
 
       // Force theme to system theme immediately
       setSystemMode();
@@ -83,21 +102,26 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
       // Token is expired: clear session data.
       setTokenExpired(true);
       updateSession({
-        ...session,
-        token: '',
-        adminName: '',
-        adminEmail: '',
-        adminRole: '',
-        adminID: '',
-        colorMode: '',
+        session: {
+          ...session,
+          token: '',
+          colorMode: '',
+        },
+        sessionAdmin: {
+          adminName: '',
+          adminEmail: '',
+          adminRole: '',
+          adminID: '',
+        },
       });
 
       client.resetStore();
       localStorage.clear();
+      setIsRevoked(true);
       // sessionStorage.clear();
-      window['location'].reload();
+      // window['location'].reload();
     }
-  }, [session, tokenExpired, updateSession]);
+  }, [session, sessionAdmin, tokenExpired, updateSession]);
 
   // Run the check on every route change.
   useEffect(() => {
@@ -110,8 +134,7 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
     return () => clearInterval(intervalId);
   }, [checkToken]);
 
-  const value = useMemo(() => ({ session, updateSession }), [session, updateSession]);
-
+  const value = useMemo(() => ({ session, sessionAdmin: parsedSessionAdmin, updateSession }), [session, parsedSessionAdmin, updateSession]);
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;
 };
 

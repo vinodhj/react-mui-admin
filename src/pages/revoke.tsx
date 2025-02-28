@@ -8,7 +8,7 @@ import Button from '@mui/material/Button';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import EngineeringIcon from '@mui/icons-material/Engineering';
 
-export default function RevokeError({ isRevoked }: { isRevoked: boolean }) {
+export default function RevokeError({ isRevoked }: Readonly<{ isRevoked: boolean }>) {
   const theme = useTheme();
 
   const handleSignIn = () => {

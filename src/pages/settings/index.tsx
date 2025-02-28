@@ -12,16 +12,14 @@ import EmailIcon from '@mui/icons-material/Email';
 import WorkIcon from '@mui/icons-material/Work';
 import PhoneIcon from '@mui/icons-material/Phone';
 import HomeIcon from '@mui/icons-material/Home';
-import { SessionContext } from '../../contexts/session-context';
-import { useContext } from 'react';
 import startCase from 'lodash/startCase';
 import PageHeader from '../../components/pages/page-header';
 import ProfileSidebar from '../../components/profile-sidebar';
 import { useNavigate } from 'react-router-dom';
+import { useSession } from '../../hooks/use-session';
 
 const Profile = () => {
-  const sessionDetails = useContext(SessionContext);
-  const { session } = sessionDetails ?? {};
+  const { sessionAdmin } = useSession();
   const navigate = useNavigate();
 
   // Callbacks for sidebar actions
@@ -34,9 +32,9 @@ const Profile = () => {
   };
 
   const user = {
-    name: session?.adminName ?? '',
-    email: session?.adminEmail ?? '',
-    role: session?.adminRole === 'ADMIN' ? 'Administrator' : 'User',
+    name: sessionAdmin.adminName,
+    email: sessionAdmin.adminEmail,
+    role: sessionAdmin.adminRole === 'ADMIN' ? 'Administrator' : 'User',
   };
 
   return (
