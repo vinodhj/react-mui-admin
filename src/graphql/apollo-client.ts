@@ -14,15 +14,14 @@ if (!projectToken) {
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors) {
     graphQLErrors.forEach(({ message, locations, path, extensions }) => {
-      console.log(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`);
-      // Handle revoke token error
-      if (extensions?.code === 'REVOKE_TOKEN_ERROR') {
-        console.warn('Revoke token error encountered. Clearing storage and redirecting.');
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('session_admin_id');
-        localStorage.removeItem('session_admin_name');
-        localStorage.removeItem('session_admin_email');
-        localStorage.removeItem('session_admin_role');
+      console.log(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}, Extensions: ${JSON.stringify(extensions)}`);
+      // Handle revoke token or unauthorized error
+      if (extensions?.code === 'REVOKE_TOKEN_ERROR' || extensions?.code === 'UNAUTHORIZED') {
+        const errorMessage =
+          extensions.code === 'REVOKE_TOKEN_ERROR'
+            ? 'Revoke token error encountered. Clearing storage and redirecting.'
+            : 'Unauthorized access error encountered. Clearing storage and redirecting.';
+        console.warn(`⚠️ Warning: ${errorMessage}`);
         localStorage.clear();
         // sessionStorage.clear();
         window.location.href = '/revoke?revokeError=true';
