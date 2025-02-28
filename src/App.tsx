@@ -1,7 +1,4 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
-import ThemeProvider from '@mui/material/styles/ThemeProvider';
-import CssBaseline from '@mui/material/CssBaseline';
-import { ColorModeContext, useMode } from './contexts/color-mode-context';
 import ErrorBoundary from './error-boundary';
 import useLocalStorage from 'react-use-localstorage';
 import { AuthContext } from './contexts/auth';
@@ -19,9 +16,7 @@ const UNDER_MAINTENANCE = false;
 
 function App() {
   const [accessToken, setAccessToken] = useLocalStorage('access_token');
-  const [theme, colorMode] = useMode();
   const [revoke, setRevoked] = useState<boolean>(false);
-
   useEffect(() => {
     const unsubscribe = subscribeIsRevoked((newState) => {
       setRevoked(newState);
@@ -41,25 +36,22 @@ function App() {
 
   return (
     <ApolloProvider client={client}>
-      <ColorModeContext.Provider value={colorMode}>
-        <ThemeProvider theme={theme}>
-          <AuthContext.Provider value={authContextValue}>
-            <CssBaseline />
-            <SessionProvider>
-              <ErrorBoundary>
-                <Suspense fallback={<LoadingFallback />}>
-                  {(() => {
-                    if (UNDER_MAINTENANCE) return <RevokeError isRevoked={false} />;
-                    if (revoke) return <RevokeError isRevoked={revoke} />;
-                    if (accessToken) return <AuthenticatedApp />;
-                    return <UnAuthenticatedApp />;
-                  })()}
-                </Suspense>
-              </ErrorBoundary>
-            </SessionProvider>
-          </AuthContext.Provider>
-        </ThemeProvider>
-      </ColorModeContext.Provider>
+      <AuthContext.Provider value={authContextValue}>
+        <SessionProvider>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingFallback />}>
+              {(() => {
+                if (UNDER_MAINTENANCE) return <RevokeError isRevoked={false} />;
+                if (revoke) return <RevokeError isRevoked={revoke} />;
+                if (accessToken) {
+                  return <AuthenticatedApp />;
+                }
+                return <UnAuthenticatedApp />;
+              })()}
+            </Suspense>
+          </ErrorBoundary>
+        </SessionProvider>
+      </AuthContext.Provider>
     </ApolloProvider>
   );
 }

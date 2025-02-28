@@ -1,5 +1,5 @@
 import CssBaseline from '@mui/material/CssBaseline';
-import { ThemeProvider, useTheme } from '@mui/material/styles';
+import { ThemeProvider } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
 import signInTheme from '../theme/signIn-theme';
 import Grid from '@mui/material/Grid2';
@@ -7,9 +7,10 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import EngineeringIcon from '@mui/icons-material/Engineering';
+import { useMode } from '../contexts/color-mode-context';
 
 export default function RevokeError({ isRevoked }: Readonly<{ isRevoked: boolean }>) {
-  const theme = useTheme();
+  const [theme] = useMode();
 
   const handleSignIn = () => {
     window.location.href = '/';

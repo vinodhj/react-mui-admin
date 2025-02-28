@@ -1,18 +1,13 @@
 import * as React from 'react';
-import CssBaseline from '@mui/material/CssBaseline';
-import { ThemeProvider, useTheme } from '@mui/material/styles';
 import { useLoginMutation } from '../../graphql/graphql-generated';
 import { useValidateSignInForm } from '../../hooks/auth/use-validate-signin';
 import Paper from '@mui/material/Paper';
-import signInTheme from '../../theme/signIn-theme';
-import { Suspense, useCallback } from 'react';
-import { useMediaQuery } from '@mui/material';
+import { useCallback } from 'react';
+import { useMediaQuery, useTheme } from '@mui/material';
 import Grid from '@mui/material/Grid2';
-import CircularProgress from '@mui/material/CircularProgress';
 import { useAuth } from '../../contexts/auth';
 import { useSession } from '../../hooks/use-session';
-
-const SignInForm = React.lazy(() => import('../../components/auth/signin-form'));
+import SignInForm from '../../components/auth/signin-form';
 
 export default function SignIn() {
   const { setAccessToken } = useAuth();
@@ -66,48 +61,30 @@ export default function SignIn() {
   };
 
   return (
-    <ThemeProvider theme={signInTheme}>
-      <Suspense
-        fallback={
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              height: '100vh',
-            }}
-          >
-            <CircularProgress />
-          </div>
-        }
-      >
-        <Grid container component="main" sx={{ height: '100vh' }}>
-          <CssBaseline />
-          <Grid
-            size={{
-              xs: false,
-              sm: 4,
-              md: 7,
-            }}
-            sx={{
-              backgroundImage: 'url(https://lh3.googleusercontent.com/p/AF1QipPwaVe8g2KzlvObbHdww9zrw4ZI5CRZ2kkbCfm6=s1360-w1360-h1020)',
-              backgroundRepeat: 'no-repeat',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-            }}
-          />
-          <Grid size={{ xs: 12, sm: 8, md: 5 }} component={Paper} elevation={6} square>
-            <SignInForm
-              serverError={serverError}
-              values={values}
-              errors={errors}
-              loading={loading}
-              handleChange={handleChange}
-              handleSubmit={handleSubmit}
-            />
-          </Grid>
-        </Grid>
-      </Suspense>
-    </ThemeProvider>
+    <Grid container component="main" sx={{ height: '100vh' }}>
+      <Grid
+        size={{
+          xs: false,
+          sm: 4,
+          md: 7,
+        }}
+        sx={{
+          backgroundImage: 'url(https://lh3.googleusercontent.com/p/AF1QipPwaVe8g2KzlvObbHdww9zrw4ZI5CRZ2kkbCfm6=s1360-w1360-h1020)',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      />
+      <Grid size={{ xs: 12, sm: 8, md: 5 }} component={Paper} elevation={6} square>
+        <SignInForm
+          serverError={serverError}
+          values={values}
+          errors={errors}
+          loading={loading}
+          handleChange={handleChange}
+          handleSubmit={handleSubmit}
+        />
+      </Grid>
+    </Grid>
   );
 }
