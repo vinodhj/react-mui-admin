@@ -106,7 +106,7 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 
   // Also run the check periodically (every 5 minutes)
   useEffect(() => {
-    const intervalId = setInterval(checkToken, 1000);
+    const intervalId = setInterval(checkToken, signOutCheckInterval);
     return () => clearInterval(intervalId);
   }, [checkToken]);
 
