@@ -17,6 +17,7 @@ export interface SessionData {
   sidebarImage?: string;
   sidebarCollapsed?: string;
   sidebarRTL?: string;
+  sidebarToggled?: string;
 }
 
 export interface SessionAdmin {
@@ -44,6 +45,7 @@ const defaultSession: SessionData = {
   sidebarImage: getStorageItem(localStorage, 'sidebarImage') || 'true',
   sidebarCollapsed: getStorageItem(localStorage, 'sidebarCollapsed') || 'false',
   sidebarRTL: getStorageItem(localStorage, 'sidebarRTL') || 'false',
+  sidebarToggled: getStorageItem(localStorage, 'sidebarToggled') || 'false',
 };
 
 const defaultSessionAdmin: SessionAdmin = {
@@ -88,6 +90,7 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
       localStorage.setItem('sidebarImage', data.session.sidebarImage?.toString() ?? 'true');
       localStorage.setItem('sidebarCollapsed', data.session.sidebarCollapsed?.toString() ?? 'false');
       localStorage.setItem('sidebarRTL', data.session.sidebarRTL?.toString() ?? 'false');
+      localStorage.setItem('sidebarToggled', data.session.sidebarToggled?.toString() ?? 'false');
 
       // Force theme to system theme immediately
       setSystemMode();
