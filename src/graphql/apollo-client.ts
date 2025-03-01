@@ -1,15 +1,16 @@
-import { ApolloClient, ApolloLink, InMemoryCache, NormalizedCacheObject, createHttpLink } from '@apollo/client';
+import { ApolloClient, ApolloLink, NormalizedCacheObject, createHttpLink } from '@apollo/client';
 import { onError } from '@apollo/client/link/error';
 import { setContext } from '@apollo/client/link/context';
 import { getToken } from '../utils/get-token';
 import { setIsRevoked } from './authEvents';
+import { cache } from './cache-config';
 
 // Environment variables
 const graphqlApiUrl = import.meta.env.DEV ? import.meta.env.VITE_DEV_API_URL : import.meta.env.VITE_PROD_API_URL;
 const projectToken = import.meta.env.VITE_PROJECT_TOKEN;
 
 // Check for required environment variables
-const requiredEnvVars = ['VITE_PROJECT_TOKEN', 'VITE_DEV_API_URL', 'VITE_PROD_API_URL'];
+const requiredEnvVars = ['VITE_PROJECT_TOKEN', 'VITE_DEV_API_URL', 'VITE_PROD_API_URL', 'VITE_SIGNOUT_CHECK_INTERVAL_MINUTES'];
 const missingVars = requiredEnvVars.filter((varName) => !import.meta.env[varName]);
 if (missingVars.length > 0) {
   console.error(`⚠️ Error: Missing required environment variables: ${missingVars.join(', ')}`);
@@ -21,7 +22,6 @@ const cleanupSession = () => {
   // Update the state so that the app can react
   setIsRevoked(true);
   // sessionStorage.clear();
-  // window.location.href = '/revoke?revokeError=true';
 };
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
@@ -49,13 +49,21 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
     });
   }
   if (networkError) {
-    console.error(`[Network error]: ${networkError}`);
+    console.error(`[Network error]: `, networkError);
+    // Get more information about the network error
+    if ('statusCode' in networkError) {
+      console.error(`Status code: ${networkError.statusCode}`);
+    }
+    if ('bodyText' in networkError) {
+      console.error(`Response body: ${networkError.bodyText}`);
+    }
+    // Log the full error object to see all available properties
+    console.error('Full network error object:', networkError);
   }
 });
 
 const httpLink = createHttpLink({
   uri: `${graphqlApiUrl}/graphql`,
-  // credentials: 'same-origin',
   credentials: 'include',
 });
 
@@ -68,44 +76,6 @@ const authLink = setContext((_, { headers }) => {
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
   };
-});
-
-// Cache configuration tailored to your schema
-const cache = new InMemoryCache({
-  typePolicies: {
-    Query: {
-      fields: {
-        // For the 'users' query - simple caching
-        users: {
-          merge(_, incoming) {
-            return incoming; // Replace with new data on refetch
-          },
-        },
-        // For the 'userByfield' query which returns an array
-        userByfield: {
-          // Use the input as the key to cache different queries separately
-          keyArgs: ['input'],
-          merge(_, incoming) {
-            return incoming; // Replace with new data on refetch
-          },
-        },
-      },
-    },
-    // User entity normalization
-    User: {
-      keyFields: ['id'],
-    },
-    UserResponse: {
-      keyFields: ['id'],
-    },
-    UserSuccessResponse: {
-      keyFields: ['id'],
-    },
-    // Admin KV Asset doesn't have an ID, use kv_key as unique identifier
-    AdminKvAsset: {
-      keyFields: ['kv_key'],
-    },
-  },
 });
 
 const client: ApolloClient<NormalizedCacheObject> = new ApolloClient({
