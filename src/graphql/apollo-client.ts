@@ -70,10 +70,48 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 
+// Cache configuration tailored to your schema
+const cache = new InMemoryCache({
+  typePolicies: {
+    Query: {
+      fields: {
+        // For the 'users' query - simple caching
+        users: {
+          merge(_, incoming) {
+            return incoming; // Replace with new data on refetch
+          },
+        },
+        // For the 'userByfield' query which returns an array
+        userByfield: {
+          // Use the input as the key to cache different queries separately
+          keyArgs: ['input'],
+          merge(_, incoming) {
+            return incoming; // Replace with new data on refetch
+          },
+        },
+      },
+    },
+    // User entity normalization
+    User: {
+      keyFields: ['id'],
+    },
+    UserResponse: {
+      keyFields: ['id'],
+    },
+    UserSuccessResponse: {
+      keyFields: ['id'],
+    },
+    // Admin KV Asset doesn't have an ID, use kv_key as unique identifier
+    AdminKvAsset: {
+      keyFields: ['kv_key'],
+    },
+  },
+});
+
 const client: ApolloClient<NormalizedCacheObject> = new ApolloClient({
   connectToDevTools: import.meta.env.DEV,
   link: ApolloLink.from([errorLink, authLink.concat(httpLink)]),
-  cache: new InMemoryCache(),
+  cache,
   ssrMode: typeof window === 'undefined', // Disable SSR mode for Apollo
   queryDeduplication: true,
   name: 'admin-client',
