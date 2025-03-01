@@ -50,15 +50,15 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
   }
   if (networkError) {
     console.error(`[Network error]: `, networkError);
-    // Get more information about the network error
-    if ('statusCode' in networkError) {
-      console.error(`Status code: ${networkError.statusCode}`);
+    if (import.meta.env.DEV) {
+      // Get more information about the network error
+      if ('statusCode' in networkError) {
+        console.error(`Status code: ${networkError.statusCode}`);
+      }
+      if ('bodyText' in networkError) {
+        console.error(`Response body: ${networkError.bodyText}`);
+      }
     }
-    if ('bodyText' in networkError) {
-      console.error(`Response body: ${networkError.bodyText}`);
-    }
-    // Log the full error object to see all available properties
-    console.error('Full network error object:', networkError);
   }
 });
 
