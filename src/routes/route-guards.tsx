@@ -9,13 +9,7 @@ interface ProtectedRouteProps {
   allowedRoles?: string[]; // Define which roles can access this route
 }
 
-export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
-  element,
-  allowedRoles,
-}: {
-  element: React.ReactNode;
-  allowedRoles?: string[];
-}) => {
+export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ element, allowedRoles }: ProtectedRouteProps) => {
   const { session, sessionAdmin } = useSession();
   const location = useLocation();
 

@@ -1,4 +1,4 @@
-import React, { createContext, useState, useCallback, useMemo, ReactNode, useEffect, useContext, useRef } from 'react';
+import React, { createContext, useState, useCallback, useMemo, ReactNode, useEffect, useContext } from 'react';
 import isJwtTokenExpired from 'jwt-check-expiry';
 import { useLocation } from 'react-router-dom';
 import { ColorModeContext } from './color-mode-context';

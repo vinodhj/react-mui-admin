@@ -1,5 +1,4 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
-import ErrorBoundary from './error-boundary';
 import useLocalStorage from 'react-use-localstorage';
 import { AuthContext } from './contexts/auth';
 import { ApolloProvider } from '@apollo/client';
@@ -10,7 +9,7 @@ import LoadingFallback from './components/common/loading-fallback';
 
 const AuthenticatedApp = lazy(() => import('./AuthenticatedApp'));
 const UnAuthenticatedApp = lazy(() => import('./UnAuthenticatedApp'));
-const RevokeError = lazy(() => import('./pages/revoke'));
+const ErrorApp = lazy(() => import('./ErrorApp'));
 
 const UNDER_MAINTENANCE = false;
 
@@ -30,7 +29,7 @@ function App() {
       setAccessToken('');
       localStorage.clear();
     }
-  }, []);
+  }, [UNDER_MAINTENANCE, setRevoked, setAccessToken]);
 
   const authContextValue = useMemo(() => ({ accessToken, setAccessToken, revoke, setRevoked }), [accessToken, setAccessToken, revoke]);
 
@@ -38,18 +37,16 @@ function App() {
     <ApolloProvider client={client}>
       <AuthContext.Provider value={authContextValue}>
         <SessionProvider>
-          <ErrorBoundary>
-            <Suspense fallback={<LoadingFallback />}>
-              {(() => {
-                if (UNDER_MAINTENANCE) return <RevokeError isRevoked={false} />;
-                if (revoke) return <RevokeError isRevoked={revoke} />;
-                if (accessToken) {
-                  return <AuthenticatedApp />;
-                }
-                return <UnAuthenticatedApp />;
-              })()}
-            </Suspense>
-          </ErrorBoundary>
+          <Suspense fallback={<LoadingFallback />}>
+            {(() => {
+              if (UNDER_MAINTENANCE) return <ErrorApp status={false} />;
+              if (revoke) return <ErrorApp status={revoke} />;
+              if (accessToken) {
+                return <AuthenticatedApp />;
+              }
+              return <UnAuthenticatedApp />;
+            })()}
+          </Suspense>
         </SessionProvider>
       </AuthContext.Provider>
     </ApolloProvider>
