@@ -63,10 +63,10 @@ interface SessionProviderProps {
   children: ReactNode;
 }
 
-// Function to log events - TODO:
+// Function to log events
 const logEvent = (eventType: string, data: any) => {
   console.log(`Event: ${eventType}`, data);
-  //TODO: send the data to your analytics backend:
+  // TODO: send the data to your analytics backend
   // fetch('/analytics', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ eventType, ...data }) });
 };
 
@@ -194,6 +194,7 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
   // Log a user interaction event for every click.
   useEffect(() => {
     const handleUserInteraction = (event: MouseEvent) => {
+      // TODO: Only the specific event needs to be sent to the backend
       logEvent('CurrentUserInteractionEvent', {
         sessionID: sessionId,
         session: session.token,
