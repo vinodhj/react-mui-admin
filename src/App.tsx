@@ -39,8 +39,8 @@ function App() {
         <SessionProvider>
           <Suspense fallback={<LoadingFallback />}>
             {(() => {
-              if (UNDER_MAINTENANCE) return <ErrorApp status={false} />;
-              if (revoke) return <ErrorApp status={revoke} />;
+              if (UNDER_MAINTENANCE) return <ErrorApp message="UNDER_MAINTENANCE" />;
+              if (revoke) return <ErrorApp message="REVOKE_ERROR" />;
               if (accessToken) {
                 return <AuthenticatedApp />;
               }

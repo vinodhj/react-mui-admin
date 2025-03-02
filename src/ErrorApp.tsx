@@ -5,13 +5,13 @@ import { CssBaseline, ThemeProvider } from '@mui/material';
 import signInTheme from './theme/signIn-theme';
 import RevokeError from './pages/revoke';
 
-function ErrorApp({ status }: Readonly<{ status: boolean }>) {
+function ErrorApp({ message }: Readonly<{ message: string }>) {
   return (
     <ThemeProvider theme={signInTheme}>
       <CssBaseline />
       <ErrorBoundary>
         <Suspense fallback={<LoadingFallback />}>
-          <RevokeError isRevoked={status} />
+          <RevokeError message={message} />
         </Suspense>
       </ErrorBoundary>
     </ThemeProvider>
