@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 import { useTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import { useParams } from 'react-router-dom';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import PageHeader from '../../components/pages/page-header';
 import { SearchTokens } from '../../theme/main-theme';
 import { ColumnName, useEditUserMutation, useUserByFieldQuery } from '../../graphql/graphql-generated';
@@ -11,14 +11,14 @@ import EditTeamForm from './form/edit-team-form';
 import CustomSnackbar from '../../components/common/custom-snackbar';
 import LoadingSpinner from '../../components/common/loading-spinner';
 import ErrorAlert from '../../components/common/error-alert';
-import { SessionContext } from '../../contexts/session-context';
+import { useSession } from '../../hooks/use-session';
 
 function EditTeam() {
   const theme = useTheme();
   const mode = theme.palette.mode;
   const searchTokens = SearchTokens(mode);
   const { id } = useParams<{ id: string }>();
-  const sessionDetails = useContext(SessionContext);
+  const { session, sessionAdmin, updateSession } = useSession();
 
   const { data, loading, error } = useUserByFieldQuery({
     variables: {
@@ -50,20 +50,21 @@ function EditTeam() {
   useEffect(() => {
     if (updateData?.editUser?.success) {
       const { user } = updateData.editUser;
-      const { session, updateSession } = sessionDetails ?? {};
 
       setSnackbarMessage('Team member updated successfully!');
       setSnackbarSeverity('success');
       setOpenSnackbar(true);
 
       // update session if data
-      if (session && updateSession && session.adminID === user?.id && user?.name) {
+      if (sessionAdmin.adminID === user?.id && user?.name) {
         updateSession({
-          ...session,
-          adminName: user.name ?? '',
-          // need to update once super role or some other setting to update email and role
-          // adminEmail: user.email ?? '',
-          // adminRole: user.role ?? ''
+          session: {
+            ...session,
+          },
+          sessionAdmin: {
+            ...sessionAdmin,
+            adminName: user.name,
+          },
         });
       }
     }

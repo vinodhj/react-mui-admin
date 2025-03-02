@@ -20,18 +20,18 @@ import PageHeader from '../../components/pages/page-header';
 import NewUserButton from '../../components/pages/new-user-button';
 import startCase from 'lodash/startCase';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import DeleteConfirmationDialog from '../../components/pages/delete-confirmation-dialog';
 import { useDeleteUser } from '../../hooks/use-delete-user';
 import InfoRow from '../../components/pages/info-row';
-import { SessionContext } from '../../contexts/session-context';
 import CustomSnackbar from '../../components/common/custom-snackbar';
+import { useSession } from '../../hooks/use-session';
 
 function TeamDetails() {
-  const { session } = useContext(SessionContext) ?? {};
   const location = useLocation();
   const navigate = useNavigate();
+  const { sessionAdmin } = useSession();
   const { id } = useParams();
   const theme = useTheme();
   const mode = theme.palette.mode;
@@ -160,7 +160,7 @@ function TeamDetails() {
                   <IconButton
                     size="small"
                     onClick={() => {
-                      if (session?.adminRole !== 'ADMIN') {
+                      if (sessionAdmin.adminRole !== 'ADMIN') {
                         setSnackbarMessage("You don't have permission to delete users.");
                         setSnackbarSeverity('error');
                         setOpenSnackbar(true);
