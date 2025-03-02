@@ -1,4 +1,4 @@
-import { useState, createContext, ReactNode, Dispatch, SetStateAction, useMemo, FC, useEffect } from 'react';
+import { useState, createContext, ReactNode, Dispatch, SetStateAction, useMemo, FC } from 'react';
 import MyProSidebar from '../components/sidebar';
 import { useTypedLocalStorage } from '../hooks/use-typed-local-storage';
 
