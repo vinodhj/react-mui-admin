@@ -171,7 +171,7 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
   // Helper function to update metadata using the custom hook.
   const updateMetadata = useCallback(() => {
     setSessionMetadata({
-      sessionId: sessionId || 'session-' + Date.now(), // Fallback if sessionId is not set
+      sessionId: sessionId || 'session-' + Date.now(),
       token: session.token || '',
       url: window.location.href,
       lastTimestamp: new Date().toISOString(),
