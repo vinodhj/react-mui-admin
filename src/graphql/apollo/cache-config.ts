@@ -1,5 +1,5 @@
 import { InMemoryCache } from '@apollo/client/cache';
-import { StrictTypedTypePolicies } from './apollo-generated-helpers';
+import { StrictTypedTypePolicies } from './type-policies-generated-helpers';
 
 const typePolicies: StrictTypedTypePolicies = {
   Query: {

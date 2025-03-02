@@ -2,9 +2,9 @@ import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import useLocalStorage from 'react-use-localstorage';
 import { AuthContext } from './contexts/auth';
 import { ApolloProvider } from '@apollo/client';
-import client from './graphql/apollo-client';
+import client from './graphql/apollo/apollo-client';
 import SessionProvider from './contexts/session-context';
-import { subscribeIsRevoked } from './graphql/authEvents';
+import { subscribeIsRevoked } from './graphql/auth-events';
 import LoadingFallback from './components/common/loading-fallback';
 
 const AuthenticatedApp = lazy(() => import('./AuthenticatedApp'));

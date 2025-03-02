@@ -2,9 +2,9 @@ import React, { createContext, useState, useCallback, useMemo, ReactNode, useEff
 import isJwtTokenExpired from 'jwt-check-expiry';
 import { useLocation } from 'react-router-dom';
 import { ColorModeContext } from './color-mode-context';
-import client from '../graphql/apollo-client';
+import client from '../graphql/apollo/apollo-client';
 import getStoredOrPreferredColorMode from '../utils/preferred-color-mode';
-import { setIsRevoked } from '../graphql/authEvents';
+import { setIsRevoked } from '../graphql/auth-events';
 import useLocalStorage from 'react-use-localstorage';
 import { useTypedSessionStorage } from '../hooks/use-typed-session-storage';
 

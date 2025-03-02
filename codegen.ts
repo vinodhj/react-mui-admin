@@ -23,7 +23,7 @@ const config: CodegenConfig = {
         inlineFragmentTypes: 'combine',
       },
     },
-    'src/graphql/apollo-generated-helpers.ts': {
+    'src/graphql/apollo/type-policies-generated-helpers.ts': {
       plugins: ['typescript-apollo-client-helpers'],
       config: {
         useTypeImports: true,

@@ -1,4 +1,4 @@
-import client from '../graphql/apollo-client';
+import client from '../graphql/apollo/apollo-client';
 import { useLogOutMutation } from '../graphql/graphql-generated';
 import { useSession } from '../hooks/use-session';
 

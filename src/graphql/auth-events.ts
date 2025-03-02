@@ -1,4 +1,3 @@
-// src/authEvents.ts
 type Listener = (isRevoked: boolean) => void;
 
 let isRevoked = false;
