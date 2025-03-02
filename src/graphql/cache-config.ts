@@ -5,6 +5,7 @@ const typePolicies: StrictTypedTypePolicies = {
   Query: {
     fields: {
       // For the 'users' query - simple list of users
+      // TODO: pagination or incremental loading, you might need to modify the merge function to combine existing and incoming data.
       users: {
         merge(_existing, incoming) {
           return incoming; // Replace with new data on refetch
@@ -27,7 +28,7 @@ const typePolicies: StrictTypedTypePolicies = {
       },
       // For adminKvAsset query
       adminKvAsset: {
-        keyArgs: ['input.kv_key'],
+        keyArgs: (args) => args?.input?.kv_key,
         merge(_existing, incoming) {
           return incoming;
         },
