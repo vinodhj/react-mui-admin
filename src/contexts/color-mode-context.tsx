@@ -54,7 +54,7 @@ export const useMode = (): [Theme, ColorModeContextProps] => {
     [setMode]
   );
 
-  const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
+  const appTheme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
 
-  return [theme, colorMode];
+  return [appTheme, colorMode];
 };

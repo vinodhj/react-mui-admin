@@ -61,7 +61,9 @@ const SidebarFooter: FC<SidebarFooterProps> = ({
             </StyleBadge>
             <Box textAlign="left">
               <Typography variant="subtitle1" sx={{ color: colors.vibrantBlue[500], fontWeight: 'bold' }}>
-                {startCase(sessionAdmin.adminName.toLowerCase())}
+                {sessionAdmin.adminName.length > 13
+                  ? `${startCase(sessionAdmin.adminName.toLowerCase().substring(0, 13))}...`
+                  : startCase(sessionAdmin.adminName.toLowerCase())}
               </Typography>
               <Typography variant="body2" sx={{ color: colors.grey[300] }}>
                 {sessionAdmin.adminEmail}

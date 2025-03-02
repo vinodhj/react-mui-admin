@@ -116,7 +116,7 @@ export type Query = {
 };
 
 export type QueryAdminKvAssetArgs = {
-  input?: InputMaybe<AdminKvAssetInput>;
+  input: AdminKvAssetInput;
 };
 
 export type QueryUserByEmailArgs = {
@@ -124,7 +124,7 @@ export type QueryUserByEmailArgs = {
 };
 
 export type QueryUserByfieldArgs = {
-  input?: InputMaybe<UserByFieldInput>;
+  input: UserByFieldInput;
 };
 
 export enum Role {
