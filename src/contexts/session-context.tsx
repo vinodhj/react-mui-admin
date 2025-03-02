@@ -63,6 +63,13 @@ interface SessionProviderProps {
   children: ReactNode;
 }
 
+// Function to log events
+const logEvent = (eventType: string, data: any) => {
+  console.log(`Event: ${eventType}`, data);
+  // TODO: send the data to your analytics backend
+  // fetch('/analytics', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ eventType, ...data }) });
+};
+
 const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
   const [tokenExpired, setTokenExpired] = useState(false);
   const [session, setSession] = useState<SessionData>(defaultSession);
@@ -174,15 +181,27 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
   // Log page load event when session data is available.
   useEffect(() => {
     if (session.token) {
-      // TODO: Log page load event
+      logEvent('current_page_loads', {
+        sessionID: sessionId,
+        session: session.token,
+        url: window.location.href,
+        timestamp: new Date().toISOString(),
+      });
       updateMetadata();
     }
   }, [session.token, sessionId, updateMetadata]);
 
   // Log a user interaction event for every click.
   useEffect(() => {
-    const handleUserInteraction = (_event: MouseEvent) => {
-      // TODO: Add targetTag and targetId to the event object
+    const handleUserInteraction = (event: MouseEvent) => {
+      // TODO: Only the specific event needs to be sent to the backend
+      logEvent('CurrentUserInteractionEvent', {
+        sessionID: sessionId,
+        session: session.token,
+        targetTag: (event.target as HTMLElement).tagName,
+        targetId: (event.target as HTMLElement).id || null,
+        timestamp: new Date().toISOString(),
+      });
       updateMetadata();
     };
     document.addEventListener('click', handleUserInteraction);
