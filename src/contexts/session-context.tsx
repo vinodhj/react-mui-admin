@@ -34,7 +34,7 @@ export interface SessionContextProps {
   updateSession: (data: UpdateSessionData) => void;
 }
 
-const signOutCheckInterval = Number(import.meta.env.VITE_SIGNOUT_CHECK_INTERVAL_MINUTES) * 60 * 1000 || 5 * 60 * 1000;
+const signOutCheckInterval = Number(import.meta.env.VITE_SIGNOUT_CHECK_INTERVAL_MINUTES) * 60 * 1000;
 
 const isBrowser = typeof window !== 'undefined';
 
@@ -63,10 +63,21 @@ interface SessionProviderProps {
   children: ReactNode;
 }
 
+const generateSessionId = (): string => {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return 'session-' + Math.random().toString(36).substring(2, 15) + '-' + Date.now();
+};
+
 const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
   const [tokenExpired, setTokenExpired] = useState(false);
   const [session, setSession] = useState<SessionData>(defaultSession);
   const [sessionAdmin, setSessionAdmin] = useLocalStorage('session_admin', JSON.stringify(defaultSessionAdmin));
+  const location = useLocation();
+  const { setSystemMode } = useContext(ColorModeContext);
+
+  // Parse admin session data with error handling
   const parsedSessionAdmin = useMemo(() => {
     try {
       return JSON.parse(sessionAdmin);
@@ -75,8 +86,7 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
       return defaultSessionAdmin;
     }
   }, [sessionAdmin]);
-  const location = useLocation();
-  const { setSystemMode } = useContext(ColorModeContext);
+
   const updateSession = useCallback(
     (data: UpdateSessionData) => {
       setSession(data.session);
@@ -107,43 +117,48 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
   );
 
   // Define a function that checks for token expiration using isJwtTokenExpired.
-  const checkToken = useCallback(() => {
-    if (!tokenExpired && session.token && isJwtTokenExpired(session.token)) {
-      console.log('Token is expired');
-      // Token is expired: clear session data.
-      setTokenExpired(true);
-      updateSession({
-        session: {
-          ...session,
-          token: '',
-          colorMode: '',
-        },
-        sessionAdmin: {
-          adminName: '',
-          adminEmail: '',
-          adminRole: '',
-          adminID: '',
-        },
-      });
+  const checkTokenValidity = useCallback(() => {
+    if (tokenExpired || !session.token) return;
 
-      client.resetStore();
-      localStorage.clear();
-      setIsRevoked(true);
-      sessionStorage.clear();
-      // window['location'].reload();
+    try {
+      if (isJwtTokenExpired(session.token)) {
+        console.log('Token is expired');
+        // Token is expired: clear session data.
+        setTokenExpired(true);
+        updateSession({
+          session: {
+            ...session,
+            token: '',
+            colorMode: '',
+          },
+          sessionAdmin: {
+            adminName: '',
+            adminEmail: '',
+            adminRole: '',
+            adminID: '',
+          },
+        });
+
+        client.resetStore();
+        localStorage.clear();
+        sessionStorage.clear();
+        setIsRevoked(true);
+      }
+    } catch (error) {
+      console.error('Error checking token validity:', error);
     }
   }, [session, sessionAdmin, tokenExpired, updateSession]);
 
   // Run the check on every route change.
   useEffect(() => {
-    checkToken();
-  }, [location.pathname, checkToken]);
+    checkTokenValidity();
+  }, [location.pathname, checkTokenValidity]);
 
   // Also run the check periodically (every 5 minutes)
   useEffect(() => {
-    const intervalId = setInterval(checkToken, signOutCheckInterval);
+    const intervalId = setInterval(checkTokenValidity, signOutCheckInterval);
     return () => clearInterval(intervalId);
-  }, [checkToken]);
+  }, [checkTokenValidity]);
 
   // Use our custom hook for session ID and metadata.
   const [sessionId, setSessionId] = useTypedSessionStorage<string>('sessionId', '');
@@ -152,24 +167,36 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
     token: string;
     url: string;
     lastTimestamp: string;
+    targetElement?: string;
   }>('sessionMetadata', { sessionId: '', token: '', url: '', lastTimestamp: '' });
 
   // Initialize sessionId if not already set.
   useEffect(() => {
     if (!sessionId) {
-      setSessionId('session-' + Date.now());
+      setSessionId(generateSessionId());
     }
   }, [sessionId, setSessionId]);
 
   // Helper function to update metadata using the custom hook.
-  const updateMetadata = useCallback(() => {
-    setSessionMetadata({
-      sessionId: sessionId || 'session-' + Date.now(),
-      token: session.token || '',
-      url: window.location.href,
-      lastTimestamp: new Date().toISOString(),
-    });
-  }, [sessionId, session.token, setSessionMetadata]);
+  const updateMetadata = useCallback(
+    (targetElement?: string) => {
+      try {
+        setSessionMetadata({
+          sessionId: sessionId || generateSessionId(),
+          token: session.token || '',
+          url: window.location.href,
+          lastTimestamp: new Date().toISOString(),
+          targetElement,
+        });
+
+        // Here you would add analytics tracking or event logging
+        // Example: analyticsService.logPageView(sessionId, window.location.href);
+      } catch (error) {
+        console.error('Error updating session metadata:', error);
+      }
+    },
+    [sessionId, session.token, setSessionMetadata]
+  );
 
   // Log page load event when session data is available.
   useEffect(() => {
@@ -181,12 +208,31 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 
   // Log a user interaction event for every click.
   useEffect(() => {
-    const handleUserInteraction = (_event: MouseEvent) => {
-      // TODO: Add targetTag and targetId to the event object
-      updateMetadata();
+    let debounceTimeout: NodeJS.Timeout;
+    const handleUserInteraction = (event: MouseEvent) => {
+      if (!session.token) return;
+      if (debounceTimeout) clearTimeout(debounceTimeout);
+
+      // Capture relevant information about the clicked element
+      const target = event.target as HTMLElement;
+      let targetInfo;
+      if (target) {
+        const tagName = target.tagName.toLowerCase();
+        const targetId = target.id ? `#${target.id}` : '';
+        targetInfo = `${tagName}${targetId}`;
+      } else {
+        targetInfo = 'unknown';
+      }
+
+      debounceTimeout = setTimeout(() => {
+        updateMetadata(targetInfo);
+      }, 500);
     };
     document.addEventListener('click', handleUserInteraction);
-    return () => document.removeEventListener('click', handleUserInteraction);
+    return () => {
+      document.removeEventListener('click', handleUserInteraction);
+      if (debounceTimeout) clearTimeout(debounceTimeout);
+    };
   }, [session.token, sessionId, updateMetadata]);
 
   const value = useMemo(() => ({ session, sessionAdmin: parsedSessionAdmin, updateSession }), [session, parsedSessionAdmin, updateSession]);
