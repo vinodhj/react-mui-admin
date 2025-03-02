@@ -1,11 +1,7 @@
-import React, { lazy } from 'react';
-
-import AuthLayout from '../layouts/auth-layout';
+import React from 'react';
 import MainLayout from '../layouts/main-layout';
 import { Routes, Route } from 'react-router-dom';
-import { ProtectedRoute, PublicRoute } from './route-guards';
-
-import SignIn from '../pages/signin';
+import { ProtectedRoute } from './route-guards';
 import Dashboard from '../pages/dashboard';
 import NotFoundPage from '../pages/not-found';
 import Team from '../pages/team';
@@ -17,30 +13,26 @@ import ChangePassword from '../pages/settings/change-password';
 import EditProfile from '../pages/settings/edit-profile';
 import Faq from '../pages/settings/faq';
 
-const RevokeError = lazy(() => import('../pages/revoke'));
-
 const AppRoutes: React.FC = () => {
   return (
     <Routes>
-      <Route element={<PublicRoute element={<AuthLayout />} />}>
-        <Route path="/" element={<SignIn />} />
-        <Route path="/revoke" element={<RevokeError />} />
-      </Route>
-
       {/* Main Layout (Dashboard, other protected pages) */}
       <Route element={<ProtectedRoute element={<MainLayout />} />}>
+        <Route path="/" element={<Dashboard />} />
         <Route path="/dashboard" element={<Dashboard />} />
-
-        {/* Team routes */}
-        <Route path="/team" element={<ProtectedRoute element={<Team />} allowedRoles={['ADMIN']} />} />
-        <Route path="/team/create" element={<ProtectedRoute element={<CreateTeam />} allowedRoles={['ADMIN']} />} />
-        <Route path="/team/:id" element={<ProtectedRoute element={<TeamDetails />} allowedRoles={['ADMIN']} />} />
-        <Route path="/team/edit/:id" element={<ProtectedRoute element={<EditTeam />} allowedRoles={['ADMIN']} />} />
 
         {/* Settings */}
         <Route path="/profile" element={<Profile />} />
         <Route path="/edit-profile" element={<EditProfile />} />
         <Route path="/change-password" element={<ChangePassword />} />
+
+        {/* Team routes */}
+        <Route path="/team">
+          <Route index element={<ProtectedRoute element={<Team />} allowedRoles={['ADMIN']} />} />
+          <Route path="create" element={<ProtectedRoute element={<CreateTeam />} allowedRoles={['ADMIN']} />} />
+          <Route path=":id" element={<ProtectedRoute element={<TeamDetails />} allowedRoles={['ADMIN']} />} />
+          <Route path="edit/:id" element={<ProtectedRoute element={<EditTeam />} allowedRoles={['ADMIN']} />} />
+        </Route>
 
         {/* FAQ */}
         <Route path="/faq" element={<ProtectedRoute element={<Faq />} />} />

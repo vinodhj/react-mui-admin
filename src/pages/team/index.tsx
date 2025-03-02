@@ -12,20 +12,20 @@ import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import Link from '@mui/material/Link';
 import Box from '@mui/material/Box';
 import { GridColDef } from '@mui/x-data-grid';
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useMediaQuery, useTheme } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import NewUserButton from '../../components/pages/new-user-button';
 import { useDeleteUser } from '../../hooks/use-delete-user';
-import { SessionContext } from '../../contexts/session-context';
 import CustomSnackbar from '../../components/common/custom-snackbar';
 import { formatDate } from '../../utils/date-utils';
+import { useSession } from '../../hooks/use-session';
 
 function Team() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { session } = useContext(SessionContext) ?? {};
+  const { sessionAdmin } = useSession();
   const theme = useTheme();
   const mode = theme.palette.mode;
   const colors = tokens(mode);
@@ -219,7 +219,7 @@ function Team() {
         }}
         onDelete={() => {
           handleClose();
-          if (session?.adminRole !== 'ADMIN') {
+          if (sessionAdmin?.adminRole !== 'ADMIN') {
             setSnackbarMessage("You don't have permission to delete users.");
             setSnackbarSeverity('error');
             setOpenSnackbar(true);

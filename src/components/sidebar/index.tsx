@@ -8,14 +8,13 @@ import SidebarMenuItems from './sidebar-menu-items';
 import SidebarFooter from './footer';
 import { getMenuItemStyles } from './menu-item-styles';
 import { SidebarContext } from '../../contexts/sidebar-context';
-import { SessionContext } from '../../contexts/session-context';
+import { useSession } from '../../hooks/use-session';
 
 const MyProSidebar: FC = () => {
   const theme = useTheme();
   const mode = theme.palette.mode;
   const colors = tokens(mode);
-  const sessionDetails = useContext(SessionContext);
-  const { session } = sessionDetails ?? {};
+  const { sessionAdmin } = useSession();
   const sidebarProps = useContext(SidebarContext);
   const [selected, setSelected] = useState<string>('Dashboard');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -70,7 +69,7 @@ const MyProSidebar: FC = () => {
           <SidebarFooter
             collapsed={sidebarProps!.collapsed}
             userAvatar={userAvatar}
-            session={session ?? { adminName: '', adminEmail: '' }}
+            sessionAdmin={sessionAdmin ?? { adminName: '', adminEmail: '' }}
             colors={colors}
             anchorEl={anchorEl}
             handleMenuOpen={handleMenuOpen}

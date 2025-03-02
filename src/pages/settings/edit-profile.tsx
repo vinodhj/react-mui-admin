@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Card from '@mui/material/Card';
@@ -12,13 +12,13 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 import ProfileSidebar from '../../components/profile-sidebar';
 import PageHeader from '../../components/pages/page-header';
-import { SessionContext } from '../../contexts/session-context';
 import { useTheme } from '@mui/material';
 import { tokens } from '../../theme/main-theme';
 import { useNavigate } from 'react-router-dom';
 import { useEditUserMutation } from '../../graphql/graphql-generated';
 import LoadingSpinner from '../../components/common/loading-spinner';
 import CustomSnackbar from '../../components/common/custom-snackbar';
+import { useSession } from '../../hooks/use-session';
 
 const validationSchema = yup.object({
   name: yup.string().required('Name is required'),
@@ -27,8 +27,7 @@ const validationSchema = yup.object({
 
 const EditProfile: React.FC = () => {
   const navigate = useNavigate();
-  const sessionDetails = useContext(SessionContext);
-  const { session } = sessionDetails ?? {};
+  const { session, sessionAdmin, updateSession } = useSession();
   const theme = useTheme();
   const mode = theme.palette.mode;
   const colors = tokens(mode);
@@ -39,10 +38,10 @@ const EditProfile: React.FC = () => {
   const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error' | 'info' | 'warning'>('success');
 
   const user = {
-    id: session?.adminID ?? '',
-    name: session?.adminName ?? '',
-    email: session?.adminEmail ?? '',
-    role: session?.adminRole === 'ADMIN' ? 'Administrator' : 'User',
+    id: sessionAdmin.adminID,
+    name: sessionAdmin.adminName,
+    email: sessionAdmin.adminEmail,
+    role: sessionAdmin.adminRole === 'ADMIN' ? 'Administrator' : 'User',
   };
 
   const [updateUserMutation, { data: updateData, loading, error }] = useEditUserMutation();
@@ -77,20 +76,20 @@ const EditProfile: React.FC = () => {
   useEffect(() => {
     if (updateData?.editUser?.success) {
       const { user } = updateData.editUser;
-      const { session, updateSession } = sessionDetails ?? {};
-
       setSnackbarMessage('Profile updated successfully!');
       setSnackbarSeverity('success');
       setOpenSnackbar(true);
 
       // update session if data
-      if (session && updateSession && session.adminID === user?.id && user?.name) {
+      if (session && sessionAdmin && updateSession && sessionAdmin?.adminID === user?.id && user?.name) {
         updateSession({
-          ...session,
-          adminName: user.name ?? '',
-          // need to update once super role or some other setting to update email and role
-          // adminEmail: user.email ?? '',
-          // adminRole: user.role ?? ''
+          session: {
+            ...session,
+          },
+          sessionAdmin: {
+            ...sessionAdmin,
+            adminName: user.name,
+          },
         });
       }
     }
