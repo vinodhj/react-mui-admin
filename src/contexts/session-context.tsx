@@ -6,6 +6,7 @@ import client from '../graphql/apollo-client';
 import getStoredOrPreferredColorMode from '../utils/preferred-color-mode';
 import { setIsRevoked } from '../graphql/authEvents';
 import useLocalStorage from 'react-use-localstorage';
+import { useTypedSessionStorage } from '../hooks/use-typed-session-storage';
 
 export interface UpdateSessionData {
   session: SessionData;
@@ -66,7 +67,14 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
   const [tokenExpired, setTokenExpired] = useState(false);
   const [session, setSession] = useState<SessionData>(defaultSession);
   const [sessionAdmin, setSessionAdmin] = useLocalStorage('session_admin', JSON.stringify(defaultSessionAdmin));
-  const parsedSessionAdmin = useMemo(() => JSON.parse(sessionAdmin), [sessionAdmin]);
+  const parsedSessionAdmin = useMemo(() => {
+    try {
+      return JSON.parse(sessionAdmin);
+    } catch (error) {
+      console.error('Failed to parse session admin data:', error);
+      return defaultSessionAdmin;
+    }
+  }, [sessionAdmin]);
   const location = useLocation();
   const { setSystemMode } = useContext(ColorModeContext);
   const updateSession = useCallback(
@@ -84,7 +92,7 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
         localStorage.setItem('access_token', data.session.token);
       } else {
         localStorage.clear();
-        // sessionStorage.clear();
+        sessionStorage.clear();
       }
       localStorage.setItem('colorMode', data.session.colorMode ?? getStoredOrPreferredColorMode());
       localStorage.setItem('sidebarImage', data.session.sidebarImage?.toString() ?? 'true');
@@ -121,7 +129,7 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
       client.resetStore();
       localStorage.clear();
       setIsRevoked(true);
-      // sessionStorage.clear();
+      sessionStorage.clear();
       // window['location'].reload();
     }
   }, [session, sessionAdmin, tokenExpired, updateSession]);
@@ -136,6 +144,50 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
     const intervalId = setInterval(checkToken, signOutCheckInterval);
     return () => clearInterval(intervalId);
   }, [checkToken]);
+
+  // Use our custom hook for session ID and metadata.
+  const [sessionId, setSessionId] = useTypedSessionStorage<string>('sessionId', '');
+  const [_sessionMetadata, setSessionMetadata] = useTypedSessionStorage<{
+    sessionId: string;
+    token: string;
+    url: string;
+    lastTimestamp: string;
+  }>('sessionMetadata', { sessionId: '', token: '', url: '', lastTimestamp: '' });
+
+  // Initialize sessionId if not already set.
+  useEffect(() => {
+    if (!sessionId) {
+      setSessionId('session-' + Date.now());
+    }
+  }, [sessionId, setSessionId]);
+
+  // Helper function to update metadata using the custom hook.
+  const updateMetadata = useCallback(() => {
+    setSessionMetadata({
+      sessionId: sessionId || 'session-' + Date.now(),
+      token: session.token || '',
+      url: window.location.href,
+      lastTimestamp: new Date().toISOString(),
+    });
+  }, [sessionId, session.token, setSessionMetadata]);
+
+  // Log page load event when session data is available.
+  useEffect(() => {
+    if (session.token) {
+      // TODO: Log page load event
+      updateMetadata();
+    }
+  }, [session.token, sessionId, updateMetadata]);
+
+  // Log a user interaction event for every click.
+  useEffect(() => {
+    const handleUserInteraction = (_event: MouseEvent) => {
+      // TODO: Add targetTag and targetId to the event object
+      updateMetadata();
+    };
+    document.addEventListener('click', handleUserInteraction);
+    return () => document.removeEventListener('click', handleUserInteraction);
+  }, [session.token, sessionId, updateMetadata]);
 
   const value = useMemo(() => ({ session, sessionAdmin: parsedSessionAdmin, updateSession }), [session, parsedSessionAdmin, updateSession]);
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;

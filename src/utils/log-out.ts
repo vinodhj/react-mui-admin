@@ -36,7 +36,7 @@ export const useHandleLogout = () => {
       console.error('Error resetting Apollo store:', error);
     }
     localStorage.clear();
-    // sessionStorage.clear();
+    sessionStorage.clear();
     window['location'].reload();
   };
 

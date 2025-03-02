@@ -21,7 +21,7 @@ const cleanupSession = () => {
   localStorage.clear();
   // Update the state so that the app can react
   setIsRevoked(true);
-  // sessionStorage.clear();
+  sessionStorage.clear();
 };
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
