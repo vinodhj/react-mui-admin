@@ -9,6 +9,7 @@ import SidebarFooter from './footer';
 import { getMenuItemStyles } from './menu-item-styles';
 import { SidebarContext } from '../../contexts/sidebar-context';
 import { useSession } from '../../hooks/use-session';
+import { ENV } from '../../graphql/apollo/apollo-client';
 
 const MyProSidebar: FC = () => {
   const theme = useTheme();
@@ -26,8 +27,8 @@ const MyProSidebar: FC = () => {
   const handleMenuClose = () => setAnchorEl(null);
   const handleLogout = useHandleLogout();
 
-  const sidebarImageUrl = import.meta.env.VITE_SIDEBAR_IMAGE_URL;
-  const userAvatar = import.meta.env.VITE_AVATAR;
+  const sidebarImageUrl = ENV.sidebarImageUrl;
+  const userAvatar = ENV.userAvatar;
   const border = mode === 'dark' ? '1px solid' + colors.blackWhite[200] : '0.2px dotted' + colors.blackWhite[200];
 
   const finalToggled = isMobile ? sidebarProps?.toggled : false;

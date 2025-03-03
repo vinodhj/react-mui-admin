@@ -1,5 +1,6 @@
 import { onError } from '@apollo/client/link/error';
 import { setIsRevoked } from '../auth-events';
+import { ENV } from './apollo-client';
 
 /**
  * Creates an Apollo error handling link
@@ -32,7 +33,7 @@ export default function apolloErrorLink() {
     }
     if (networkError) {
       console.error(`[Network error]: `, networkError);
-      if (import.meta.env.DEV) {
+      if (ENV.isDev) {
         const details = {
           statusCode: 'statusCode' in networkError ? networkError.statusCode : undefined,
           message: networkError.message,

@@ -2,7 +2,7 @@ import React, { createContext, useState, useCallback, useMemo, ReactNode, useEff
 import isJwtTokenExpired from 'jwt-check-expiry';
 import { useLocation } from 'react-router-dom';
 import { ColorModeContext } from './color-mode-context';
-import client from '../graphql/apollo/apollo-client';
+import client, { ENV } from '../graphql/apollo/apollo-client';
 import getStoredOrPreferredColorMode from '../utils/preferred-color-mode';
 import { setIsRevoked } from '../graphql/auth-events';
 import useLocalStorage from 'react-use-localstorage';
@@ -34,7 +34,7 @@ export interface SessionContextProps {
   updateSession: (data: UpdateSessionData) => void;
 }
 
-const signOutCheckInterval = Number(import.meta.env.VITE_SIGNOUT_CHECK_INTERVAL_MINUTES) * 60 * 1000;
+const signOutCheckInterval = Number(ENV.signOutCheckInterval) * 60 * 1000;
 
 const isBrowser = typeof window !== 'undefined';
 
