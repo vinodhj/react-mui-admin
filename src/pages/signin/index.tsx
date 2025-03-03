@@ -69,7 +69,8 @@ export default function SignIn() {
           md: 7,
         }}
         sx={{
-          backgroundImage: 'url(https://lh3.googleusercontent.com/p/AF1QipPwaVe8g2KzlvObbHdww9zrw4ZI5CRZ2kkbCfm6=s1360-w1360-h1020)',
+          backgroundImage:
+            'linear-gradient(rgba(0.3, 0.3, 0.3, 0.3), rgba(0.3, 0.3, 0.3, 0.7)), url(https://lh3.googleusercontent.com/p/AF1QipPwaVe8g2KzlvObbHdww9zrw4ZI5CRZ2kkbCfm6=s1360-w1360-h1020)',
           backgroundRepeat: 'no-repeat',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
