@@ -7,7 +7,7 @@ import apolloErrorLink from './error-link';
 // Environment variables management
 export const ENV = {
   isDev: import.meta.env.DEV,
-  graphqlApiUrl: import.meta.env.DEV ? import.meta.env.VITE_DEV_API_URL : import.meta.env.VITE_PROD_API_URL,
+  apiUrl: import.meta.env.DEV ? import.meta.env.VITE_DEV_API_URL : import.meta.env.VITE_PROD_API_URL,
   projectToken: import.meta.env.VITE_PROJECT_TOKEN,
   sidebarImageUrl: import.meta.env.VITE_SIDEBAR_IMAGE_URL,
   userAvatar: import.meta.env.VITE_AVATAR,
@@ -26,7 +26,7 @@ if (missingVars.length > 0) {
 const errorLink = apolloErrorLink();
 
 const httpLink = createHttpLink({
-  uri: `${ENV.graphqlApiUrl}/graphql`,
+  uri: `${ENV.apiUrl}/graphql`,
   credentials: 'include',
 });
 
