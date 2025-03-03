@@ -1,5 +1,6 @@
-import { useState, createContext, FC, ReactNode, Dispatch, SetStateAction, useMemo, useEffect } from 'react';
+import { useState, createContext, ReactNode, Dispatch, SetStateAction, useMemo, FC } from 'react';
 import MyProSidebar from '../components/sidebar';
+import { useTypedLocalStorage } from '../hooks/use-typed-local-storage';
 
 export interface SidebarContextProps {
   sidebarBackgroundColor?: string;
@@ -11,7 +12,7 @@ export interface SidebarContextProps {
   collapsed: boolean;
   setCollapsed: Dispatch<SetStateAction<boolean>>;
   toggled: boolean;
-  setToggled: (value: boolean) => void;
+  setToggled: Dispatch<SetStateAction<boolean>>;
 }
 
 // Create the context
@@ -24,40 +25,11 @@ interface MyProSidebarProviderProps {
 export const MyProSidebarProvider: FC<MyProSidebarProviderProps> = ({ children }) => {
   const [sidebarBackgroundColor, setSidebarBackgroundColor] = useState<string | undefined>(undefined);
 
-  // Initialize sidebarRTL from localStorage (default: false)
-  const [sidebarRTL, setSidebarRTL] = useState<boolean>(() => {
-    const stored = localStorage.getItem('sidebarRTL');
-    return stored !== null ? JSON.parse(stored) : false;
-  });
-
-  // Initialize sidebarImage from localStorage (default: true)
-  const [sidebarImage, setSidebarImage] = useState<boolean>(() => {
-    const stored = localStorage.getItem('sidebarImage');
-    return stored !== null ? JSON.parse(stored) : true;
-  });
-
-  // Initialize collapsed state from localStorage (default: false)
-  const [collapsed, setCollapsed] = useState<boolean>(() => {
-    const stored = localStorage.getItem('sidebarCollapsed');
-    return stored !== null ? JSON.parse(stored) : false;
-  });
-
-  const [toggled, setToggled] = useState(false);
-
-  // Persist sidebarImage changes to localStorage
-  useEffect(() => {
-    localStorage.setItem('sidebarImage', JSON.stringify(sidebarImage));
-  }, [sidebarImage]);
-
-  // Persist sidebarRTL changes to localStorage
-  useEffect(() => {
-    localStorage.setItem('sidebarRTL', JSON.stringify(sidebarRTL));
-  }, [sidebarRTL]);
-
-  // Persist collapsed changes to localStorage
-  useEffect(() => {
-    localStorage.setItem('sidebarCollapsed', JSON.stringify(collapsed));
-  }, [collapsed]);
+  // Use the typed local storage hook for state persistence
+  const [sidebarRTL, setSidebarRTL] = useTypedLocalStorage<boolean>('sidebarRTL', false);
+  const [sidebarImage, setSidebarImage] = useTypedLocalStorage<boolean>('sidebarImage', true);
+  const [collapsed, setCollapsed] = useTypedLocalStorage<boolean>('sidebarCollapsed', false);
+  const [toggled, setToggled] = useTypedLocalStorage<boolean>('sidebarToggled', false);
 
   const contextValue = useMemo(
     () => ({
@@ -72,7 +44,7 @@ export const MyProSidebarProvider: FC<MyProSidebarProviderProps> = ({ children }
       toggled,
       setToggled,
     }),
-    [sidebarBackgroundColor, sidebarImage, sidebarRTL, collapsed]
+    [sidebarBackgroundColor, sidebarImage, sidebarRTL, collapsed, toggled]
   );
 
   return (

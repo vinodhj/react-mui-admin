@@ -8,14 +8,14 @@ import SidebarMenuItems from './sidebar-menu-items';
 import SidebarFooter from './footer';
 import { getMenuItemStyles } from './menu-item-styles';
 import { SidebarContext } from '../../contexts/sidebar-context';
-import { SessionContext } from '../../contexts/session-context';
+import { useSession } from '../../hooks/use-session';
+import { ENV } from '../../graphql/apollo/apollo-client';
 
 const MyProSidebar: FC = () => {
   const theme = useTheme();
   const mode = theme.palette.mode;
   const colors = tokens(mode);
-  const sessionDetails = useContext(SessionContext);
-  const { session } = sessionDetails ?? {};
+  const { sessionAdmin } = useSession();
   const sidebarProps = useContext(SidebarContext);
   const [selected, setSelected] = useState<string>('Dashboard');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -27,8 +27,8 @@ const MyProSidebar: FC = () => {
   const handleMenuClose = () => setAnchorEl(null);
   const handleLogout = useHandleLogout();
 
-  const sidebarImageUrl = import.meta.env.VITE_SIDEBAR_IMAGE_URL;
-  const userAvatar = import.meta.env.VITE_AVATAR;
+  const sidebarImageUrl = ENV.sidebarImageUrl;
+  const userAvatar = ENV.userAvatar;
   const border = mode === 'dark' ? '1px solid' + colors.blackWhite[200] : '0.2px dotted' + colors.blackWhite[200];
 
   const finalToggled = isMobile ? sidebarProps?.toggled : false;
@@ -70,7 +70,7 @@ const MyProSidebar: FC = () => {
           <SidebarFooter
             collapsed={sidebarProps!.collapsed}
             userAvatar={userAvatar}
-            session={session ?? { adminName: '', adminEmail: '' }}
+            sessionAdmin={sessionAdmin ?? { adminName: '', adminEmail: '' }}
             colors={colors}
             anchorEl={anchorEl}
             handleMenuOpen={handleMenuOpen}

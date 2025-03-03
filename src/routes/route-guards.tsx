@@ -2,20 +2,15 @@ import React, { useContext } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { SessionContext } from '../contexts/session-context';
 import AccessDenied from '../pages/access-denied';
+import { useSession } from '../hooks/use-session';
 
 interface ProtectedRouteProps {
   element: React.ReactElement;
   allowedRoles?: string[]; // Define which roles can access this route
 }
 
-export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
-  element,
-  allowedRoles,
-}: {
-  element: React.ReactNode;
-  allowedRoles?: string[];
-}) => {
-  const { session } = useContext(SessionContext) ?? {};
+export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ element, allowedRoles }: ProtectedRouteProps) => {
+  const { session, sessionAdmin } = useSession();
   const location = useLocation();
 
   if (!session?.token) {
@@ -24,7 +19,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to="/" state={{ from: location }} replace />;
   }
 
-  if (allowedRoles && !allowedRoles.includes(session.adminRole)) {
+  if (allowedRoles && !allowedRoles.includes(sessionAdmin.adminRole)) {
     // User does not have permission to access this route
     // 403 Forbidden: User lacks permission
     return <AccessDenied />;

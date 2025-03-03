@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Card from '@mui/material/Card';
@@ -12,12 +12,12 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 import ProfileSidebar from '../../components/profile-sidebar';
 import PageHeader from '../../components/pages/page-header';
-import { SessionContext } from '../../contexts/session-context';
 import { useTheme } from '@mui/material';
 import { tokens } from '../../theme/main-theme';
 import { useNavigate } from 'react-router-dom';
 import { useChangePasswordMutation } from '../../graphql/graphql-generated';
 import CustomSnackbar from '../../components/common/custom-snackbar';
+import { useSession } from '../../hooks/use-session';
 
 const validationSchema = yup.object({
   current_password: yup
@@ -43,8 +43,7 @@ const validationSchema = yup.object({
 });
 
 const ChangePassword: React.FC = () => {
-  const sessionDetails = useContext(SessionContext);
-  const { session } = sessionDetails ?? {};
+  const { sessionAdmin } = useSession();
   const navigate = useNavigate();
   const theme = useTheme();
   const mode = theme.palette.mode;
@@ -56,10 +55,10 @@ const ChangePassword: React.FC = () => {
   const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error' | 'info' | 'warning'>('success');
 
   const user = {
-    id: session?.adminID ?? '',
-    name: session?.adminName ?? '',
-    email: session?.adminEmail ?? '',
-    role: session?.adminRole === 'ADMIN' ? 'Administrator' : 'User',
+    id: sessionAdmin.adminID,
+    name: sessionAdmin.adminName,
+    email: sessionAdmin.adminEmail,
+    role: sessionAdmin.adminRole === 'ADMIN' ? 'Administrator' : 'User',
   };
 
   const [changePasswordMutation, { data: updateData, loading, error }] = useChangePasswordMutation();

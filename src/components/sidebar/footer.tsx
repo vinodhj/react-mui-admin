@@ -12,7 +12,7 @@ import StyleBadge from '../style-badge';
 interface SidebarFooterProps {
   collapsed: boolean;
   userAvatar: string;
-  session: { adminName: string; adminEmail: string };
+  sessionAdmin: { adminName: string; adminEmail: string };
   colors: any;
   anchorEl: null | HTMLElement;
   handleMenuOpen: (event: React.MouseEvent<HTMLElement>) => void;
@@ -26,7 +26,7 @@ interface SidebarFooterProps {
 const SidebarFooter: FC<SidebarFooterProps> = ({
   collapsed,
   userAvatar,
-  session,
+  sessionAdmin,
   colors,
   anchorEl,
   handleMenuOpen,
@@ -57,14 +57,16 @@ const SidebarFooter: FC<SidebarFooterProps> = ({
         >
           <Box display="flex" alignItems="center" gap={1}>
             <StyleBadge overlap="circular" anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} variant="dot">
-              <Avatar src={userAvatar} alt={session.adminName.toUpperCase()} sx={{ width: 40, height: 40 }} />
+              <Avatar src={userAvatar} alt={sessionAdmin.adminName.toUpperCase()} sx={{ width: 40, height: 40 }} />
             </StyleBadge>
             <Box textAlign="left">
               <Typography variant="subtitle1" sx={{ color: colors.vibrantBlue[500], fontWeight: 'bold' }}>
-                {startCase(session.adminName.toLowerCase())}
+                {sessionAdmin.adminName.length > 13
+                  ? `${startCase(sessionAdmin.adminName.toLowerCase().substring(0, 13))}...`
+                  : startCase(sessionAdmin.adminName.toLowerCase())}
               </Typography>
               <Typography variant="body2" sx={{ color: colors.grey[300] }}>
-                {session.adminEmail}
+                {sessionAdmin.adminEmail}
               </Typography>
             </Box>
           </Box>
@@ -112,7 +114,7 @@ const SidebarFooter: FC<SidebarFooterProps> = ({
           <StyleBadge overlap="circular" anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} variant="dot">
             <Avatar
               src={userAvatar}
-              alt={session.adminName.toUpperCase()}
+              alt={sessionAdmin.adminName.toUpperCase()}
               sx={{ width: 40, height: 40, cursor: 'pointer' }}
               onClick={handleMenuOpen}
             />

@@ -1,5 +1,5 @@
 // FAQ.tsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import Accordion from '@mui/material/Accordion';
@@ -22,7 +22,19 @@ const Faq: React.FC = () => {
   const mode = theme.palette.mode;
   const colors = tokens(mode);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [debouncedSearchFaqQuery, setdebouncedSearchFaqQuery] = useState<string>('');
   const [expanded, setExpanded] = useState<string | false>(false);
+
+  // Debounce search query
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setdebouncedSearchFaqQuery(searchQuery);
+    }, 500);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [searchQuery]);
 
   const { data, loading, error } = useAdminKvAssetQuery({
     variables: {
@@ -58,8 +70,8 @@ const Faq: React.FC = () => {
   const filteredGroups: FaqGroup[] = faqGroups
     .map((group: FaqGroup) => {
       const filteredItems: FaqItem[] = group.items.filter(
-        (item: FaqItem) => item.question.toLowerCase().includes(searchQuery.toLowerCase())
-        /* enable this line to include answer in search  -> || item.answer.toLowerCase().includes(searchQuery.toLowerCase()) */
+        (item: FaqItem) => item.question.toLowerCase().includes(debouncedSearchFaqQuery.toLowerCase())
+        /* enable this line to include answer in search  -> || item.answer.toLowerCase().includes(debouncedSearchFaqQuery.toLowerCase()) */
       );
       return { ...group, items: filteredItems };
     })

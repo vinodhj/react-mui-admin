@@ -23,6 +23,18 @@ const config: CodegenConfig = {
         inlineFragmentTypes: 'combine',
       },
     },
+    'src/graphql/apollo/type-policies-generated-helpers.ts': {
+      plugins: ['typescript-apollo-client-helpers'],
+      config: {
+        useTypeImports: true,
+        // Customize automatic key fields detection
+        nonOptionalTypename: true,
+        // For custom key fields beyond ID
+        customKeyFields: {
+          AdminKvAsset: ['kv_key'],
+        },
+      },
+    },
     './graphql.schema.json': {
       plugins: ['introspection'],
     },
