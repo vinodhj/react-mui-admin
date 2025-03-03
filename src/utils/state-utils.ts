@@ -16,7 +16,9 @@ export function createState<T>(initialValue: T) {
     subscribe: (listener: Listener<T>, immediateNotify = true) => {
       listeners.add(listener);
       if (immediateNotify) listener(value);
-      return () => listeners.delete(listener);
+      return () => {
+        listeners.delete(listener);
+      };
     },
   };
 }
