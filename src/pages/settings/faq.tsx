@@ -22,13 +22,13 @@ const Faq: React.FC = () => {
   const mode = theme.palette.mode;
   const colors = tokens(mode);
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>('');
+  const [debouncedSearchFaqQuery, setdebouncedSearchFaqQuery] = useState<string>('');
   const [expanded, setExpanded] = useState<string | false>(false);
 
   // Debounce search query
   useEffect(() => {
     const timer = setTimeout(() => {
-      setDebouncedSearchQuery(searchQuery);
+      setdebouncedSearchFaqQuery(searchQuery);
     }, 500);
 
     return () => {
@@ -70,8 +70,8 @@ const Faq: React.FC = () => {
   const filteredGroups: FaqGroup[] = faqGroups
     .map((group: FaqGroup) => {
       const filteredItems: FaqItem[] = group.items.filter(
-        (item: FaqItem) => item.question.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
-        /* enable this line to include answer in search  -> || item.answer.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) */
+        (item: FaqItem) => item.question.toLowerCase().includes(debouncedSearchFaqQuery.toLowerCase())
+        /* enable this line to include answer in search  -> || item.answer.toLowerCase().includes(debouncedSearchFaqQuery.toLowerCase()) */
       );
       return { ...group, items: filteredItems };
     })

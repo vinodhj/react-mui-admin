@@ -31,6 +31,7 @@ const SearchDialog: React.FC = () => {
 
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>('');
 
   // Ref for the TextField inside the dialog
   const inputRef = useRef<HTMLInputElement>(null);
@@ -46,6 +47,17 @@ const SearchDialog: React.FC = () => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
+
+  // Debounce search query
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(search);
+    }, 500);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [search]);
 
   const { data, loading, error } = useAdminKvAssetQuery({
     variables: {
@@ -79,9 +91,9 @@ const SearchDialog: React.FC = () => {
   // Filter the list by user input
   const filteredOptions = SEARCH_OPTIONS.filter(
     (option) =>
-      option.label.toLowerCase().includes(search.toLowerCase()) ||
-      option.path.toLowerCase().includes(search.toLowerCase()) ||
-      option.tags.toLowerCase().includes(search.toLowerCase())
+      option.label.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+      option.path.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+      option.tags.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
   );
 
   return (
