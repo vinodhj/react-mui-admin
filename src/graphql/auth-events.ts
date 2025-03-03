@@ -1,23 +1,13 @@
-type Listener = (isRevoked: boolean) => void;
+import { createState } from '../utils/state-utils';
 
-let isRevoked = false;
-const listeners: Listener[] = [];
+// --- Revoked State Management ---
+const revokedState = createState<boolean>(false);
+export const getIsRevoked = revokedState.get;
+export const setIsRevoked = revokedState.set;
+export const subscribeIsRevoked = revokedState.subscribe;
 
-export const getIsRevoked = () => isRevoked;
-
-export const setIsRevoked = (value: boolean) => {
-  isRevoked = value;
-  listeners.forEach((listener) => listener(isRevoked));
-};
-
-export const subscribeIsRevoked = (listener: Listener): (() => void) => {
-  listeners.push(listener);
-  // Optionally, call the listener immediately with the current value:
-  listener(isRevoked);
-  return () => {
-    const index = listeners.indexOf(listener);
-    if (index !== -1) {
-      listeners.splice(index, 1);
-    }
-  };
-};
+// --- Logging Out State Management ---
+const loggingOutState = createState<boolean>(false);
+export const getIsLoggingOut = loggingOutState.get;
+export const setIsLoggingOut = loggingOutState.set;
+export const subscribeIsLoggingOut = loggingOutState.subscribe;

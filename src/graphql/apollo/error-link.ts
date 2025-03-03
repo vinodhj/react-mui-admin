@@ -1,5 +1,5 @@
 import { onError } from '@apollo/client/link/error';
-import { setIsRevoked } from '../auth-events';
+import { getIsLoggingOut, setIsRevoked } from '../auth-events';
 import { ENV } from './apollo-client';
 
 /**
@@ -19,13 +19,17 @@ export default function apolloErrorLink() {
 
         // Handle revoke token or unauthorized error
         if (extensions?.code === 'REVOKE_TOKEN_ERROR' || extensions?.code === 'UNAUTHORIZED') {
-          console.error(`[Authentication Error]: ${JSON.stringify(errorInfo)}`);
-          const errorMessage =
-            extensions.code === 'REVOKE_TOKEN_ERROR'
-              ? 'Revoke token error encountered. Clearing storage and redirecting.'
-              : 'Unauthorized access error encountered. Clearing storage and redirecting.';
-          console.warn(`⚠️ Warning: ${errorMessage}`);
-          cleanupSession();
+          if (getIsLoggingOut() && extensions.code === 'UNAUTHORIZED') {
+            console.info('Ignoring unauthorized error during logout process');
+          } else {
+            console.error(`[Authentication Error]: ${JSON.stringify(errorInfo)}`);
+            const errorMessage =
+              extensions.code === 'REVOKE_TOKEN_ERROR'
+                ? 'Revoke token error encountered. Clearing storage and redirecting.'
+                : 'Unauthorized access error encountered. Clearing storage and redirecting.';
+            console.warn(`⚠️ Warning: ${errorMessage}`);
+            cleanupSession();
+          }
         } else {
           console.error(`[GraphQL error]: ${JSON.stringify(errorInfo)}`);
         }

@@ -1,4 +1,5 @@
 import client from '../graphql/apollo/apollo-client';
+import { setIsLoggingOut } from '../graphql/auth-events';
 import { useLogOutMutation } from '../graphql/graphql-generated';
 import { useSession } from '../hooks/use-session';
 
@@ -8,6 +9,9 @@ export const useHandleLogout = () => {
   const [logOutMutation] = useLogOutMutation();
 
   const handleLogout = async () => {
+    // Mark that a logout is in progress to avoid triggering the revoke error screen
+    setIsLoggingOut(true);
+
     // Call logout mutation to invalidate the token on the server
     try {
       await logOutMutation();
