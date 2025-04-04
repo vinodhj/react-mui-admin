@@ -5,6 +5,7 @@ import Typography from '@mui/material/Typography';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import PeopleOutlinedIcon from '@mui/icons-material/PeopleOutlined';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
+import CategoryIcon from '@mui/icons-material/Category';
 
 interface SidebarMenuItemsProps {
   collapsed: boolean;
@@ -76,17 +77,39 @@ const SidebarMenuItems: FC<SidebarMenuItemsProps> = ({ collapsed, selected, setS
           isMobile={isMobile}
         />
 
-        {/* Demo: Generate multiple items */}
-        {/* {[...Array(15)].map((_, i) => (
-          <SidebarItem
-            key={i}
-            title={`Menu Item ${i + 1}`}
-            to={`/menu-item-${i + 1}`}
-            icon={<PersonOutlinedIcon />}
-            selected={selected}
-            setSelected={setSelected}
-          />
-        ))} */}
+        <Typography variant="h6" color={colors.grey[300]} sx={{ m: '15px 20px 5px 20px' }}>
+          Category
+        </Typography>
+        <SidebarItem
+          title="Tag"
+          to="/category/tag"
+          icon={<CategoryIcon />}
+          selected={selected}
+          setSelected={setSelected}
+          setCollapsed={setCollapsed}
+          setToggled={setToggled}
+          isMobile={isMobile}
+        />
+        <SidebarItem
+          title="Mode"
+          to="/category/mode"
+          icon={<CategoryIcon />}
+          selected={selected}
+          setSelected={setSelected}
+          setCollapsed={setCollapsed}
+          setToggled={setToggled}
+          isMobile={isMobile}
+        />
+        <SidebarItem
+          title="Fynix"
+          to="/category/fynix"
+          icon={<CategoryIcon />}
+          selected={selected}
+          setSelected={setSelected}
+          setCollapsed={setCollapsed}
+          setToggled={setToggled}
+          isMobile={isMobile}
+        />
       </Box>
     </Box>
   );

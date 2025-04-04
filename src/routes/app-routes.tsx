@@ -1,6 +1,6 @@
 import React from 'react';
 import MainLayout from '../layouts/main-layout';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from './route-guards';
 import Dashboard from '../pages/dashboard';
 import NotFoundPage from '../pages/not-found';
@@ -12,6 +12,7 @@ import Profile from '../pages/settings';
 import ChangePassword from '../pages/settings/change-password';
 import EditProfile from '../pages/settings/edit-profile';
 import Faq from '../pages/settings/faq';
+import Category from '../pages/category';
 
 const AppRoutes: React.FC = () => {
   return (
@@ -27,11 +28,20 @@ const AppRoutes: React.FC = () => {
         <Route path="/change-password" element={<ChangePassword />} />
 
         {/* Team routes */}
-        <Route path="/team">
+        <Route path="team">
           <Route index element={<ProtectedRoute element={<Team />} allowedRoles={['ADMIN']} />} />
           <Route path="create" element={<ProtectedRoute element={<CreateTeam />} allowedRoles={['ADMIN']} />} />
           <Route path=":id" element={<ProtectedRoute element={<TeamDetails />} allowedRoles={['ADMIN']} />} />
           <Route path="edit/:id" element={<ProtectedRoute element={<EditTeam />} allowedRoles={['ADMIN']} />} />
+        </Route>
+
+        {/* Category routes */}
+        <Route path="category">
+          <Route index element={<Navigate to="/category/tag" replace />} />
+          <Route path=":type" element={<Category />} />
+          <Route path=":type/create" element={<Category />} />
+          <Route path=":type/:id" element={<Category />} />
+          <Route path=":type/edit/:id" element={<Category />} />
         </Route>
 
         {/* FAQ */}

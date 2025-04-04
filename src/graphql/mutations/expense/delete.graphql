@@ -1,0 +1,4 @@
+mutation DeleteCategory($input: DeleteCategoryInput!) {
+  __typename
+  deleteCategory(input: $input)
+}

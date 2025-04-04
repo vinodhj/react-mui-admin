@@ -563,6 +563,25 @@ export type EditUserMutation = {
   };
 };
 
+export type CreateCategoryMutationMutationVariables = Exact<{
+  input: CreateCategoryInput;
+}>;
+
+export type CreateCategoryMutationMutation = {
+  __typename?: 'Mutation';
+  createCategory: {
+    __typename: 'CategoryResponse';
+    success: boolean;
+    category?: { __typename: 'CategorySuccessResponse'; id: string; name: string; category_type: CategoryType } | null;
+  };
+};
+
+export type DeleteCategoryMutationVariables = Exact<{
+  input: DeleteCategoryInput;
+}>;
+
+export type DeleteCategoryMutation = { __typename: 'Mutation'; deleteCategory: boolean };
+
 export type LogOutMutationVariables = Exact<{ [key: string]: never }>;
 
 export type LogOutMutation = { __typename?: 'Mutation'; logout: { __typename?: 'LogoutResponse'; success: boolean } };
@@ -601,6 +620,57 @@ export type AdminKvAssetQueryVariables = Exact<{
 export type AdminKvAssetQuery = {
   __typename?: 'Query';
   adminKvAsset?: { __typename: 'AdminKvAsset'; kv_key: string; kv_value?: any | null } | null;
+};
+
+export type ExpenseFynixesQueryVariables = Exact<{
+  categoryFilter?: InputMaybe<CategoryFilter>;
+}>;
+
+export type ExpenseFynixesQuery = {
+  __typename?: 'Query';
+  expenseFynixes?: Array<{
+    __typename: 'Category';
+    id: string;
+    name: string;
+    created_at: string;
+    updated_at: string;
+    created_by: string;
+    updated_by: string;
+  } | null> | null;
+};
+
+export type ExpenseModesQueryVariables = Exact<{
+  categoryFilter?: InputMaybe<CategoryFilter>;
+}>;
+
+export type ExpenseModesQuery = {
+  __typename?: 'Query';
+  expenseModes?: Array<{
+    __typename: 'Category';
+    id: string;
+    name: string;
+    created_at: string;
+    updated_at: string;
+    created_by: string;
+    updated_by: string;
+  } | null> | null;
+};
+
+export type ExpenseTagsQueryVariables = Exact<{
+  categoryFilter?: InputMaybe<CategoryFilter>;
+}>;
+
+export type ExpenseTagsQuery = {
+  __typename?: 'Query';
+  expenseTags?: Array<{
+    __typename: 'Category';
+    id: string;
+    name: string;
+    created_at: string;
+    updated_at: string;
+    created_by: string;
+    updated_by: string;
+  } | null> | null;
 };
 
 export type UserByFieldQueryVariables = Exact<{
@@ -808,6 +878,91 @@ export function useEditUserMutation(baseOptions?: Apollo.MutationHookOptions<Edi
 export type EditUserMutationHookResult = ReturnType<typeof useEditUserMutation>;
 export type EditUserMutationResult = Apollo.MutationResult<EditUserMutation>;
 export type EditUserMutationOptions = Apollo.BaseMutationOptions<EditUserMutation, EditUserMutationVariables>;
+export const CreateCategoryMutationDocument = gql`
+  mutation CreateCategoryMutation($input: CreateCategoryInput!) {
+    createCategory(input: $input) {
+      __typename
+      success
+      category {
+        __typename
+        id
+        name
+        category_type
+      }
+    }
+  }
+`;
+export type CreateCategoryMutationMutationFn = Apollo.MutationFunction<
+  CreateCategoryMutationMutation,
+  CreateCategoryMutationMutationVariables
+>;
+
+/**
+ * __useCreateCategoryMutationMutation__
+ *
+ * To run a mutation, you first call `useCreateCategoryMutationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateCategoryMutationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createCategoryMutationMutation, { data, loading, error }] = useCreateCategoryMutationMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateCategoryMutationMutation(
+  baseOptions?: Apollo.MutationHookOptions<CreateCategoryMutationMutation, CreateCategoryMutationMutationVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<CreateCategoryMutationMutation, CreateCategoryMutationMutationVariables>(
+    CreateCategoryMutationDocument,
+    options
+  );
+}
+export type CreateCategoryMutationMutationHookResult = ReturnType<typeof useCreateCategoryMutationMutation>;
+export type CreateCategoryMutationMutationResult = Apollo.MutationResult<CreateCategoryMutationMutation>;
+export type CreateCategoryMutationMutationOptions = Apollo.BaseMutationOptions<
+  CreateCategoryMutationMutation,
+  CreateCategoryMutationMutationVariables
+>;
+export const DeleteCategoryDocument = gql`
+  mutation DeleteCategory($input: DeleteCategoryInput!) {
+    __typename
+    deleteCategory(input: $input)
+  }
+`;
+export type DeleteCategoryMutationFn = Apollo.MutationFunction<DeleteCategoryMutation, DeleteCategoryMutationVariables>;
+
+/**
+ * __useDeleteCategoryMutation__
+ *
+ * To run a mutation, you first call `useDeleteCategoryMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteCategoryMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteCategoryMutation, { data, loading, error }] = useDeleteCategoryMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useDeleteCategoryMutation(
+  baseOptions?: Apollo.MutationHookOptions<DeleteCategoryMutation, DeleteCategoryMutationVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<DeleteCategoryMutation, DeleteCategoryMutationVariables>(DeleteCategoryDocument, options);
+}
+export type DeleteCategoryMutationHookResult = ReturnType<typeof useDeleteCategoryMutation>;
+export type DeleteCategoryMutationResult = Apollo.MutationResult<DeleteCategoryMutation>;
+export type DeleteCategoryMutationOptions = Apollo.BaseMutationOptions<DeleteCategoryMutation, DeleteCategoryMutationVariables>;
 export const LogOutDocument = gql`
   mutation LogOut {
     logout {
@@ -936,6 +1091,150 @@ export type AdminKvAssetQueryHookResult = ReturnType<typeof useAdminKvAssetQuery
 export type AdminKvAssetLazyQueryHookResult = ReturnType<typeof useAdminKvAssetLazyQuery>;
 export type AdminKvAssetSuspenseQueryHookResult = ReturnType<typeof useAdminKvAssetSuspenseQuery>;
 export type AdminKvAssetQueryResult = Apollo.QueryResult<AdminKvAssetQuery, AdminKvAssetQueryVariables>;
+export const ExpenseFynixesDocument = gql`
+  query ExpenseFynixes($categoryFilter: CategoryFilter) {
+    expenseFynixes(input: $categoryFilter) {
+      __typename
+      id
+      name
+      created_at
+      updated_at
+      created_by
+      updated_by
+    }
+  }
+`;
+
+/**
+ * __useExpenseFynixesQuery__
+ *
+ * To run a query within a React component, call `useExpenseFynixesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useExpenseFynixesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useExpenseFynixesQuery({
+ *   variables: {
+ *      categoryFilter: // value for 'categoryFilter'
+ *   },
+ * });
+ */
+export function useExpenseFynixesQuery(baseOptions?: Apollo.QueryHookOptions<ExpenseFynixesQuery, ExpenseFynixesQueryVariables>) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<ExpenseFynixesQuery, ExpenseFynixesQueryVariables>(ExpenseFynixesDocument, options);
+}
+export function useExpenseFynixesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ExpenseFynixesQuery, ExpenseFynixesQueryVariables>) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<ExpenseFynixesQuery, ExpenseFynixesQueryVariables>(ExpenseFynixesDocument, options);
+}
+export function useExpenseFynixesSuspenseQuery(
+  baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<ExpenseFynixesQuery, ExpenseFynixesQueryVariables>
+) {
+  const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<ExpenseFynixesQuery, ExpenseFynixesQueryVariables>(ExpenseFynixesDocument, options);
+}
+export type ExpenseFynixesQueryHookResult = ReturnType<typeof useExpenseFynixesQuery>;
+export type ExpenseFynixesLazyQueryHookResult = ReturnType<typeof useExpenseFynixesLazyQuery>;
+export type ExpenseFynixesSuspenseQueryHookResult = ReturnType<typeof useExpenseFynixesSuspenseQuery>;
+export type ExpenseFynixesQueryResult = Apollo.QueryResult<ExpenseFynixesQuery, ExpenseFynixesQueryVariables>;
+export const ExpenseModesDocument = gql`
+  query ExpenseModes($categoryFilter: CategoryFilter) {
+    expenseModes(input: $categoryFilter) {
+      __typename
+      id
+      name
+      created_at
+      updated_at
+      created_by
+      updated_by
+    }
+  }
+`;
+
+/**
+ * __useExpenseModesQuery__
+ *
+ * To run a query within a React component, call `useExpenseModesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useExpenseModesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useExpenseModesQuery({
+ *   variables: {
+ *      categoryFilter: // value for 'categoryFilter'
+ *   },
+ * });
+ */
+export function useExpenseModesQuery(baseOptions?: Apollo.QueryHookOptions<ExpenseModesQuery, ExpenseModesQueryVariables>) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<ExpenseModesQuery, ExpenseModesQueryVariables>(ExpenseModesDocument, options);
+}
+export function useExpenseModesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ExpenseModesQuery, ExpenseModesQueryVariables>) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<ExpenseModesQuery, ExpenseModesQueryVariables>(ExpenseModesDocument, options);
+}
+export function useExpenseModesSuspenseQuery(
+  baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<ExpenseModesQuery, ExpenseModesQueryVariables>
+) {
+  const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<ExpenseModesQuery, ExpenseModesQueryVariables>(ExpenseModesDocument, options);
+}
+export type ExpenseModesQueryHookResult = ReturnType<typeof useExpenseModesQuery>;
+export type ExpenseModesLazyQueryHookResult = ReturnType<typeof useExpenseModesLazyQuery>;
+export type ExpenseModesSuspenseQueryHookResult = ReturnType<typeof useExpenseModesSuspenseQuery>;
+export type ExpenseModesQueryResult = Apollo.QueryResult<ExpenseModesQuery, ExpenseModesQueryVariables>;
+export const ExpenseTagsDocument = gql`
+  query ExpenseTags($categoryFilter: CategoryFilter) {
+    expenseTags(input: $categoryFilter) {
+      __typename
+      id
+      name
+      created_at
+      updated_at
+      created_by
+      updated_by
+    }
+  }
+`;
+
+/**
+ * __useExpenseTagsQuery__
+ *
+ * To run a query within a React component, call `useExpenseTagsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useExpenseTagsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useExpenseTagsQuery({
+ *   variables: {
+ *      categoryFilter: // value for 'categoryFilter'
+ *   },
+ * });
+ */
+export function useExpenseTagsQuery(baseOptions?: Apollo.QueryHookOptions<ExpenseTagsQuery, ExpenseTagsQueryVariables>) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<ExpenseTagsQuery, ExpenseTagsQueryVariables>(ExpenseTagsDocument, options);
+}
+export function useExpenseTagsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ExpenseTagsQuery, ExpenseTagsQueryVariables>) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<ExpenseTagsQuery, ExpenseTagsQueryVariables>(ExpenseTagsDocument, options);
+}
+export function useExpenseTagsSuspenseQuery(
+  baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<ExpenseTagsQuery, ExpenseTagsQueryVariables>
+) {
+  const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<ExpenseTagsQuery, ExpenseTagsQueryVariables>(ExpenseTagsDocument, options);
+}
+export type ExpenseTagsQueryHookResult = ReturnType<typeof useExpenseTagsQuery>;
+export type ExpenseTagsLazyQueryHookResult = ReturnType<typeof useExpenseTagsLazyQuery>;
+export type ExpenseTagsSuspenseQueryHookResult = ReturnType<typeof useExpenseTagsSuspenseQuery>;
+export type ExpenseTagsQueryResult = Apollo.QueryResult<ExpenseTagsQuery, ExpenseTagsQueryVariables>;
 export const UserByFieldDocument = gql`
   query UserByField($field: ColumnName!, $value: String!) {
     userByfield(input: { field: $field, value: $value }) {
