@@ -2,22 +2,15 @@ import Box from '@mui/material/Box';
 import PageHeader from '../../components/pages/page-header';
 import NewUserButton from '../../components/pages/new-user-button';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { Link as RouterLink, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Link as RouterLink, useNavigate, useParams } from 'react-router-dom';
 import Link from '@mui/material/Link';
 import { useSession } from '../../hooks/use-session';
 import useTheme from '@mui/material/styles/useTheme';
 import { tokens } from '../../theme/main-theme';
-import { useEffect, useMemo, useState } from 'react';
-import {
-  useExpenseFynixesQuery,
-  useExpenseModesQuery,
-  useExpenseTagsQuery,
-  Category as categoryMerge,
-} from '../../graphql/graphql-generated';
+import { useMemo, useState } from 'react';
 import LoadingSpinner from '../../components/common/loading-spinner';
 import ErrorAlert from '../../components/common/error-alert';
 import InfoAlert from '../../components/common/info-alert';
-import { formatDate } from '../../utils/date-utils';
 import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { GridColDef } from '@mui/x-data-grid/models';
@@ -26,82 +19,33 @@ import DataTable from '../../components/pages/data-table';
 import CustomSnackbar from '../../components/common/custom-snackbar';
 import DeleteConfirmationDialog from '../../components/pages/delete-confirmation-dialog';
 import { useDeleteCategory } from '../../hooks/use-delete-category';
-
-const ALLOWED_TYPES = ['tag', 'mode', 'fynix'];
-
-// Type mapping to help with type-specific operations
-const TYPE_CONFIG = {
-  tag: {
-    useQuery: useExpenseTagsQuery,
-    dataKey: 'expenseTags',
-  },
-  mode: {
-    useQuery: useExpenseModesQuery,
-    dataKey: 'expenseModes',
-  },
-  fynix: {
-    useQuery: useExpenseFynixesQuery,
-    dataKey: 'expenseFynixes',
-  },
-};
+import { useCategoryData } from '../../hooks/use-category-data';
+import { useSnackbar } from '../../hooks/use-snackbar';
 
 function Category() {
-  const { type } = useParams();
+  const { type } = useParams<{ type: string }>();
   const navigate = useNavigate();
-  const location = useLocation();
   const { sessionAdmin } = useSession();
   const theme = useTheme();
   const mode = theme.palette.mode;
   const colors = tokens(mode);
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  // Snackbar state
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: '',
-    severity: 'success' as 'success' | 'error' | 'info' | 'warning',
-  });
+  // Use our custom hooks
+  const { snackbar, showSnackbar, closeSnackbar } = useSnackbar();
+  const { data: rowData, loading, error, refetch, isValidType, capitalize } = useCategoryData(type);
 
   // Action menu state
-  const [actionMenu, setActionMenu] = useState({
-    anchorEl: null as HTMLElement | null,
-    selectedId: null as string | null,
+  const [actionMenu, setActionMenu] = useState<{
+    anchorEl: HTMLElement | null;
+    selectedId: string | null;
+  }>({
+    anchorEl: null,
+    selectedId: null,
   });
 
   // Dialog state
   const [openDialog, setOpenDialog] = useState(false);
-
-  // Validate type and redirect if invalid
-  useEffect(() => {
-    if (!type || !ALLOWED_TYPES.includes(type)) {
-      navigate('/category-not-found', { replace: true });
-    }
-  }, [type, navigate]);
-
-  // Handle alert messages from navigation state
-  useEffect(() => {
-    const alertType = location.state?.alertType as string | undefined;
-    const alertMessage = location.state?.alertMessage as string | undefined;
-
-    if (alertMessage) {
-      setSnackbar({
-        open: true,
-        message: alertMessage,
-        severity: (alertType as 'success' | 'error' | 'info' | 'warning') || 'success',
-      });
-      navigate(location.pathname, { replace: true, state: {} });
-    }
-  }, [location.state, navigate, location.pathname]);
-
-  // Run the appropriate query based on the type
-  const queryConfig = type ? TYPE_CONFIG[type as keyof typeof TYPE_CONFIG] : null;
-  const { data, loading, error, refetch } = queryConfig
-    ? queryConfig.useQuery({
-        skip: !type || !ALLOWED_TYPES.includes(type),
-        notifyOnNetworkStatusChange: true,
-        fetchPolicy: 'cache-and-network',
-      })
-    : { data: null, loading: false, error: new Error('Invalid type'), refetch: () => {} };
 
   // Delete category hook
   const {
@@ -114,24 +58,16 @@ function Category() {
       // Refetch data after deletion
       refetch();
       setOpenDialog(false);
-      setSnackbar({
-        open: true,
-        message: `${capitalize(type)} deleted successfully!`,
-        severity: 'success',
-      });
+      showSnackbar(`${capitalize(type)} deleted successfully!`);
     },
     onError: (err) => {
       console.error('Delete failed:', err);
       setOpenDialog(false);
-      setSnackbar({
-        open: true,
-        message: err.message || `Failed to delete ${type}`,
-        severity: 'error',
-      });
+      showSnackbar(err.message || `Failed to delete ${type}`, 'error');
     },
   });
 
-  // Define table columns
+  // Define table columns with useMemo to prevent unnecessary re-renders
   const columns: GridColDef[] = useMemo(
     () => [
       { field: 'id', headerName: 'Id', width: 50 },
@@ -189,7 +125,7 @@ function Category() {
   // Action menu handlers
   const handleActionClick = (event: React.MouseEvent<HTMLElement>, id: string) => {
     setActionMenu({
-      anchorEl: event.currentTarget as HTMLElement,
+      anchorEl: event.currentTarget,
       selectedId: id,
     });
   };
@@ -201,11 +137,7 @@ function Category() {
   const handleDeleteClick = () => {
     handleActionClose();
     if (sessionAdmin?.adminRole !== 'ADMIN') {
-      setSnackbar({
-        open: true,
-        message: "You don't have permission to delete items.",
-        severity: 'error',
-      });
+      showSnackbar("You don't have permission to delete items.", 'error');
       return;
     }
     setOpenDialog(true);
@@ -218,58 +150,26 @@ function Category() {
     }
   };
 
-  // Process data for table
-  const processData = () => {
-    if (!data || !type || !queryConfig) return [];
-
-    const items = data[queryConfig.dataKey as keyof typeof data] ?? [];
-
-    if (!Array.isArray(items)) return [];
-
-    return items
-      .map((item: categoryMerge | null, index: number) => {
-        if (!item) return null;
-        return {
-          id: index + 1,
-          registeredId: item.id,
-          name: item.name,
-          created_at: formatDate(item.created_at),
-          updated_at: formatDate(item.updated_at),
-        };
-      })
-      .filter(Boolean);
-  };
-
-  // Handle loading and error states
+  // Handle loading and error states with improved messaging
   if (loading) return <LoadingSpinner />;
-  if (error) return <ErrorAlert message={error.message} />;
-  if (deleteError) return <ErrorAlert message={deleteError.message} />;
-  if (!type || !ALLOWED_TYPES.includes(type)) return null;
-
-  const rowData = processData();
+  if (error) return <ErrorAlert message={`Error loading ${type} data: ${error.message}`} />;
+  if (deleteError) return <ErrorAlert message={`Error deleting ${type}: ${deleteError.message}`} />;
+  if (!isValidType) return <ErrorAlert message={`Invalid category type: ${type}`} />;
 
   if (!rowData.length) {
-    return <InfoAlert message="No data available" />;
+    return <InfoAlert message={`No ${type} data available`} />;
   }
-
-  // Helper function to capitalize strings
-  const capitalize = (s?: string) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : '');
 
   return (
     <Box m="20px" sx={{ p: '0 15px' }}>
       <Box display="flex" flexWrap="wrap" justifyContent="space-between" alignItems="center" mb={2}>
-        <PageHeader title={type} subtitle={isMobile ? '' : `Manage  ${type}-specific content in a structured manner."`} />
+        <PageHeader title={type ?? ''} subtitle={isMobile ? '' : `Manage ${type}-specific content in a structured manner.`} />
 
         <NewUserButton to={`/category/${type}/create`} label={`+ New ${capitalize(type)}`} />
       </Box>
 
       {/* Snackbar Alert */}
-      <CustomSnackbar
-        open={snackbar.open}
-        message={snackbar.message}
-        severity={snackbar.severity}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-      />
+      <CustomSnackbar open={snackbar.open} message={snackbar.message} severity={snackbar.severity} onClose={closeSnackbar} />
 
       <DataTable rows={rowData} columns={columns} />
 

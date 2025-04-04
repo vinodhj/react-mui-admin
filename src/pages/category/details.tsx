@@ -1,15 +1,9 @@
-import { useLocation, Link as RouterLink, useNavigate, useParams } from 'react-router-dom';
+import { Link as RouterLink, useNavigate, useParams } from 'react-router-dom';
 import { useSession } from '../../hooks/use-session';
 import { Box, Card, CardContent, IconButton, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { tokens } from '../../theme/main-theme';
 import { useDeleteCategory } from '../../hooks/use-delete-category';
-import {
-  useExpenseFynixesQuery,
-  useExpenseModesQuery,
-  useExpenseTagsQuery,
-  Category as categoryMerge,
-} from '../../graphql/graphql-generated';
 import LoadingSpinner from '../../components/common/loading-spinner';
 import ErrorAlert from '../../components/common/error-alert';
 import { formatDate } from '../../utils/date-utils';
@@ -22,28 +16,11 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import Grid from '@mui/material/Grid2';
 import InfoRow from '../../components/pages/info-row';
-
-const ALLOWED_TYPES = ['tag', 'mode', 'fynix'];
-
-// Type mapping to help with type-specific operations
-const TYPE_CONFIG = {
-  tag: {
-    useQuery: useExpenseTagsQuery,
-    dataKey: 'expenseTags',
-  },
-  mode: {
-    useQuery: useExpenseModesQuery,
-    dataKey: 'expenseModes',
-  },
-  fynix: {
-    useQuery: useExpenseFynixesQuery,
-    dataKey: 'expenseFynixes',
-  },
-};
+import { useCategoryData } from '../../hooks/use-category-data';
+import { useSnackbar } from '../../hooks/use-snackbar';
 
 function CategoryDetails() {
-  const { type, id } = useParams();
-  const location = useLocation();
+  const { type, id } = useParams<{ type: string; id: string }>();
   const navigate = useNavigate();
   const { sessionAdmin } = useSession();
   const theme = useTheme();
@@ -52,47 +29,9 @@ function CategoryDetails() {
   const [openDialog, setOpenDialog] = useState(false);
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  // Snackbar state
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: '',
-    severity: 'success' as 'success' | 'error' | 'info' | 'warning',
-  });
-
-  // Handle alert messages from navigation state
-  useEffect(() => {
-    const alertType = location.state?.alertType as string | undefined;
-    const alertMessage = location.state?.alertMessage as string | undefined;
-
-    if (alertMessage) {
-      setSnackbar({
-        open: true,
-        message: alertMessage,
-        severity: (alertType as 'success' | 'error' | 'info' | 'warning') || 'success',
-      });
-      navigate(location.pathname, { replace: true, state: {} });
-    }
-  }, [location.state, navigate, location.pathname]);
-
-  const capitalize = (s?: string) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : '');
-
-  // Handle delete confirmation
-  const handleDelete = () => {
-    if (id) {
-      handleDeleteCategory(id);
-    }
-  };
-
-  // Run the appropriate query based on the type
-  const queryConfig = type ? TYPE_CONFIG[type as keyof typeof TYPE_CONFIG] : null;
-  const { data, loading, error } = queryConfig
-    ? queryConfig.useQuery({
-        variables: { categoryFilter: { id } },
-        skip: !type || !ALLOWED_TYPES.includes(type),
-        notifyOnNetworkStatusChange: true,
-        fetchPolicy: 'network-only',
-      })
-    : { data: null, loading: false, error: new Error('Invalid type') };
+  // Use our custom hooks
+  const { snackbar, showSnackbar, closeSnackbar } = useSnackbar();
+  const { data: rowData, loading, error, isValidType, capitalize } = useCategoryData(type, id);
 
   // Delete category hook
   const {
@@ -103,75 +42,50 @@ function CategoryDetails() {
     type: type as 'tag' | 'mode' | 'fynix',
     onCompleted: () => {
       setOpenDialog(false);
-      navigate(`/category/${type}`, { state: { alertType: 'success', alertMessage: 'User deleted successfully' } });
+      navigate(`/category/${type}`, {
+        state: {
+          alertType: 'success',
+          alertMessage: `${capitalize(type)} deleted successfully`,
+        },
+      });
     },
     onError: (err) => {
       console.error('Delete failed:', err);
       setOpenDialog(false);
-      setSnackbar({
-        open: true,
-        message: err.message || `Failed to delete ${type}`,
-        severity: 'error',
-      });
+      showSnackbar(err.message || `Failed to delete ${type}`, 'error');
     },
   });
 
-  // Handle loading and error states
-  if (loading) return <LoadingSpinner />;
-  if (error) return <ErrorAlert message={error.message} />;
-  if (deleteError) return <ErrorAlert message={deleteError.message} />;
-  if (!type || !ALLOWED_TYPES.includes(type)) return null;
-
-  // Process data for table
-  const processData = () => {
-    if (!data || !type || !queryConfig) return [];
-
-    const items = data[queryConfig.dataKey as keyof typeof data] ?? [];
-
-    if (!Array.isArray(items)) return [];
-
-    return items
-      .map((item: categoryMerge | null, index: number) => {
-        if (!item) return null;
-        return {
-          id: index + 1,
-          registeredId: item.id,
-          name: item.name,
-          created_at: item.created_at,
-          updated_at: item.updated_at,
-        };
-      })
-      .filter(Boolean);
+  // Handle delete confirmation
+  const handleDelete = () => {
+    if (id) {
+      handleDeleteCategory(id);
+    }
   };
 
-  const rowData = processData();
+  // Handle loading and error states with improved messaging
+  if (loading) return <LoadingSpinner />;
+  if (error) return <ErrorAlert message={`Error loading ${type} details: ${error.message}`} />;
+  if (deleteError) return <ErrorAlert message={`Error deleting ${type}: ${deleteError.message}`} />;
+  if (!isValidType) return <ErrorAlert message={`Invalid category type: ${type}`} />;
+  if (!id) return <ErrorAlert message="Missing ID parameter" />;
 
   if (!rowData.length) {
-    return <InfoAlert message="No data available" />;
-  }
-
-  if (!id) {
-    return <ErrorAlert message="Invalid Registered ID" />;
+    return <InfoAlert message={`No data available for ${type} with ID: ${id}`} />;
   }
 
   const categoryData = rowData[0];
 
   if (!categoryData) {
-    return <ErrorAlert message="categoryData not found" />;
+    return <ErrorAlert message={`${capitalize(type)} not found with ID: ${id}`} />;
   }
 
-  console.log('categoryData', categoryData);
   const { name, created_at, updated_at } = categoryData;
 
   return (
     <Box m="20px" sx={{ p: '0 15px' }}>
       {/* Snackbar Alert */}
-      <CustomSnackbar
-        open={snackbar.open}
-        message={snackbar.message}
-        severity={snackbar.severity}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-      />
+      <CustomSnackbar open={snackbar.open} message={snackbar.message} severity={snackbar.severity} onClose={closeSnackbar} />
       {/* Delete Confirmation Dialog */}
       <DeleteConfirmationDialog
         openDialog={openDialog}
@@ -197,11 +111,7 @@ function CategoryDetails() {
                 size="small"
                 onClick={() => {
                   if (sessionAdmin?.adminRole !== 'ADMIN') {
-                    setSnackbar({
-                      open: true,
-                      message: "You don't have permission to delete items.",
-                      severity: 'error',
-                    });
+                    showSnackbar("You don't have permission to delete items.", 'error');
                     return;
                   }
                   setOpenDialog(true);
@@ -230,10 +140,10 @@ function CategoryDetails() {
                 <InfoRow label="Name" value={isMobile && name.length > 20 ? `${name.substring(0, 20)}...` : name} />
               </Grid>
               <Grid size={{ xs: 12 }} sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <InfoRow label="Created At" value={isMobile ? formatDate(created_at, 'MMM dd, yyyy') : formatDate(created_at)} />
+                <InfoRow label="Created At" value={isMobile ? formatDate(created_at, 'MMM dd, yyyy') : created_at} />
               </Grid>
               <Grid size={{ xs: 12 }}>
-                <InfoRow label="Updated At" value={isMobile ? formatDate(updated_at, 'MMM dd, yyyy') : formatDate(updated_at)} />
+                <InfoRow label="Updated At" value={isMobile ? formatDate(updated_at, 'MMM dd, yyyy') : updated_at} />
               </Grid>
             </Grid>
           </CardContent>
