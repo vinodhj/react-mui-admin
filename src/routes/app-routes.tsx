@@ -13,6 +13,7 @@ import ChangePassword from '../pages/settings/change-password';
 import EditProfile from '../pages/settings/edit-profile';
 import Faq from '../pages/settings/faq';
 import Category from '../pages/category';
+import CategoryDetails from '../pages/category/details';
 
 const AppRoutes: React.FC = () => {
   return (
@@ -40,7 +41,7 @@ const AppRoutes: React.FC = () => {
           <Route index element={<Navigate to="/category/tag" replace />} />
           <Route path=":type" element={<Category />} />
           <Route path=":type/create" element={<Category />} />
-          <Route path=":type/:id" element={<Category />} />
+          <Route path=":type/:id" element={<CategoryDetails />} />
           <Route path=":type/edit/:id" element={<Category />} />
         </Route>
 
