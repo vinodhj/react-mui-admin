@@ -582,6 +582,19 @@ export type DeleteCategoryMutationVariables = Exact<{
 
 export type DeleteCategoryMutation = { __typename: 'Mutation'; deleteCategory: boolean };
 
+export type UpdateCategoryMutationMutationVariables = Exact<{
+  input: UpdateCategoryInput;
+}>;
+
+export type UpdateCategoryMutationMutation = {
+  __typename?: 'Mutation';
+  updateCategory: {
+    __typename: 'CategoryResponse';
+    success: boolean;
+    category?: { __typename: 'CategorySuccessResponse'; id: string; name: string; category_type: CategoryType } | null;
+  };
+};
+
 export type LogOutMutationVariables = Exact<{ [key: string]: never }>;
 
 export type LogOutMutation = { __typename?: 'Mutation'; logout: { __typename?: 'LogoutResponse'; success: boolean } };
@@ -963,6 +976,57 @@ export function useDeleteCategoryMutation(
 export type DeleteCategoryMutationHookResult = ReturnType<typeof useDeleteCategoryMutation>;
 export type DeleteCategoryMutationResult = Apollo.MutationResult<DeleteCategoryMutation>;
 export type DeleteCategoryMutationOptions = Apollo.BaseMutationOptions<DeleteCategoryMutation, DeleteCategoryMutationVariables>;
+export const UpdateCategoryMutationDocument = gql`
+  mutation UpdateCategoryMutation($input: UpdateCategoryInput!) {
+    updateCategory(input: $input) {
+      __typename
+      success
+      category {
+        __typename
+        id
+        name
+        category_type
+      }
+    }
+  }
+`;
+export type UpdateCategoryMutationMutationFn = Apollo.MutationFunction<
+  UpdateCategoryMutationMutation,
+  UpdateCategoryMutationMutationVariables
+>;
+
+/**
+ * __useUpdateCategoryMutationMutation__
+ *
+ * To run a mutation, you first call `useUpdateCategoryMutationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateCategoryMutationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateCategoryMutationMutation, { data, loading, error }] = useUpdateCategoryMutationMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateCategoryMutationMutation(
+  baseOptions?: Apollo.MutationHookOptions<UpdateCategoryMutationMutation, UpdateCategoryMutationMutationVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<UpdateCategoryMutationMutation, UpdateCategoryMutationMutationVariables>(
+    UpdateCategoryMutationDocument,
+    options
+  );
+}
+export type UpdateCategoryMutationMutationHookResult = ReturnType<typeof useUpdateCategoryMutationMutation>;
+export type UpdateCategoryMutationMutationResult = Apollo.MutationResult<UpdateCategoryMutationMutation>;
+export type UpdateCategoryMutationMutationOptions = Apollo.BaseMutationOptions<
+  UpdateCategoryMutationMutation,
+  UpdateCategoryMutationMutationVariables
+>;
 export const LogOutDocument = gql`
   mutation LogOut {
     logout {

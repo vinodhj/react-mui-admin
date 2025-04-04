@@ -1,0 +1,12 @@
+mutation UpdateCategoryMutation($input: UpdateCategoryInput!) {
+  updateCategory(input: $input) {
+    __typename
+    success
+    category {
+      __typename
+      id
+      name
+      category_type
+    }
+  }
+}
