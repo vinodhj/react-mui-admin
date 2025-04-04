@@ -7,7 +7,13 @@ mutation EditUser($input: EditUserInput!) {
       id
       name
       email
+      phone
       role
+      address
+      city
+      state
+      country
+      zipcode
     }
   }
 }

@@ -29,6 +29,7 @@ export const useHandleLogout = () => {
       sessionAdmin: {
         adminName: '',
         adminEmail: '',
+        adminPhone: '',
         adminRole: '',
         adminID: '',
       },

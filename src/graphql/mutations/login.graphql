@@ -1,5 +1,5 @@
-mutation login($email: String!, $password: String!) {
-  login(input: {email: $email, password: $password}) {
+mutation Login($email: String!, $password: String!) {
+  login(input: { email: $email, password: $password }) {
     __typename
     success
     token
@@ -8,7 +8,13 @@ mutation login($email: String!, $password: String!) {
       id
       name
       email
+      phone
       role
+      address
+      city
+      state
+      country
+      zipcode
     }
   }
 }

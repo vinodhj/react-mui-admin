@@ -9,11 +9,17 @@ import { tokens } from '../../../theme/main-theme';
 
 const validationSchema = yup.object({
   name: yup.string().required('Name is required'),
+  phone: yup
+    .string()
+    .trim()
+    .matches(/^\d{10}$/, 'Invalid phone number')
+    .min(10, 'Phone number must be at least 10 digits')
+    .required('Phone number is required'),
   email: yup.string().trim().email('Invalid email address').required('Email is required'),
 });
 
 interface EditTeamFormProps {
-  user: { id: string; name: string; email: string; role: Role };
+  user: { id: string; name: string; phone: string; email: string; role: Role };
   updateUserMutation: (options: { variables: { input: EditUserInput } }) => Promise<any>;
   loading: boolean;
 }
@@ -26,6 +32,7 @@ const EditTeamForm: React.FC<EditTeamFormProps> = ({ user, updateUserMutation, l
   const formik = useFormik({
     initialValues: {
       name: user.name,
+      phone: user.phone,
       email: user.email,
     },
     validationSchema,
@@ -44,7 +51,7 @@ const EditTeamForm: React.FC<EditTeamFormProps> = ({ user, updateUserMutation, l
         Edit User Details
       </Typography>
 
-      {(['name', 'email'] as const).map((field) => (
+      {(['name', 'phone', 'email'] as const).map((field) => (
         <TextField
           key={field}
           label={field.charAt(0).toUpperCase() + field.slice(1)}

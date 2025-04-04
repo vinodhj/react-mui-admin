@@ -10,6 +10,12 @@ import * as yup from 'yup';
 const validationSchema = yup.object({
   name: yup.string().required('Name is required'),
   email: yup.string().trim().email('Invalid email address').required('Email is required'),
+  phone: yup
+    .string()
+    .trim()
+    .matches(/^\d{10}$/, 'Invalid phone number')
+    .min(10, 'Phone number must be at least 10 digits')
+    .required('Phone number is required'),
   password: yup
     .string()
     .trim()
@@ -35,6 +41,7 @@ const CreateTeamForm: React.FC<CreateTeamFormProps> = ({ createUserMutation, loa
     initialValues: {
       name: '',
       email: '',
+      phone: '',
       password: '',
       role: Role.User, // Default and non-changeable
     },
@@ -55,7 +62,7 @@ const CreateTeamForm: React.FC<CreateTeamFormProps> = ({ createUserMutation, loa
         Create a new user
       </Typography>
 
-      {(['name', 'email', 'password'] as const).map((field) => (
+      {(['name', 'email', 'phone', 'password'] as const).map((field) => (
         <TextField
           key={field}
           label={field.charAt(0).toUpperCase() + field.slice(1)}

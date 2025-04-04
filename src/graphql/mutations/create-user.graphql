@@ -1,4 +1,4 @@
-mutation CreateUser($input: SignUpInput!) {
+mutation SignUp($input: SignUpInput!) {
   __typename
   signUp(input: $input) {
     success
@@ -8,7 +8,13 @@ mutation CreateUser($input: SignUpInput!) {
       email
       id
       name
+      phone
       role
+      address
+      city
+      state
+      country
+      zipcode
     }
   }
 }

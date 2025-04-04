@@ -33,6 +33,7 @@ const Profile = () => {
 
   const user = {
     name: sessionAdmin.adminName,
+    phone: sessionAdmin.adminPhone,
     email: sessionAdmin.adminEmail,
     role: sessionAdmin.adminRole === 'ADMIN' ? 'Administrator' : 'User',
   };
@@ -121,7 +122,7 @@ const Profile = () => {
                       Phone
                     </Typography>
                     <Typography variant="body2" color="textSecondary">
-                      N/A
+                      {user.phone}
                     </Typography>
                   </Box>
                 </Box>

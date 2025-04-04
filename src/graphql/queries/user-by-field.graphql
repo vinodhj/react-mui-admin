@@ -4,7 +4,13 @@ query UserByField($field: ColumnName!, $value: String!) {
     id
     name
     email
+    phone
     role
+    address
+    city
+    state
+    country
+    zipcode
     created_at
     updated_at
   }

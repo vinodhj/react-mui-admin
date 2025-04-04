@@ -17,6 +17,8 @@ export type Scalars = {
   Float: { input: number; output: number };
   DateTime: { input: string; output: string };
   JSON: { input: any; output: any };
+  TransportOptions: { input: any; output: any };
+  _DirectiveExtensions: { input: any; output: any };
 };
 
 export type AdminKvAsset = {
@@ -29,6 +31,40 @@ export type AdminKvAssetInput = {
   kv_key: Scalars['String']['input'];
 };
 
+export type Category = {
+  __typename?: 'Category';
+  created_at: Scalars['DateTime']['output'];
+  created_by: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  updated_at: Scalars['DateTime']['output'];
+  updated_by: Scalars['String']['output'];
+};
+
+export type CategoryFilter = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+  search?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type CategoryResponse = {
+  __typename?: 'CategoryResponse';
+  category?: Maybe<CategorySuccessResponse>;
+  success: Scalars['Boolean']['output'];
+};
+
+export type CategorySuccessResponse = {
+  __typename?: 'CategorySuccessResponse';
+  category_type: CategoryType;
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+};
+
+export enum CategoryType {
+  ExpenseFynix = 'EXPENSE_FYNIX',
+  ExpenseMode = 'EXPENSE_MODE',
+  ExpenseTag = 'EXPENSE_TAG',
+}
+
 export type ChangePasswordInput = {
   confirm_password: Scalars['String']['input'];
   current_password: Scalars['String']['input'];
@@ -37,27 +73,143 @@ export type ChangePasswordInput = {
 };
 
 export enum ColumnName {
+  Address = 'address',
+  City = 'city',
+  Country = 'country',
   Email = 'email',
   Id = 'id',
   Name = 'name',
+  Phone = 'phone',
   Role = 'role',
+  State = 'state',
+  Zipcode = 'zipcode',
 }
+
+export type CreateCategoryInput = {
+  category_type: CategoryType;
+  name: Scalars['String']['input'];
+};
+
+export type CreateExpenseTrackerInput = {
+  amount: Scalars['Float']['input'];
+  description?: InputMaybe<Scalars['String']['input']>;
+  expense_period: Scalars['String']['input'];
+  fynix_id: Scalars['ID']['input'];
+  item_details?: InputMaybe<Scalars['String']['input']>;
+  mode_id: Scalars['ID']['input'];
+  status: ExpenseStatus;
+  tag_id: Scalars['ID']['input'];
+  user_id: Scalars['ID']['input'];
+};
+
+export type DeleteCategoryInput = {
+  category_type: CategoryType;
+  id: Scalars['ID']['input'];
+};
+
+export type DeleteExpenseTrackerInput = {
+  id: Scalars['ID']['input'];
+  user_id: Scalars['ID']['input'];
+};
 
 export type DeleteUserInput = {
   id: Scalars['ID']['input'];
 };
 
 export type EditUserInput = {
+  address?: InputMaybe<Scalars['String']['input']>;
+  city?: InputMaybe<Scalars['String']['input']>;
+  country?: InputMaybe<Scalars['String']['input']>;
   email: Scalars['String']['input'];
   id: Scalars['ID']['input'];
   name: Scalars['String']['input'];
+  phone: Scalars['String']['input'];
   role?: InputMaybe<Role>;
+  state?: InputMaybe<Scalars['String']['input']>;
+  zipcode?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EditUserResponse = {
   __typename?: 'EditUserResponse';
   success: Scalars['Boolean']['output'];
   user?: Maybe<UserSuccessResponse>;
+};
+
+export enum ExpenseStatus {
+  NextDue = 'NextDue',
+  Paid = 'Paid',
+  UnPaid = 'UnPaid',
+}
+
+export type ExpenseTracker = {
+  __typename?: 'ExpenseTracker';
+  amount: Scalars['Float']['output'];
+  created_at: Scalars['DateTime']['output'];
+  created_by: Scalars['String']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  expense_period: Scalars['String']['output'];
+  fynix: Category;
+  fynix_id: Scalars['ID']['output'];
+  id: Scalars['ID']['output'];
+  is_disabled: Scalars['Boolean']['output'];
+  item_details?: Maybe<Scalars['String']['output']>;
+  mode: Category;
+  mode_id: Scalars['ID']['output'];
+  status: ExpenseStatus;
+  tag: Category;
+  tag_id: Scalars['ID']['output'];
+  updated_at: Scalars['DateTime']['output'];
+  updated_by: Scalars['String']['output'];
+  user: User;
+  user_id: Scalars['String']['output'];
+};
+
+export type ExpenseTrackerConnection = {
+  __typename?: 'ExpenseTrackerConnection';
+  edges: Array<ExpenseTrackerEdge>;
+  pageInfo: PageInfo;
+};
+
+export type ExpenseTrackerEdge = {
+  __typename?: 'ExpenseTrackerEdge';
+  cursor: Scalars['String']['output'];
+  node: ExpenseTracker;
+};
+
+export type ExpenseTrackerResponse = {
+  __typename?: 'ExpenseTrackerResponse';
+  expenseTracker?: Maybe<ExpenseTrackerSuccessResponse>;
+  success: Scalars['Boolean']['output'];
+};
+
+export type ExpenseTrackerSuccessResponse = {
+  __typename?: 'ExpenseTrackerSuccessResponse';
+  amount: Scalars['Float']['output'];
+  created_at: Scalars['DateTime']['output'];
+  created_by: Scalars['String']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  expense_period: Scalars['String']['output'];
+  fynix_id: Scalars['ID']['output'];
+  id: Scalars['ID']['output'];
+  item_details?: Maybe<Scalars['String']['output']>;
+  mode_id: Scalars['ID']['output'];
+  status: ExpenseStatus;
+  tag_id: Scalars['ID']['output'];
+  updated_at: Scalars['DateTime']['output'];
+  updated_by: Scalars['String']['output'];
+  user_id: Scalars['String']['output'];
+};
+
+export type GenericCategoryResponse = {
+  __typename?: 'GenericCategoryResponse';
+  category_type: CategoryType;
+  created_at: Scalars['DateTime']['output'];
+  created_by: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  is_disabled: Scalars['Boolean']['output'];
+  name: Scalars['String']['output'];
+  updated_at: Scalars['DateTime']['output'];
+  updated_by: Scalars['String']['output'];
 };
 
 export type LoginInput = {
@@ -80,15 +232,37 @@ export type LogoutResponse = {
 export type Mutation = {
   __typename?: 'Mutation';
   changePassword: Scalars['Boolean']['output'];
+  createCategory: CategoryResponse;
+  createExpenseTracker: ExpenseTrackerResponse;
+  deleteCategory: Scalars['Boolean']['output'];
+  deleteExpenseTracker: Scalars['Boolean']['output'];
   deleteUser: Scalars['Boolean']['output'];
   editUser: EditUserResponse;
   login: LoginResponse;
   logout: LogoutResponse;
   signUp: SignUpResponse;
+  updateCategory: CategoryResponse;
+  updateExpenseTracker: ExpenseTrackerResponse;
 };
 
 export type MutationChangePasswordArgs = {
   input: ChangePasswordInput;
+};
+
+export type MutationCreateCategoryArgs = {
+  input: CreateCategoryInput;
+};
+
+export type MutationCreateExpenseTrackerArgs = {
+  input: CreateExpenseTrackerInput;
+};
+
+export type MutationDeleteCategoryArgs = {
+  input: DeleteCategoryInput;
+};
+
+export type MutationDeleteExpenseTrackerArgs = {
+  input: DeleteExpenseTrackerInput;
 };
 
 export type MutationDeleteUserArgs = {
@@ -107,9 +281,52 @@ export type MutationSignUpArgs = {
   input: SignUpInput;
 };
 
+export type MutationUpdateCategoryArgs = {
+  input: UpdateCategoryInput;
+};
+
+export type MutationUpdateExpenseTrackerArgs = {
+  input: UpdateExpenseTrackerInput;
+};
+
+export type PageInfo = {
+  __typename?: 'PageInfo';
+  endCursor?: Maybe<Scalars['String']['output']>;
+  hasNextPage: Scalars['Boolean']['output'];
+};
+
+export type PaginatedExpenseInputs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  expense_period?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  fynix_ids?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  max_amount?: InputMaybe<Scalars['Float']['input']>;
+  min_amount?: InputMaybe<Scalars['Float']['input']>;
+  mode_ids?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  sort?: InputMaybe<Sort>;
+  sort_by?: InputMaybe<Sort_By>;
+  statuses?: InputMaybe<Array<InputMaybe<ExpenseStatus>>>;
+  tag_ids?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  user_ids?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+};
+
+export type PaginatedUsersInputs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Sort>;
+  sort_by?: InputMaybe<Sort_By>;
+};
+
 export type Query = {
   __typename?: 'Query';
   adminKvAsset?: Maybe<AdminKvAsset>;
+  expenseFynixes?: Maybe<Array<Maybe<Category>>>;
+  expenseModes?: Maybe<Array<Maybe<Category>>>;
+  expenseTags?: Maybe<Array<Maybe<Category>>>;
+  expenseTrackerById?: Maybe<ExpenseTracker>;
+  expenseTrackerByUserIds: Array<Maybe<ExpenseTracker>>;
+  paginatedExpenseTrackers: ExpenseTrackerConnection;
+  paginatedUsers?: Maybe<UsersConnection>;
   userByEmail?: Maybe<UserResponse>;
   userByfield?: Maybe<Array<Maybe<UserResponse>>>;
   users?: Maybe<Array<Maybe<UserResponse>>>;
@@ -117,6 +334,38 @@ export type Query = {
 
 export type QueryAdminKvAssetArgs = {
   input: AdminKvAssetInput;
+};
+
+export type QueryExpenseFynixesArgs = {
+  input?: InputMaybe<CategoryFilter>;
+};
+
+export type QueryExpenseModesArgs = {
+  input?: InputMaybe<CategoryFilter>;
+};
+
+export type QueryExpenseTagsArgs = {
+  input?: InputMaybe<CategoryFilter>;
+};
+
+export type QueryExpenseTrackerByIdArgs = {
+  id: Scalars['ID']['input'];
+  session_id: Scalars['ID']['input'];
+};
+
+export type QueryExpenseTrackerByUserIdsArgs = {
+  session_id: Scalars['ID']['input'];
+  user_ids: Array<Scalars['ID']['input']>;
+};
+
+export type QueryPaginatedExpenseTrackersArgs = {
+  input?: InputMaybe<PaginatedExpenseInputs>;
+  session_id: Scalars['ID']['input'];
+};
+
+export type QueryPaginatedUsersArgs = {
+  ids?: InputMaybe<Array<Scalars['ID']['input']>>;
+  input?: InputMaybe<PaginatedUsersInputs>;
 };
 
 export type QueryUserByEmailArgs = {
@@ -132,11 +381,22 @@ export enum Role {
   User = 'USER',
 }
 
+export enum Sort_By {
+  CreatedAt = 'CREATED_AT',
+  UpdatedAt = 'UPDATED_AT',
+}
+
 export type SignUpInput = {
+  address?: InputMaybe<Scalars['String']['input']>;
+  city?: InputMaybe<Scalars['String']['input']>;
+  country?: InputMaybe<Scalars['String']['input']>;
   email: Scalars['String']['input'];
   name: Scalars['String']['input'];
   password: Scalars['String']['input'];
+  phone: Scalars['String']['input'];
   role?: InputMaybe<Role>;
+  state?: InputMaybe<Scalars['String']['input']>;
+  zipcode?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type SignUpResponse = {
@@ -145,15 +405,47 @@ export type SignUpResponse = {
   user?: Maybe<UserSuccessResponse>;
 };
 
+export enum Sort {
+  Asc = 'ASC',
+  Desc = 'DESC',
+}
+
+export type UpdateCategoryInput = {
+  category_type: CategoryType;
+  id: Scalars['ID']['input'];
+  name: Scalars['String']['input'];
+};
+
+export type UpdateExpenseTrackerInput = {
+  amount: Scalars['Float']['input'];
+  description?: InputMaybe<Scalars['String']['input']>;
+  expense_period: Scalars['String']['input'];
+  fynix_id: Scalars['ID']['input'];
+  id: Scalars['ID']['input'];
+  item_details?: InputMaybe<Scalars['String']['input']>;
+  mode_id: Scalars['ID']['input'];
+  status: ExpenseStatus;
+  tag_id: Scalars['ID']['input'];
+  user_id: Scalars['ID']['input'];
+};
+
 export type User = {
   __typename?: 'User';
+  address?: Maybe<Scalars['String']['output']>;
+  city?: Maybe<Scalars['String']['output']>;
+  country?: Maybe<Scalars['String']['output']>;
   created_at: Scalars['DateTime']['output'];
+  created_by: Scalars['String']['output'];
   email: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   password: Scalars['String']['output'];
+  phone: Scalars['String']['output'];
   role: Role;
+  state?: Maybe<Scalars['String']['output']>;
   updated_at: Scalars['DateTime']['output'];
+  updated_by: Scalars['String']['output'];
+  zipcode?: Maybe<Scalars['String']['output']>;
 };
 
 export type UserByEmailInput = {
@@ -165,22 +457,48 @@ export type UserByFieldInput = {
   value: Scalars['String']['input'];
 };
 
+export type UserEdge = {
+  __typename?: 'UserEdge';
+  cursor: Scalars['String']['output'];
+  node: UserResponse;
+};
+
 export type UserResponse = {
   __typename?: 'UserResponse';
+  address?: Maybe<Scalars['String']['output']>;
+  city?: Maybe<Scalars['String']['output']>;
+  country?: Maybe<Scalars['String']['output']>;
   created_at: Scalars['DateTime']['output'];
+  created_by: Scalars['String']['output'];
   email: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
+  phone: Scalars['String']['output'];
   role: Role;
+  state?: Maybe<Scalars['String']['output']>;
   updated_at: Scalars['DateTime']['output'];
+  updated_by: Scalars['String']['output'];
+  zipcode?: Maybe<Scalars['String']['output']>;
 };
 
 export type UserSuccessResponse = {
   __typename?: 'UserSuccessResponse';
+  address?: Maybe<Scalars['String']['output']>;
+  city?: Maybe<Scalars['String']['output']>;
+  country?: Maybe<Scalars['String']['output']>;
   email: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
+  phone: Scalars['String']['output'];
   role: Role;
+  state?: Maybe<Scalars['String']['output']>;
+  zipcode?: Maybe<Scalars['String']['output']>;
+};
+
+export type UsersConnection = {
+  __typename?: 'UsersConnection';
+  edges: Array<UserEdge>;
+  pageInfo: PageInfo;
 };
 
 export type ChangePasswordMutationVariables = Exact<{
@@ -189,16 +507,28 @@ export type ChangePasswordMutationVariables = Exact<{
 
 export type ChangePasswordMutation = { __typename?: 'Mutation'; changePassword: boolean };
 
-export type CreateUserMutationVariables = Exact<{
+export type SignUpMutationVariables = Exact<{
   input: SignUpInput;
 }>;
 
-export type CreateUserMutation = {
+export type SignUpMutation = {
   __typename: 'Mutation';
   signUp: {
     __typename: 'SignUpResponse';
     success: boolean;
-    user?: { __typename: 'UserSuccessResponse'; email: string; id: string; name: string; role: Role } | null;
+    user?: {
+      __typename: 'UserSuccessResponse';
+      email: string;
+      id: string;
+      name: string;
+      phone: string;
+      role: Role;
+      address?: string | null;
+      city?: string | null;
+      state?: string | null;
+      country?: string | null;
+      zipcode?: string | null;
+    } | null;
   };
 };
 
@@ -217,7 +547,19 @@ export type EditUserMutation = {
   editUser: {
     __typename: 'EditUserResponse';
     success: boolean;
-    user?: { __typename: 'UserSuccessResponse'; id: string; name: string; email: string; role: Role } | null;
+    user?: {
+      __typename: 'UserSuccessResponse';
+      id: string;
+      name: string;
+      email: string;
+      phone: string;
+      role: Role;
+      address?: string | null;
+      city?: string | null;
+      state?: string | null;
+      country?: string | null;
+      zipcode?: string | null;
+    } | null;
   };
 };
 
@@ -236,7 +578,19 @@ export type LoginMutation = {
     __typename: 'LoginResponse';
     success: boolean;
     token?: string | null;
-    user?: { __typename: 'UserSuccessResponse'; id: string; name: string; email: string; role: Role } | null;
+    user?: {
+      __typename: 'UserSuccessResponse';
+      id: string;
+      name: string;
+      email: string;
+      phone: string;
+      role: Role;
+      address?: string | null;
+      city?: string | null;
+      state?: string | null;
+      country?: string | null;
+      zipcode?: string | null;
+    } | null;
   };
 };
 
@@ -261,7 +615,13 @@ export type UserByFieldQuery = {
     id: string;
     name: string;
     email: string;
+    phone: string;
     role: Role;
+    address?: string | null;
+    city?: string | null;
+    state?: string | null;
+    country?: string | null;
+    zipcode?: string | null;
     created_at: string;
     updated_at: string;
   } | null> | null;
@@ -277,6 +637,12 @@ export type AllUsersQuery = {
     name: string;
     email: string;
     role: Role;
+    phone: string;
+    address?: string | null;
+    city?: string | null;
+    state?: string | null;
+    country?: string | null;
+    zipcode?: string | null;
     created_at: string;
     updated_at: string;
   } | null> | null;
@@ -315,8 +681,8 @@ export function useChangePasswordMutation(
 export type ChangePasswordMutationHookResult = ReturnType<typeof useChangePasswordMutation>;
 export type ChangePasswordMutationResult = Apollo.MutationResult<ChangePasswordMutation>;
 export type ChangePasswordMutationOptions = Apollo.BaseMutationOptions<ChangePasswordMutation, ChangePasswordMutationVariables>;
-export const CreateUserDocument = gql`
-  mutation CreateUser($input: SignUpInput!) {
+export const SignUpDocument = gql`
+  mutation SignUp($input: SignUpInput!) {
     __typename
     signUp(input: $input) {
       success
@@ -326,37 +692,43 @@ export const CreateUserDocument = gql`
         email
         id
         name
+        phone
         role
+        address
+        city
+        state
+        country
+        zipcode
       }
     }
   }
 `;
-export type CreateUserMutationFn = Apollo.MutationFunction<CreateUserMutation, CreateUserMutationVariables>;
+export type SignUpMutationFn = Apollo.MutationFunction<SignUpMutation, SignUpMutationVariables>;
 
 /**
- * __useCreateUserMutation__
+ * __useSignUpMutation__
  *
- * To run a mutation, you first call `useCreateUserMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateUserMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useSignUpMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSignUpMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [createUserMutation, { data, loading, error }] = useCreateUserMutation({
+ * const [signUpMutation, { data, loading, error }] = useSignUpMutation({
  *   variables: {
  *      input: // value for 'input'
  *   },
  * });
  */
-export function useCreateUserMutation(baseOptions?: Apollo.MutationHookOptions<CreateUserMutation, CreateUserMutationVariables>) {
+export function useSignUpMutation(baseOptions?: Apollo.MutationHookOptions<SignUpMutation, SignUpMutationVariables>) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<CreateUserMutation, CreateUserMutationVariables>(CreateUserDocument, options);
+  return Apollo.useMutation<SignUpMutation, SignUpMutationVariables>(SignUpDocument, options);
 }
-export type CreateUserMutationHookResult = ReturnType<typeof useCreateUserMutation>;
-export type CreateUserMutationResult = Apollo.MutationResult<CreateUserMutation>;
-export type CreateUserMutationOptions = Apollo.BaseMutationOptions<CreateUserMutation, CreateUserMutationVariables>;
+export type SignUpMutationHookResult = ReturnType<typeof useSignUpMutation>;
+export type SignUpMutationResult = Apollo.MutationResult<SignUpMutation>;
+export type SignUpMutationOptions = Apollo.BaseMutationOptions<SignUpMutation, SignUpMutationVariables>;
 export const DeleteUserDocument = gql`
   mutation DeleteUser($id: ID!) {
     __typename
@@ -399,7 +771,13 @@ export const EditUserDocument = gql`
         id
         name
         email
+        phone
         role
+        address
+        city
+        state
+        country
+        zipcode
       }
     }
   }
@@ -463,7 +841,7 @@ export type LogOutMutationHookResult = ReturnType<typeof useLogOutMutation>;
 export type LogOutMutationResult = Apollo.MutationResult<LogOutMutation>;
 export type LogOutMutationOptions = Apollo.BaseMutationOptions<LogOutMutation, LogOutMutationVariables>;
 export const LoginDocument = gql`
-  mutation login($email: String!, $password: String!) {
+  mutation Login($email: String!, $password: String!) {
     login(input: { email: $email, password: $password }) {
       __typename
       success
@@ -473,7 +851,13 @@ export const LoginDocument = gql`
         id
         name
         email
+        phone
         role
+        address
+        city
+        state
+        country
+        zipcode
       }
     }
   }
@@ -559,7 +943,13 @@ export const UserByFieldDocument = gql`
       id
       name
       email
+      phone
       role
+      address
+      city
+      state
+      country
+      zipcode
       created_at
       updated_at
     }
@@ -612,6 +1002,12 @@ export const AllUsersDocument = gql`
       name
       email
       role
+      phone
+      address
+      city
+      state
+      country
+      zipcode
       created_at
       updated_at
     }

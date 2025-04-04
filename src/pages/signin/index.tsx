@@ -38,6 +38,7 @@ export default function SignIn() {
             sessionAdmin: {
               adminName: data.login.user?.name ?? '',
               adminEmail: data.login.user?.email ?? '',
+              adminPhone: data.login.user?.phone ?? '',
               adminRole: data.login.user?.role ?? '',
               adminID: data.login.user?.id ?? '',
             },

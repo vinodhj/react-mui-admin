@@ -5,8 +5,9 @@ dotenv.config();
 const config: CodegenConfig = {
   overwrite: true,
   schema: {
-    ['http://localhost:7787/graphql']: {
+    ['http://localhost:8500/graphql']: {
       headers: {
+        'X-Schema-Federation': 'true',
         'X-Project-Token': process.env.VITE_PROJECT_TOKEN || '',
       },
     },

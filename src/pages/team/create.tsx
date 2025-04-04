@@ -1,7 +1,7 @@
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
 import { useTheme } from '@mui/material/styles';
-import { useCreateUserMutation } from '../../graphql/graphql-generated';
+import { useSignUpMutation } from '../../graphql/graphql-generated';
 import PageHeader from '../../components/pages/page-header';
 import { SearchTokens } from '../../theme/main-theme';
 import CreateTeamForm from './form/create-team-form';
@@ -12,7 +12,7 @@ function CreateTeam() {
   const theme = useTheme();
   const mode = theme.palette.mode;
   const searchTokens = SearchTokens(mode);
-  const [createUserMutation, { data, loading, error }] = useCreateUserMutation();
+  const [createUserMutation, { data, loading, error }] = useSignUpMutation();
 
   // Snackbar state
   const [openSnackbar, setOpenSnackbar] = useState(false);

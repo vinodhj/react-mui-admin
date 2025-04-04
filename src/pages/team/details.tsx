@@ -114,7 +114,7 @@ function TeamDetails() {
     return <ErrorAlert message="User not found" />;
   }
 
-  const { name, email, role, created_at, updated_at } = user;
+  const { name, email, phone, role, created_at, updated_at } = user;
 
   return (
     <Box m="20px" sx={{ p: '0 15px' }}>
@@ -190,6 +190,9 @@ function TeamDetails() {
               </Grid>
               <Grid size={{ xs: 12 }} sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <InfoRow label="Email" value={email} />
+              </Grid>
+              <Grid size={{ xs: 12 }} sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                <InfoRow label="Phone" value={phone} />
               </Grid>
               <Grid size={{ xs: 12 }} sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <InfoRow label="Role" value={role} />

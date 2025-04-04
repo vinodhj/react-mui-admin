@@ -24,6 +24,7 @@ export interface SessionData {
 export interface SessionAdmin {
   adminName: string;
   adminEmail: string;
+  adminPhone: string;
   adminRole: string;
   adminID: string;
 }
@@ -52,6 +53,7 @@ const defaultSession: SessionData = {
 const defaultSessionAdmin: SessionAdmin = {
   adminName: getStorageItem(localStorage, 'session_admin_name'),
   adminEmail: getStorageItem(localStorage, 'session_admin_email'),
+  adminPhone: getStorageItem(localStorage, 'session_admin_phone'),
   adminRole: getStorageItem(localStorage, 'session_admin_role'),
   adminID: getStorageItem(localStorage, 'session_admin_id'),
 };
@@ -94,6 +96,7 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
         JSON.stringify({
           adminName: data.sessionAdmin.adminName,
           adminEmail: data.sessionAdmin.adminEmail,
+          adminPhone: data.sessionAdmin.adminPhone,
           adminRole: data.sessionAdmin.adminRole,
           adminID: data.sessionAdmin.adminID,
         })
@@ -134,6 +137,7 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
           sessionAdmin: {
             adminName: '',
             adminEmail: '',
+            adminPhone: '',
             adminRole: '',
             adminID: '',
           },

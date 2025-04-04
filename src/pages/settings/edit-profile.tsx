@@ -22,6 +22,12 @@ import { useSession } from '../../hooks/use-session';
 
 const validationSchema = yup.object({
   name: yup.string().required('Name is required'),
+  phone: yup
+    .string()
+    .trim()
+    .matches(/^\d{10}$/, 'Invalid phone number')
+    .min(10, 'Phone number must be at least 10 digits')
+    .required('Phone number is required'),
   email: yup.string().trim().email('Invalid email address').required('Email is required'),
 });
 
@@ -41,6 +47,7 @@ const EditProfile: React.FC = () => {
     id: sessionAdmin.adminID,
     name: sessionAdmin.adminName,
     email: sessionAdmin.adminEmail,
+    phone: sessionAdmin.adminPhone,
     role: sessionAdmin.adminRole === 'ADMIN' ? 'Administrator' : 'User',
   };
 
@@ -50,6 +57,7 @@ const EditProfile: React.FC = () => {
   const formik = useFormik({
     initialValues: {
       name: user.name,
+      phone: user.phone,
       email: user.email,
     },
     validationSchema: validationSchema,
@@ -132,7 +140,7 @@ const EditProfile: React.FC = () => {
             </Typography>
             <Divider sx={{ mb: 3 }} />
             <form onSubmit={formik.handleSubmit}>
-              {(['name', 'email'] as const).map((field) => (
+              {(['name', 'phone', 'email'] as const).map((field) => (
                 <TextField
                   key={field}
                   label={field.charAt(0).toUpperCase() + field.slice(1)}

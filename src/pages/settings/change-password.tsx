@@ -57,6 +57,7 @@ const ChangePassword: React.FC = () => {
   const user = {
     id: sessionAdmin.adminID,
     name: sessionAdmin.adminName,
+    phone: sessionAdmin.adminPhone,
     email: sessionAdmin.adminEmail,
     role: sessionAdmin.adminRole === 'ADMIN' ? 'Administrator' : 'User',
   };
