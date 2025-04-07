@@ -18,6 +18,7 @@ import Grid from '@mui/material/Grid2';
 import InfoRow from '../../components/pages/info-row';
 import { useCategoryData } from '../../hooks/use-category-data';
 import { useSnackbar } from '../../hooks/use-snackbar';
+import { ValidCategoryType } from './category-config';
 
 function CategoryDetails() {
   const { type, id } = useParams<{ type: string; id: string }>();
@@ -39,7 +40,7 @@ function CategoryDetails() {
     loading: deleteLoading,
     error: deleteError,
   } = useDeleteCategory({
-    type: type as 'tag' | 'mode' | 'fynix',
+    type: type as ValidCategoryType,
     onCompleted: () => {
       setOpenDialog(false);
       navigate(`/category/${type}`, {

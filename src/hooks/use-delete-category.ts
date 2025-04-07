@@ -1,18 +1,12 @@
 // src/hooks/use-delete-category.ts
-import { useDeleteCategoryMutation, CategoryType } from '../graphql/graphql-generated';
+import { useDeleteCategoryMutation } from '../graphql/graphql-generated';
+import { categoryTypeMap, ValidCategoryType } from '../pages/category/category-config';
 
 interface UseDeleteCategoryOptions {
-  type: 'tag' | 'mode' | 'fynix';
+  type: ValidCategoryType;
   onCompleted?: () => void;
   onError?: (error: any) => void;
 }
-
-// Map from component types to GraphQL enum values
-export const categoryTypeMap = {
-  tag: CategoryType.ExpenseTag,
-  mode: CategoryType.ExpenseMode,
-  fynix: CategoryType.ExpenseFynix,
-};
 
 export const useDeleteCategory = ({ type, onCompleted, onError }: UseDeleteCategoryOptions) => {
   // Use the generic deleteCategory mutation

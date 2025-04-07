@@ -7,7 +7,7 @@ import { SearchTokens } from '../../theme/main-theme';
 import { useEffect } from 'react';
 import { useCreateCategoryMutation } from '../../graphql/graphql-generated';
 import { Navigate, useParams } from 'react-router-dom';
-import { categoryTypeMap } from '../../hooks/use-delete-category';
+import { categoryTypeMap } from './category-config.ts';
 import { useSnackbar } from '../../hooks/use-snackbar';
 import CategoryForm from './form/category-form';
 import { isValidCategoryType } from './category-config';

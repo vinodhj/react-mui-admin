@@ -21,6 +21,7 @@ import DeleteConfirmationDialog from '../../components/pages/delete-confirmation
 import { useDeleteCategory } from '../../hooks/use-delete-category';
 import { useCategoryData } from '../../hooks/use-category-data';
 import { useSnackbar } from '../../hooks/use-snackbar';
+import { ValidCategoryType } from './category-config';
 
 function Category() {
   const { type } = useParams<{ type: string }>();
@@ -53,7 +54,7 @@ function Category() {
     loading: deleteLoading,
     error: deleteError,
   } = useDeleteCategory({
-    type: type as 'tag' | 'mode' | 'fynix',
+    type: type as ValidCategoryType,
     onCompleted: () => {
       // Refetch data after deletion
       refetch();
