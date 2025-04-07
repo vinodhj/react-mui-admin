@@ -68,7 +68,7 @@ const SidebarMenuItems: FC<SidebarMenuItemsProps> = ({ collapsed, selected, setS
         </Typography>
         <SidebarItem
           title="Tracker Expense"
-          to="/form"
+          to="/expense"
           icon={<PersonOutlinedIcon />}
           selected={selected}
           setSelected={setSelected}
