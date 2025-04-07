@@ -18,11 +18,3 @@ export const isValidCategoryType = (type: string | undefined): type is ValidCate
 
 // Helper function to capitalize strings
 export const capitalize = (s?: string) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : '');
-
-// Category route paths
-export const getCategoryPath = (type?: ValidCategoryType, action?: string, id?: string) => {
-  if (!type) return '/category';
-  if (!action) return `/category/${type}`;
-  if (!id) return `/category/${type}/${action}`;
-  return `/category/${type}/${action}/${id}`;
-};

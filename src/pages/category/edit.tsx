@@ -8,7 +8,7 @@ import { SearchTokens } from '../../theme/main-theme';
 import { useEffect } from 'react';
 import { useUpdateCategoryMutation } from '../../graphql/graphql-generated';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
-import { categoryTypeMap, isValidCategoryType, capitalize } from './category-config.ts';
+import { categoryTypeMap, isValidCategoryType, capitalize } from './category-config';
 import { useSnackbar } from '../../hooks/use-snackbar';
 import { useCategoryData } from '../../hooks/use-category-data';
 import LoadingSpinner from '../../components/common/loading-spinner';
