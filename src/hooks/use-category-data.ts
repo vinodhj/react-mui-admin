@@ -2,25 +2,19 @@ import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useExpenseFynixesQuery, useExpenseModesQuery, useExpenseTagsQuery, Category as CategoryType } from '../graphql/graphql-generated';
 import { formatDate } from '../utils/date-utils';
-
-// Define allowed category types as enum for better type safety
-export enum CategoryTypes {
-  TAG = 'tag',
-  MODE = 'mode',
-  FYNIX = 'fynix',
-}
+import { isValidCategoryType, capitalize as capitalizeHelper } from '../pages/category/category-config';
 
 // Type configuration with proper TypeScript typing
 export const TYPE_CONFIG = {
-  [CategoryTypes.TAG]: {
+  tag: {
     useQuery: useExpenseTagsQuery,
     dataKey: 'expenseTags',
   },
-  [CategoryTypes.MODE]: {
+  mode: {
     useQuery: useExpenseModesQuery,
     dataKey: 'expenseModes',
   },
-  [CategoryTypes.FYNIX]: {
+  fynix: {
     useQuery: useExpenseFynixesQuery,
     dataKey: 'expenseFynixes',
   },
@@ -45,15 +39,6 @@ interface UseCategoryDataReturn {
   capitalize: (s?: string) => string;
 }
 
-// Define valid category types
-const validTypes = ['tag', 'mode', 'fynix'] as const;
-type ValidCategoryType = typeof validTypes[number];
-
-// Type guard to check if a string is a valid category type
-export const isValidCategoryType = (type: string | undefined): type is ValidCategoryType => {
-  return type !== undefined && validTypes.includes(type as any);
-};
-
 export function useCategoryData(
   type: string | undefined,
   id?: string | null,
@@ -70,10 +55,10 @@ export function useCategoryData(
     if (!isValidType && !options.skipRedirect) {
       navigate('/error', { replace: true, state: { message: `Invalid category type: ${type}` } });
     }
-  }, [isValidType, navigate, options.skipRedirect]);
+  }, [isValidType, navigate, options.skipRedirect, type]);
 
   // Get the appropriate query configuration
-  const queryConfig = isValidType ? TYPE_CONFIG[type as CategoryTypes] : null;
+  const queryConfig = isValidType ? TYPE_CONFIG[type] : null;
 
   // Set up query variables based on whether we're fetching a list or a single item
   const variables = id ? { categoryFilter: { id } } : {};
@@ -122,15 +107,12 @@ export function useCategoryData(
       .filter(Boolean) as ProcessedCategoryData[];
   }, [data, isValidType, queryConfig]);
 
-  // Helper function to capitalize strings
-  const capitalize = (s?: string) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : '');
-
   return {
     data: processedData,
     loading,
     error: error || queryError || null,
     refetch,
     isValidType,
-    capitalize,
+    capitalize: capitalizeHelper,
   };
 }

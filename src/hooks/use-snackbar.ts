@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 export type SnackbarSeverity = 'success' | 'error' | 'info' | 'warning';
@@ -9,7 +9,7 @@ export interface SnackbarState {
   severity: SnackbarSeverity;
 }
 
-export function useSnackbar() {
+export const useSnackbar = (initialState?: Partial<SnackbarState>) => {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -17,6 +17,7 @@ export function useSnackbar() {
     open: false,
     message: '',
     severity: 'success',
+    ...initialState,
   });
 
   // Handle alert messages from navigation state
@@ -34,21 +35,21 @@ export function useSnackbar() {
     }
   }, [location.state, navigate, location.pathname]);
 
-  const closeSnackbar = () => {
+  const closeSnackbar = useCallback(() => {
     setSnackbar((prev) => ({ ...prev, open: false }));
-  };
+  }, []);
 
-  const showSnackbar = (message: string, severity: SnackbarSeverity = 'success') => {
+  const showSnackbar = useCallback((message: string, severity: SnackbarSeverity = 'success') => {
     setSnackbar({
       open: true,
       message,
       severity,
     });
-  };
+  }, []);
 
   return {
     snackbar,
     showSnackbar,
     closeSnackbar,
   };
-}
+};

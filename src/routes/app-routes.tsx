@@ -16,6 +16,7 @@ import Category from '../pages/category';
 import CategoryDetails from '../pages/category/details';
 import CreateCategory from '../pages/category/create';
 import ErrorPage from '../pages/error';
+import EditCategory from '../pages/category/edit';
 
 const AppRoutes: React.FC = () => {
   return (
@@ -44,7 +45,7 @@ const AppRoutes: React.FC = () => {
           <Route path=":type" element={<Category />} />
           <Route path=":type/create" element={<CreateCategory />} />
           <Route path=":type/:id" element={<CategoryDetails />} />
-          <Route path=":type/edit/:id" element={<Category />} />
+          <Route path=":type/edit/:id" element={<EditCategory />} />
         </Route>
 
         {/* FAQ */}

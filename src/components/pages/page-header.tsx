@@ -15,9 +15,18 @@ interface HeaderProps {
   subtitle?: string;
   Breadcrumbs_level1?: string;
   Breadcrumbs_level1_url?: string;
+  Breadcrumbs_level2?: string;
+  Breadcrumbs_level2_url?: string;
 }
 
-const PageHeader: FC<HeaderProps> = ({ title, subtitle, Breadcrumbs_level1, Breadcrumbs_level1_url }) => {
+const PageHeader: FC<HeaderProps> = ({
+  title,
+  subtitle,
+  Breadcrumbs_level1,
+  Breadcrumbs_level1_url,
+  Breadcrumbs_level2,
+  Breadcrumbs_level2_url,
+}) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
@@ -35,6 +44,11 @@ const PageHeader: FC<HeaderProps> = ({ title, subtitle, Breadcrumbs_level1, Brea
             {Breadcrumbs_level1 && Breadcrumbs_level1_url && (
               <Link underline="hover" color="inherit" component={RouterLink} to={Breadcrumbs_level1_url}>
                 {startCase(Breadcrumbs_level1.toLowerCase())}
+              </Link>
+            )}
+            {Breadcrumbs_level2 && Breadcrumbs_level2_url && (
+              <Link underline="hover" color="inherit" component={RouterLink} to={Breadcrumbs_level2_url}>
+                {startCase(Breadcrumbs_level2.toLowerCase())}
               </Link>
             )}
             <Typography color="text.primary"> {startCase(title.toLowerCase())}</Typography>
