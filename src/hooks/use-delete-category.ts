@@ -8,7 +8,7 @@ interface UseDeleteCategoryOptions {
 }
 
 // Map from component types to GraphQL enum values
-const categoryTypeMap = {
+export const categoryTypeMap = {
   tag: CategoryType.ExpenseTag,
   mode: CategoryType.ExpenseMode,
   fynix: CategoryType.ExpenseFynix,

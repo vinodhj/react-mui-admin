@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useExpenseFynixesQuery, useExpenseModesQuery, useExpenseTagsQuery, Category as CategoryType } from '../graphql/graphql-generated';
 import { formatDate } from '../utils/date-utils';
@@ -45,6 +45,15 @@ interface UseCategoryDataReturn {
   capitalize: (s?: string) => string;
 }
 
+// Define valid category types
+const validTypes = ['tag', 'mode', 'fynix'] as const;
+type ValidCategoryType = typeof validTypes[number];
+
+// Type guard to check if a string is a valid category type
+export const isValidCategoryType = (type: string | undefined): type is ValidCategoryType => {
+  return type !== undefined && validTypes.includes(type as any);
+};
+
 export function useCategoryData(
   type: string | undefined,
   id?: string | null,
@@ -53,13 +62,15 @@ export function useCategoryData(
   const navigate = useNavigate();
   const [error, setError] = useState<Error | null>(null);
 
-  // Validate type
-  const isValidType = Boolean(type && Object.values(CategoryTypes).includes(type as CategoryTypes));
+  // Check if the type is valid
+  const isValidType = isValidCategoryType(type);
 
-  // Redirect if invalid type
-  if (!isValidType && !options.skipRedirect) {
-    navigate('/category-not-found', { replace: true });
-  }
+  // Handle navigation in useEffect instead of during render
+  useEffect(() => {
+    if (!isValidType && !options.skipRedirect) {
+      navigate('/error', { replace: true, state: { message: `Invalid category type: ${type}` } });
+    }
+  }, [isValidType, navigate, options.skipRedirect]);
 
   // Get the appropriate query configuration
   const queryConfig = isValidType ? TYPE_CONFIG[type as CategoryTypes] : null;
@@ -83,9 +94,11 @@ export function useCategoryData(
     : { data: null, loading: false, error: new Error('Invalid category type'), refetch: () => Promise.resolve() };
 
   // Handle errors
-  if (queryError && !error) {
-    setError(queryError);
-  }
+  useEffect(() => {
+    if (queryError && !error) {
+      setError(queryError);
+    }
+  }, [queryError, error]);
 
   // Process data with useMemo to avoid unnecessary recomputation
   const processedData = useMemo(() => {

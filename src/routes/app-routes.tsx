@@ -14,6 +14,8 @@ import EditProfile from '../pages/settings/edit-profile';
 import Faq from '../pages/settings/faq';
 import Category from '../pages/category';
 import CategoryDetails from '../pages/category/details';
+import CreateCategory from '../pages/category/create';
+import ErrorPage from '../pages/error';
 
 const AppRoutes: React.FC = () => {
   return (
@@ -40,7 +42,7 @@ const AppRoutes: React.FC = () => {
         <Route path="category">
           <Route index element={<Navigate to="/category/tag" replace />} />
           <Route path=":type" element={<Category />} />
-          <Route path=":type/create" element={<Category />} />
+          <Route path=":type/create" element={<CreateCategory />} />
           <Route path=":type/:id" element={<CategoryDetails />} />
           <Route path=":type/edit/:id" element={<Category />} />
         </Route>
@@ -48,6 +50,7 @@ const AppRoutes: React.FC = () => {
         {/* FAQ */}
         <Route path="/faq" element={<ProtectedRoute element={<Faq />} />} />
 
+        <Route path="/error" element={<ErrorPage />} />
         {/* Catch-all: 404 Not Found */}
         <Route path="*" element={<NotFoundPage />} />
       </Route>

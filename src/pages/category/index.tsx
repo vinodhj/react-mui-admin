@@ -155,7 +155,6 @@ function Category() {
   if (error) return <ErrorAlert message={`Error loading ${type} data: ${error.message}`} />;
   if (deleteError) return <ErrorAlert message={`Error deleting ${type}: ${deleteError.message}`} />;
   if (!isValidType) return <ErrorAlert message={`Invalid category type: ${type}`} />;
-
   if (!rowData.length) {
     return <InfoAlert message={`No ${type} data available`} />;
   }

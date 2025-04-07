@@ -1,4 +1,4 @@
-mutation CreateCategoryMutation($input: CreateCategoryInput!) {
+mutation CreateCategory($input: CreateCategoryInput!) {
   createCategory(input: $input) {
     __typename
     success

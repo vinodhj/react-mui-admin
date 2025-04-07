@@ -1,4 +1,4 @@
-mutation UpdateCategoryMutation($input: UpdateCategoryInput!) {
+mutation UpdateCategory($input: UpdateCategoryInput!) {
   updateCategory(input: $input) {
     __typename
     success
