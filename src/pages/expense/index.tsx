@@ -1,4 +1,4 @@
-import { useMediaQuery, useTheme } from '@mui/material';
+import { Chip, Stack, useMediaQuery, useTheme } from '@mui/material';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import Link from '@mui/material/Link';
 import { tokens } from '../../theme/main-theme';
@@ -21,6 +21,7 @@ import UserActionsMenu from '../../components/pages/user-actions-menu';
 import ServerDataTable from '../../components/pages/server-data-table';
 import DeleteConfirmationDialog from '../../components/pages/delete-confirmation-dialog';
 import { useDeleteExpense } from '../../hooks/use-delete-expense';
+import ExpenseFilter, { ExpenseFilterValues } from '../../components/pages/expense-filter';
 
 function Expense() {
   const navigate = useNavigate();
@@ -43,13 +44,24 @@ function Expense() {
     0: null, // First page has no cursor
   });
 
-  const variables = {
-    session_id: sessionAdmin.adminID,
-    input: {
-      first: paginationModel.pageSize,
-      after: cursors[paginationModel.page] ?? null,
-    },
-  };
+  // Filter state
+  const [filters, setFilters] = useState<ExpenseFilterValues>({});
+
+  // Filter variables could be memoized
+  const variables = useMemo(
+    () => ({
+      session_id: sessionAdmin.adminID,
+      input: {
+        first: paginationModel.pageSize,
+        after: cursors[paginationModel.page] ?? null,
+        expense_period: filters.expense_period ?? undefined,
+        min_amount: filters.min_amount ?? undefined,
+        max_amount: filters.max_amount ?? undefined,
+        statuses: filters.status ?? undefined,
+      },
+    }),
+    [sessionAdmin.adminID, paginationModel.pageSize, cursors, paginationModel.page, filters]
+  );
 
   // custom hooks
   const { snackbar, showSnackbar, closeSnackbar } = useSnackbar();
@@ -176,6 +188,14 @@ function Expense() {
     [colors]
   );
 
+  // Handle filter changes
+  const handleApplyFilter = (newFilters: ExpenseFilterValues) => {
+    // Reset pagination when filters change
+    setPaginationModel({ ...paginationModel, page: 0 });
+    setCursors({ 0: null });
+    setFilters(newFilters);
+  };
+
   // Handle pagination changes
   const handlePaginationModelChange = (newModel: GridPaginationModel) => {
     // If we're moving to a new page we haven't visited before
@@ -218,11 +238,14 @@ function Expense() {
     }
   };
 
+  // Check if any filters are active
+  const hasActiveFilters = Object.values(filters).some((value) => value !== null && (Array.isArray(value) ? value.length > 0 : true));
+
   // Handle loading and error states with improved messaging
   if (loading) return <LoadingSpinner />;
   if (error) return <ErrorAlert message={`Error loading data: ${error.message}`} />;
   if (deleteError) return <ErrorAlert message={`Error deleting data: ${deleteError.message}`} />;
-  if (!data?.paginatedExpenseTrackers.edges.length) {
+  if (!data?.paginatedExpenseTrackers.edges) {
     return <InfoAlert message="No data available" />;
   }
 
@@ -249,6 +272,70 @@ function Expense() {
   const pageInfo = data.paginatedExpenseTrackers.pageInfo;
   const totalCount = pageInfo.totalCount;
 
+  // Create filter component
+  const filterComponent = (
+    <Box sx={{ width: '100%' }}>
+      <ExpenseFilter
+        currentFilters={filters}
+        onApplyFilter={handleApplyFilter}
+        onResetFilters={() => {
+          // Reset pagination here when filters are cleared
+          setPaginationModel({ ...paginationModel, page: 0 });
+          setCursors({ 0: null });
+          setFilters({});
+        }}
+      />
+      {hasActiveFilters && !isMobile && (
+        <Stack direction="row" spacing={1} sx={{ mt: 1, flexWrap: 'wrap', gap: 1 }}>
+          {filters.expense_period && (
+            <Chip
+              label={`Period: ${filters.expense_period}`}
+              size="small"
+              onDelete={() => {
+                const newFilters = { ...filters };
+                delete newFilters.expense_period;
+                handleApplyFilter(newFilters);
+              }}
+            />
+          )}
+          {filters.min_amount && (
+            <Chip
+              label={`Min: $${filters.min_amount}`}
+              size="small"
+              onDelete={() => {
+                const newFilters = { ...filters };
+                delete newFilters.min_amount;
+                handleApplyFilter(newFilters);
+              }}
+            />
+          )}
+          {filters.max_amount && (
+            <Chip
+              label={`Max: $${filters.max_amount}`}
+              size="small"
+              onDelete={() => {
+                const newFilters = { ...filters };
+                delete newFilters.max_amount;
+                handleApplyFilter(newFilters);
+              }}
+            />
+          )}
+          {filters.status && filters.status.length > 0 && (
+            <Chip
+              label={`Status: ${filters.status.join(', ')}`}
+              size="small"
+              onDelete={() => {
+                const newFilters = { ...filters };
+                delete newFilters.status;
+                handleApplyFilter(newFilters);
+              }}
+            />
+          )}
+        </Stack>
+      )}
+    </Box>
+  );
+
   return (
     <Box m="20px" sx={{ p: '0 15px' }}>
       <Box display="flex" flexWrap="wrap" justifyContent="space-between" alignItems="center" mb={2}>
@@ -263,14 +350,19 @@ function Expense() {
       {/* Snackbar Alert */}
       <CustomSnackbar open={snackbar.open} message={snackbar.message} severity={snackbar.severity} onClose={closeSnackbar} />
 
-      <ServerDataTable
-        rows={rowData}
-        columns={columns}
-        totalCount={totalCount}
-        paginationModel={paginationModel}
-        onPaginationModelChange={handlePaginationModelChange}
-        loading={loading}
-      />
+      {loading ? (
+        <LoadingSpinner />
+      ) : (
+        <ServerDataTable
+          rows={rowData}
+          columns={columns}
+          totalCount={totalCount}
+          paginationModel={paginationModel}
+          onPaginationModelChange={handlePaginationModelChange}
+          loading={loading}
+          filterComponent={filterComponent}
+        />
+      )}
 
       <UserActionsMenu
         anchorEl={actionMenu.anchorEl}

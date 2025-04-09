@@ -19,13 +19,29 @@ interface DataTableProps {
   pageSizeOptions?: number[];
   onPaginationModelChange?: (model: GridPaginationModel) => void;
   loading?: boolean;
+  filterComponent?: React.ReactNode;
 }
 
-const CustomToolbar = () => (
-  <GridToolbarContainer>
-    <GridToolbarColumnsButton />
-    <GridToolbarDensitySelector />
-    <GridToolbarQuickFilter debounceMs={200} sx={{ width: '300px', fontSize: '1rem' }} />
+interface CustomToolbarProps {
+  filterComponent?: React.ReactNode;
+}
+
+const CustomToolbar = ({ filterComponent }: CustomToolbarProps) => (
+  <GridToolbarContainer
+    sx={{
+      display: 'flex',
+      flexDirection: { xs: 'column', md: 'row' },
+      alignItems: { xs: 'flex-start', md: 'center' },
+      gap: 2,
+      p: 1,
+    }}
+  >
+    <Box sx={{ display: 'flex', gap: 1 }}>
+      <GridToolbarColumnsButton />
+      <GridToolbarDensitySelector />
+      <GridToolbarQuickFilter debounceMs={200} sx={{ width: '300px', fontSize: '1rem' }} />
+    </Box>
+    <Box sx={{ display: 'flex', flexGrow: 1, justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>{filterComponent}</Box>
   </GridToolbarContainer>
 );
 
@@ -37,6 +53,7 @@ const ServerDataTable: FC<DataTableProps> = ({
   pageSizeOptions = [10],
   onPaginationModelChange,
   loading = false,
+  filterComponent,
 }) => {
   const theme = useTheme();
   const colorMode = theme.palette.mode;
@@ -77,7 +94,7 @@ const ServerDataTable: FC<DataTableProps> = ({
       }}
     >
       {/* paginationMode -> need to check and tweaks */}
-      <Box sx={{ minWidth: 1300, height: '100%' }}>
+      <Box sx={{ width: '100%', maxWidth: 1300, height: '100%' }}>
         <DataGrid
           rowCount={totalCount} // -> If you're using server-side pagination, you must pass the total row count (rowCount).
           rows={rows}
@@ -92,7 +109,9 @@ const ServerDataTable: FC<DataTableProps> = ({
             },
           }}
           pageSizeOptions={pageSizeOptions}
-          slots={{ toolbar: CustomToolbar }} // Use the custom toolbar here
+          slots={{
+            toolbar: () => <CustomToolbar filterComponent={filterComponent} />,
+          }}
           disableColumnFilter
           disableRowSelectionOnClick
           checkboxSelection
