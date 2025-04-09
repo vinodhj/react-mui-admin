@@ -6,9 +6,7 @@ import { tokens } from '../../theme/main-theme';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import {
   GridToolbarContainer,
-  GridToolbarExport,
   GridToolbarColumnsButton,
-  GridToolbarFilterButton,
   GridToolbarDensitySelector,
   GridToolbarQuickFilter,
 } from '@mui/x-data-grid/components';
@@ -23,58 +21,17 @@ interface DataTableProps {
 const CustomToolbar = () => (
   <GridToolbarContainer>
     <GridToolbarColumnsButton />
-    <GridToolbarFilterButton />
     <GridToolbarDensitySelector />
-    <GridToolbarExport
-      printOptions={{
-        disableToolbarButton: true,
-        hideFooter: true,
-        hideToolbar: true,
-        pageStyle: `
-          @media print {
-            @page {
-              size: A4 landscape;
-              margin: 1cm;
-            }
-
-            /* Force black text on white background */
-            body,
-            .MuiDataGrid-root,
-            .MuiDataGrid-root * {
-              color: #000 !important;
-              background-color: #fff !important;
-            }
-
-            /* Expand the grid so all rows/columns appear */
-            .MuiDataGrid-main,
-            .MuiDataGrid-virtualScroller {
-              overflow: visible !important;
-              height: auto !important;
-              max-height: none !important;
-            }
-
-            /* Avoid splitting a row across pages */
-            .MuiDataGrid-row {
-              break-inside: avoid !important;
-              page-break-inside: avoid !important;
-            }
-
-            /* Optionally scale down to fit all columns on one page */
-            .MuiDataGrid-main {
-              transform: scale(0.85);
-              transform-origin: top left;
-              width: 100%;
-            }
-          }
-        `,
-      }}
-    />
-
     <GridToolbarQuickFilter debounceMs={200} sx={{ width: '300px', fontSize: '1rem' }} />
   </GridToolbarContainer>
 );
 
-const DataTable: FC<DataTableProps> = ({ rows, columns, paginationModel = { page: 0, pageSize: 50 }, pageSizeOptions = [50, 100] }) => {
+const ServerDataTable: FC<DataTableProps> = ({
+  rows,
+  columns,
+  paginationModel = { page: 0, pageSize: 10 },
+  pageSizeOptions = [10, 20],
+}) => {
   const theme = useTheme();
   const colorMode = theme.palette.mode;
   const colors = tokens(colorMode);
@@ -120,16 +77,15 @@ const DataTable: FC<DataTableProps> = ({ rows, columns, paginationModel = { page
           rowCount={rows.length} // -> If you're using server-side pagination, you must pass the total row count (rowCount).
           rows={rows}
           columns={columns}
-          paginationMode="client" // server or client
+          paginationMode="server" // server or client
           initialState={{ pagination: { paginationModel: { page, pageSize } } }}
           pageSizeOptions={pageSizeOptions}
-          // slots={{ toolbar: GridToolbar }}
           slots={{ toolbar: CustomToolbar }} // Use the custom toolbar here
-          // disableColumnFilter -> to disable column filter
+          disableColumnFilter
           disableRowSelectionOnClick
           checkboxSelection
           // Disabling virtualization is fine for smaller data sets, but if you have hundreds or thousands of rows, it can impact performance in normal usage
-          // disableVirtualization
+          disableVirtualization
           sx={{
             maxWidth: 1300,
             height: '80vh',
@@ -143,4 +99,4 @@ const DataTable: FC<DataTableProps> = ({ rows, columns, paginationModel = { page
   );
 };
 
-export default DataTable;
+export default ServerDataTable;

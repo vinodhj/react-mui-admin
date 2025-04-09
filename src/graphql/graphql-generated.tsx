@@ -582,6 +582,12 @@ export type DeleteCategoryMutationVariables = Exact<{
 
 export type DeleteCategoryMutation = { __typename: 'Mutation'; deleteCategory: boolean };
 
+export type DeleteExpenseTrackerMutationVariables = Exact<{
+  input: DeleteExpenseTrackerInput;
+}>;
+
+export type DeleteExpenseTrackerMutation = { __typename: 'Mutation'; deleteExpenseTracker: boolean };
+
 export type UpdateCategoryMutationVariables = Exact<{
   input: UpdateCategoryInput;
 }>;
@@ -635,6 +641,63 @@ export type AdminKvAssetQuery = {
   adminKvAsset?: { __typename: 'AdminKvAsset'; kv_key: string; kv_value?: any | null } | null;
 };
 
+export type AdminPaginatedExpenseQueryVariables = Exact<{
+  session_id: Scalars['ID']['input'];
+  input?: InputMaybe<PaginatedExpenseInputs>;
+}>;
+
+export type AdminPaginatedExpenseQuery = {
+  __typename?: 'Query';
+  paginatedExpenseTrackers: {
+    __typename: 'ExpenseTrackerConnection';
+    edges: Array<{
+      __typename: 'ExpenseTrackerEdge';
+      cursor: string;
+      node: {
+        __typename: 'ExpenseTracker';
+        id: string;
+        user_id: string;
+        expense_period: string;
+        amount: number;
+        description?: string | null;
+        status: ExpenseStatus;
+        created_at: string;
+        updated_at: string;
+        created_by: string;
+        updated_by: string;
+        tag: { __typename?: 'Category'; name: string };
+        mode: { __typename?: 'Category'; name: string };
+        fynix: { __typename?: 'Category'; name: string };
+        user: { __typename?: 'User'; name: string };
+      };
+    }>;
+    pageInfo: { __typename: 'PageInfo'; endCursor?: string | null; hasNextPage: boolean };
+  };
+};
+
+export type CreateExpenseTrackerMutationVariables = Exact<{
+  input: CreateExpenseTrackerInput;
+}>;
+
+export type CreateExpenseTrackerMutation = {
+  __typename?: 'Mutation';
+  createExpenseTracker: {
+    __typename: 'ExpenseTrackerResponse';
+    success: boolean;
+    expenseTracker?: {
+      __typename: 'ExpenseTrackerSuccessResponse';
+      id: string;
+      user_id: string;
+      expense_period: string;
+      amount: number;
+      status: ExpenseStatus;
+      tag_id: string;
+      mode_id: string;
+      fynix_id: string;
+    } | null;
+  };
+};
+
 export type ExpenseFynixesQueryVariables = Exact<{
   categoryFilter?: InputMaybe<CategoryFilter>;
 }>;
@@ -684,6 +747,37 @@ export type ExpenseTagsQuery = {
     created_by: string;
     updated_by: string;
   } | null> | null;
+};
+
+export type UserPaginatedExpenseQueryVariables = Exact<{
+  session_id: Scalars['ID']['input'];
+  input?: InputMaybe<PaginatedExpenseInputs>;
+}>;
+
+export type UserPaginatedExpenseQuery = {
+  __typename?: 'Query';
+  paginatedExpenseTrackers: {
+    __typename: 'ExpenseTrackerConnection';
+    edges: Array<{
+      __typename: 'ExpenseTrackerEdge';
+      cursor: string;
+      node: {
+        __typename: 'ExpenseTracker';
+        id: string;
+        user_id: string;
+        expense_period: string;
+        amount: number;
+        description?: string | null;
+        status: ExpenseStatus;
+        created_at: string;
+        updated_at: string;
+        tag: { __typename?: 'Category'; name: string };
+        mode: { __typename?: 'Category'; name: string };
+        fynix: { __typename?: 'Category'; name: string };
+      };
+    }>;
+    pageInfo: { __typename: 'PageInfo'; endCursor?: string | null; hasNextPage: boolean };
+  };
 };
 
 export type UserByFieldQueryVariables = Exact<{
@@ -967,6 +1061,43 @@ export function useDeleteCategoryMutation(
 export type DeleteCategoryMutationHookResult = ReturnType<typeof useDeleteCategoryMutation>;
 export type DeleteCategoryMutationResult = Apollo.MutationResult<DeleteCategoryMutation>;
 export type DeleteCategoryMutationOptions = Apollo.BaseMutationOptions<DeleteCategoryMutation, DeleteCategoryMutationVariables>;
+export const DeleteExpenseTrackerDocument = gql`
+  mutation DeleteExpenseTracker($input: DeleteExpenseTrackerInput!) {
+    __typename
+    deleteExpenseTracker(input: $input)
+  }
+`;
+export type DeleteExpenseTrackerMutationFn = Apollo.MutationFunction<DeleteExpenseTrackerMutation, DeleteExpenseTrackerMutationVariables>;
+
+/**
+ * __useDeleteExpenseTrackerMutation__
+ *
+ * To run a mutation, you first call `useDeleteExpenseTrackerMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteExpenseTrackerMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteExpenseTrackerMutation, { data, loading, error }] = useDeleteExpenseTrackerMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useDeleteExpenseTrackerMutation(
+  baseOptions?: Apollo.MutationHookOptions<DeleteExpenseTrackerMutation, DeleteExpenseTrackerMutationVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<DeleteExpenseTrackerMutation, DeleteExpenseTrackerMutationVariables>(DeleteExpenseTrackerDocument, options);
+}
+export type DeleteExpenseTrackerMutationHookResult = ReturnType<typeof useDeleteExpenseTrackerMutation>;
+export type DeleteExpenseTrackerMutationResult = Apollo.MutationResult<DeleteExpenseTrackerMutation>;
+export type DeleteExpenseTrackerMutationOptions = Apollo.BaseMutationOptions<
+  DeleteExpenseTrackerMutation,
+  DeleteExpenseTrackerMutationVariables
+>;
 export const UpdateCategoryDocument = gql`
   mutation UpdateCategory($input: UpdateCategoryInput!) {
     updateCategory(input: $input) {
@@ -1137,6 +1268,138 @@ export type AdminKvAssetQueryHookResult = ReturnType<typeof useAdminKvAssetQuery
 export type AdminKvAssetLazyQueryHookResult = ReturnType<typeof useAdminKvAssetLazyQuery>;
 export type AdminKvAssetSuspenseQueryHookResult = ReturnType<typeof useAdminKvAssetSuspenseQuery>;
 export type AdminKvAssetQueryResult = Apollo.QueryResult<AdminKvAssetQuery, AdminKvAssetQueryVariables>;
+export const AdminPaginatedExpenseDocument = gql`
+  query AdminPaginatedExpense($session_id: ID!, $input: PaginatedExpenseInputs) {
+    paginatedExpenseTrackers(input: $input, session_id: $session_id) {
+      __typename
+      edges {
+        __typename
+        node {
+          __typename
+          id
+          user_id
+          expense_period
+          amount
+          description
+          status
+          created_at
+          updated_at
+          created_by
+          updated_by
+          tag {
+            name
+          }
+          mode {
+            name
+          }
+          fynix {
+            name
+          }
+          user {
+            name
+          }
+        }
+        cursor
+      }
+      pageInfo {
+        __typename
+        endCursor
+        hasNextPage
+      }
+    }
+  }
+`;
+
+/**
+ * __useAdminPaginatedExpenseQuery__
+ *
+ * To run a query within a React component, call `useAdminPaginatedExpenseQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAdminPaginatedExpenseQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAdminPaginatedExpenseQuery({
+ *   variables: {
+ *      session_id: // value for 'session_id'
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useAdminPaginatedExpenseQuery(
+  baseOptions: Apollo.QueryHookOptions<AdminPaginatedExpenseQuery, AdminPaginatedExpenseQueryVariables> &
+    ({ variables: AdminPaginatedExpenseQueryVariables; skip?: boolean } | { skip: boolean })
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<AdminPaginatedExpenseQuery, AdminPaginatedExpenseQueryVariables>(AdminPaginatedExpenseDocument, options);
+}
+export function useAdminPaginatedExpenseLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<AdminPaginatedExpenseQuery, AdminPaginatedExpenseQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<AdminPaginatedExpenseQuery, AdminPaginatedExpenseQueryVariables>(AdminPaginatedExpenseDocument, options);
+}
+export function useAdminPaginatedExpenseSuspenseQuery(
+  baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<AdminPaginatedExpenseQuery, AdminPaginatedExpenseQueryVariables>
+) {
+  const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<AdminPaginatedExpenseQuery, AdminPaginatedExpenseQueryVariables>(AdminPaginatedExpenseDocument, options);
+}
+export type AdminPaginatedExpenseQueryHookResult = ReturnType<typeof useAdminPaginatedExpenseQuery>;
+export type AdminPaginatedExpenseLazyQueryHookResult = ReturnType<typeof useAdminPaginatedExpenseLazyQuery>;
+export type AdminPaginatedExpenseSuspenseQueryHookResult = ReturnType<typeof useAdminPaginatedExpenseSuspenseQuery>;
+export type AdminPaginatedExpenseQueryResult = Apollo.QueryResult<AdminPaginatedExpenseQuery, AdminPaginatedExpenseQueryVariables>;
+export const CreateExpenseTrackerDocument = gql`
+  mutation CreateExpenseTracker($input: CreateExpenseTrackerInput!) {
+    createExpenseTracker(input: $input) {
+      __typename
+      success
+      expenseTracker {
+        __typename
+        id
+        user_id
+        expense_period
+        amount
+        status
+        tag_id
+        mode_id
+        fynix_id
+      }
+    }
+  }
+`;
+export type CreateExpenseTrackerMutationFn = Apollo.MutationFunction<CreateExpenseTrackerMutation, CreateExpenseTrackerMutationVariables>;
+
+/**
+ * __useCreateExpenseTrackerMutation__
+ *
+ * To run a mutation, you first call `useCreateExpenseTrackerMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateExpenseTrackerMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createExpenseTrackerMutation, { data, loading, error }] = useCreateExpenseTrackerMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateExpenseTrackerMutation(
+  baseOptions?: Apollo.MutationHookOptions<CreateExpenseTrackerMutation, CreateExpenseTrackerMutationVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<CreateExpenseTrackerMutation, CreateExpenseTrackerMutationVariables>(CreateExpenseTrackerDocument, options);
+}
+export type CreateExpenseTrackerMutationHookResult = ReturnType<typeof useCreateExpenseTrackerMutation>;
+export type CreateExpenseTrackerMutationResult = Apollo.MutationResult<CreateExpenseTrackerMutation>;
+export type CreateExpenseTrackerMutationOptions = Apollo.BaseMutationOptions<
+  CreateExpenseTrackerMutation,
+  CreateExpenseTrackerMutationVariables
+>;
 export const ExpenseFynixesDocument = gql`
   query ExpenseFynixes($categoryFilter: CategoryFilter) {
     expenseFynixes(input: $categoryFilter) {
@@ -1281,6 +1544,83 @@ export type ExpenseTagsQueryHookResult = ReturnType<typeof useExpenseTagsQuery>;
 export type ExpenseTagsLazyQueryHookResult = ReturnType<typeof useExpenseTagsLazyQuery>;
 export type ExpenseTagsSuspenseQueryHookResult = ReturnType<typeof useExpenseTagsSuspenseQuery>;
 export type ExpenseTagsQueryResult = Apollo.QueryResult<ExpenseTagsQuery, ExpenseTagsQueryVariables>;
+export const UserPaginatedExpenseDocument = gql`
+  query UserPaginatedExpense($session_id: ID!, $input: PaginatedExpenseInputs) {
+    paginatedExpenseTrackers(input: $input, session_id: $session_id) {
+      __typename
+      edges {
+        __typename
+        node {
+          __typename
+          id
+          user_id
+          expense_period
+          amount
+          description
+          status
+          created_at
+          updated_at
+          tag {
+            name
+          }
+          mode {
+            name
+          }
+          fynix {
+            name
+          }
+        }
+        cursor
+      }
+      pageInfo {
+        __typename
+        endCursor
+        hasNextPage
+      }
+    }
+  }
+`;
+
+/**
+ * __useUserPaginatedExpenseQuery__
+ *
+ * To run a query within a React component, call `useUserPaginatedExpenseQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUserPaginatedExpenseQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUserPaginatedExpenseQuery({
+ *   variables: {
+ *      session_id: // value for 'session_id'
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUserPaginatedExpenseQuery(
+  baseOptions: Apollo.QueryHookOptions<UserPaginatedExpenseQuery, UserPaginatedExpenseQueryVariables> &
+    ({ variables: UserPaginatedExpenseQueryVariables; skip?: boolean } | { skip: boolean })
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<UserPaginatedExpenseQuery, UserPaginatedExpenseQueryVariables>(UserPaginatedExpenseDocument, options);
+}
+export function useUserPaginatedExpenseLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<UserPaginatedExpenseQuery, UserPaginatedExpenseQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<UserPaginatedExpenseQuery, UserPaginatedExpenseQueryVariables>(UserPaginatedExpenseDocument, options);
+}
+export function useUserPaginatedExpenseSuspenseQuery(
+  baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<UserPaginatedExpenseQuery, UserPaginatedExpenseQueryVariables>
+) {
+  const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<UserPaginatedExpenseQuery, UserPaginatedExpenseQueryVariables>(UserPaginatedExpenseDocument, options);
+}
+export type UserPaginatedExpenseQueryHookResult = ReturnType<typeof useUserPaginatedExpenseQuery>;
+export type UserPaginatedExpenseLazyQueryHookResult = ReturnType<typeof useUserPaginatedExpenseLazyQuery>;
+export type UserPaginatedExpenseSuspenseQueryHookResult = ReturnType<typeof useUserPaginatedExpenseSuspenseQuery>;
+export type UserPaginatedExpenseQueryResult = Apollo.QueryResult<UserPaginatedExpenseQuery, UserPaginatedExpenseQueryVariables>;
 export const UserByFieldDocument = gql`
   query UserByField($field: ColumnName!, $value: String!) {
     userByfield(input: { field: $field, value: $value }) {

@@ -1,0 +1,17 @@
+mutation CreateExpenseTracker($input: CreateExpenseTrackerInput!) {
+  createExpenseTracker(input: $input) {
+    __typename
+    success
+    expenseTracker {
+      __typename
+      id
+      user_id
+      expense_period
+      amount
+      status
+      tag_id
+      mode_id
+      fynix_id
+    }
+  }
+}
