@@ -3,7 +3,7 @@ import { useTheme } from '@mui/material';
 import Box from '@mui/material/Box';
 
 import { tokens } from '../../theme/main-theme';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridPaginationModel } from '@mui/x-data-grid';
 import {
   GridToolbarContainer,
   GridToolbarColumnsButton,
@@ -14,8 +14,11 @@ import {
 interface DataTableProps {
   rows: any[];
   columns: GridColDef[];
+  totalCount: number;
   paginationModel?: { page: number; pageSize: number };
   pageSizeOptions?: number[];
+  onPaginationModelChange?: (model: GridPaginationModel) => void;
+  loading?: boolean;
 }
 
 const CustomToolbar = () => (
@@ -29,13 +32,15 @@ const CustomToolbar = () => (
 const ServerDataTable: FC<DataTableProps> = ({
   rows,
   columns,
+  totalCount,
   paginationModel = { page: 0, pageSize: 10 },
-  pageSizeOptions = [10, 20],
+  pageSizeOptions = [10],
+  onPaginationModelChange,
+  loading = false,
 }) => {
   const theme = useTheme();
   const colorMode = theme.palette.mode;
   const colors = tokens(colorMode);
-  const { page, pageSize } = paginationModel;
 
   return (
     <Box
@@ -74,18 +79,25 @@ const ServerDataTable: FC<DataTableProps> = ({
       {/* paginationMode -> need to check and tweaks */}
       <Box sx={{ minWidth: 1300, height: '100%' }}>
         <DataGrid
-          rowCount={rows.length} // -> If you're using server-side pagination, you must pass the total row count (rowCount).
+          rowCount={totalCount} // -> If you're using server-side pagination, you must pass the total row count (rowCount).
           rows={rows}
           columns={columns}
           paginationMode="server" // server or client
-          initialState={{ pagination: { paginationModel: { page, pageSize } } }}
+          initialState={{
+            pagination: {
+              paginationModel: {
+                page: paginationModel.page,
+                pageSize: paginationModel.pageSize,
+              },
+            },
+          }}
           pageSizeOptions={pageSizeOptions}
           slots={{ toolbar: CustomToolbar }} // Use the custom toolbar here
           disableColumnFilter
           disableRowSelectionOnClick
           checkboxSelection
-          // Disabling virtualization is fine for smaller data sets, but if you have hundreds or thousands of rows, it can impact performance in normal usage
-          disableVirtualization
+          onPaginationModelChange={onPaginationModelChange}
+          loading={loading}
           sx={{
             maxWidth: 1300,
             height: '80vh',

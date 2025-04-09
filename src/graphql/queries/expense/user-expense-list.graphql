@@ -29,6 +29,7 @@ query UserPaginatedExpense($session_id: ID! ,$input: PaginatedExpenseInputs) {
       __typename
       endCursor
       hasNextPage
+      totalCount
     }
   }
 }

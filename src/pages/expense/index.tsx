@@ -6,7 +6,7 @@ import { useSnackbar } from '../../hooks/use-snackbar';
 import { useMemo, useState } from 'react';
 import { useUserPaginatedExpenseQuery } from '../../graphql/graphql-generated';
 import { useSession } from '../../hooks/use-session';
-import { GridColDef } from '@mui/x-data-grid/models';
+import { GridColDef, GridPaginationModel } from '@mui/x-data-grid/models';
 import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import LoadingSpinner from '../../components/common/loading-spinner';
@@ -30,7 +30,26 @@ function Expense() {
   const colors = tokens(mode);
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  const variables = { session_id: sessionAdmin.adminID, input: {} };
+  // Pagination state
+  const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
+    page: 0,
+    pageSize: 10,
+  });
+
+  // Cursor state
+  const [cursors, setCursors] = useState<{
+    [page: number]: string | null;
+  }>({
+    0: null, // First page has no cursor
+  });
+
+  const variables = {
+    session_id: sessionAdmin.adminID,
+    input: {
+      first: paginationModel.pageSize,
+      after: cursors[paginationModel.page] ?? null,
+    },
+  };
 
   // custom hooks
   const { snackbar, showSnackbar, closeSnackbar } = useSnackbar();
@@ -157,6 +176,20 @@ function Expense() {
     [colors]
   );
 
+  // Handle pagination changes
+  const handlePaginationModelChange = (newModel: GridPaginationModel) => {
+    // If we're moving to a new page we haven't visited before
+    // and we have a cursor from the current page, store it
+    if (newModel.page > paginationModel.page && data?.paginatedExpenseTrackers.pageInfo.endCursor && !cursors[newModel.page]) {
+      setCursors({
+        ...cursors,
+        [newModel.page]: data.paginatedExpenseTrackers.pageInfo.endCursor,
+      });
+    }
+
+    setPaginationModel(newModel);
+  };
+
   // Action menu handlers
   const handleActionClick = (event: React.MouseEvent<HTMLElement>, id: string) => {
     setActionMenu({
@@ -212,6 +245,10 @@ function Expense() {
     })
     .filter((row) => row !== null);
 
+  // Pagination
+  const pageInfo = data.paginatedExpenseTrackers.pageInfo;
+  const totalCount = pageInfo.totalCount;
+
   return (
     <Box m="20px" sx={{ p: '0 15px' }}>
       <Box display="flex" flexWrap="wrap" justifyContent="space-between" alignItems="center" mb={2}>
@@ -226,7 +263,14 @@ function Expense() {
       {/* Snackbar Alert */}
       <CustomSnackbar open={snackbar.open} message={snackbar.message} severity={snackbar.severity} onClose={closeSnackbar} />
 
-      <ServerDataTable rows={rowData} columns={columns} />
+      <ServerDataTable
+        rows={rowData}
+        columns={columns}
+        totalCount={totalCount}
+        paginationModel={paginationModel}
+        onPaginationModelChange={handlePaginationModelChange}
+        loading={loading}
+      />
 
       <UserActionsMenu
         anchorEl={actionMenu.anchorEl}

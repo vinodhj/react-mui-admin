@@ -293,6 +293,7 @@ export type PageInfo = {
   __typename?: 'PageInfo';
   endCursor?: Maybe<Scalars['String']['output']>;
   hasNextPage: Scalars['Boolean']['output'];
+  totalCount: Scalars['Int']['output'];
 };
 
 export type PaginatedExpenseInputs = {
@@ -776,7 +777,7 @@ export type UserPaginatedExpenseQuery = {
         fynix: { __typename?: 'Category'; name: string };
       };
     }>;
-    pageInfo: { __typename: 'PageInfo'; endCursor?: string | null; hasNextPage: boolean };
+    pageInfo: { __typename: 'PageInfo'; endCursor?: string | null; hasNextPage: boolean; totalCount: number };
   };
 };
 
@@ -1576,6 +1577,7 @@ export const UserPaginatedExpenseDocument = gql`
         __typename
         endCursor
         hasNextPage
+        totalCount
       }
     }
   }
