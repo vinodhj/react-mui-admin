@@ -3,7 +3,7 @@ import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import Link from '@mui/material/Link';
 import { tokens } from '../../theme/main-theme';
 import { useSnackbar } from '../../hooks/use-snackbar';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import { useUserPaginatedExpenseQuery } from '../../graphql/graphql-generated';
 import { useSession } from '../../hooks/use-session';
 import { GridColDef, GridPaginationModel } from '@mui/x-data-grid/models';
@@ -23,6 +23,81 @@ import DeleteConfirmationDialog from '../../components/pages/delete-confirmation
 import { useDeleteExpense } from '../../hooks/use-delete-expense';
 import ExpenseFilter, { ExpenseFilterValues } from '../../components/pages/expense-filter';
 
+// Define state reducer for pagination and filter state management
+type StateAction =
+  | { type: 'SET_PAGINATION_MODEL'; payload: GridPaginationModel }
+  | { type: 'SET_CURSORS'; payload: { page: number; cursor: string | null } }
+  | { type: 'SET_FILTERS'; payload: ExpenseFilterValues }
+  | { type: 'RESET_FILTERS' }
+  | { type: 'SET_TOTAL_ITEMS'; payload: number }
+  | { type: 'RESET_CURSORS' };
+
+interface State {
+  paginationModel: GridPaginationModel;
+  cursors: { [page: number]: string | null };
+  filters: ExpenseFilterValues;
+  totalItems: number;
+}
+
+const initialState: State = {
+  paginationModel: { page: 0, pageSize: 10 },
+  cursors: { 0: null },
+  filters: {},
+  totalItems: 0,
+};
+
+function stateReducer(state: State, action: StateAction): State {
+  switch (action.type) {
+    case 'SET_PAGINATION_MODEL':
+      return { ...state, paginationModel: action.payload };
+    case 'SET_CURSORS':
+      return {
+        ...state,
+        cursors: { ...state.cursors, [action.payload.page]: action.payload.cursor },
+      };
+    case 'SET_FILTERS':
+      return {
+        ...state,
+        filters: action.payload,
+        paginationModel: { ...state.paginationModel, page: 0 },
+        cursors: { 0: null },
+      };
+    case 'RESET_FILTERS':
+      return {
+        ...state,
+        filters: {},
+        paginationModel: { ...state.paginationModel, page: 0 },
+        cursors: { 0: null },
+      };
+    case 'SET_TOTAL_ITEMS':
+      return { ...state, totalItems: action.payload };
+    default:
+      return state;
+  }
+}
+
+// Separate reusable components
+const ActiveFilterChips = ({
+  filters,
+  onDeleteFilter,
+}: {
+  filters: ExpenseFilterValues;
+  onDeleteFilter: (key: keyof ExpenseFilterValues) => void;
+}) => {
+  return (
+    <Stack direction="row" spacing={1} sx={{ mt: 1, flexWrap: 'wrap', gap: 1 }}>
+      {filters.expense_period && (
+        <Chip label={`Period: ${filters.expense_period}`} size="small" onDelete={() => onDeleteFilter('expense_period')} />
+      )}
+      {filters.min_amount && <Chip label={`Min: $${filters.min_amount}`} size="small" onDelete={() => onDeleteFilter('min_amount')} />}
+      {filters.max_amount && <Chip label={`Max: $${filters.max_amount}`} size="small" onDelete={() => onDeleteFilter('max_amount')} />}
+      {filters.status && filters.status.length > 0 && (
+        <Chip label={`Status: ${filters.status.join(', ')}`} size="small" onDelete={() => onDeleteFilter('status')} />
+      )}
+    </Stack>
+  );
+};
+
 function Expense() {
   const navigate = useNavigate();
   const { sessionAdmin } = useSession();
@@ -30,26 +105,24 @@ function Expense() {
   const mode = theme.palette.mode;
   const colors = tokens(mode);
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const { snackbar, showSnackbar, closeSnackbar } = useSnackbar();
 
-  const [totalItems, setTotalItems] = useState(0);
+  // Use reducer for pagination and filter state management
+  const [state, dispatch] = useReducer(stateReducer, initialState);
+  const { paginationModel, cursors, filters, totalItems } = state;
 
-  // Pagination state
-  const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
-    page: 0,
-    pageSize: 10,
-  });
-
-  // Cursor state
-  const [cursors, setCursors] = useState<{
-    [page: number]: string | null;
+  // Keep action menu and dialog as separate state hooks
+  const [actionMenu, setActionMenu] = useState<{
+    anchorEl: HTMLElement | null;
+    selectedId: string | null;
   }>({
-    0: null, // First page has no cursor
+    anchorEl: null,
+    selectedId: null,
   });
 
-  // Filter state
-  const [filters, setFilters] = useState<ExpenseFilterValues>({});
+  const [openDialog, setOpenDialog] = useState(false);
 
-  // Filter variables could be memoized
+  // Memoize query variables to prevent unnecessary re-fetches
   const variables = useMemo(
     () => ({
       session_id: sessionAdmin.adminID,
@@ -65,44 +138,36 @@ function Expense() {
     [sessionAdmin.adminID, paginationModel.pageSize, cursors, paginationModel.page, filters]
   );
 
-  // custom hooks
-  const { snackbar, showSnackbar, closeSnackbar } = useSnackbar();
-  // Action menu state
-  const [actionMenu, setActionMenu] = useState<{
-    anchorEl: HTMLElement | null;
-    selectedId: string | null;
-  }>({
-    anchorEl: null,
-    selectedId: null,
-  });
-
-  // Dialog state
-  const [openDialog, setOpenDialog] = useState(false);
-
   const { data, loading, error, refetch } = useUserPaginatedExpenseQuery({
     variables,
     notifyOnNetworkStatusChange: true,
     fetchPolicy: 'cache-and-network',
   });
 
-  // Delete expense hook
+  // Optimize delete expense hook with callbacks
+  const handleDeleteSuccess = useCallback(() => {
+    refetch();
+    setOpenDialog(false);
+    showSnackbar('Expense deleted successfully!');
+  }, [refetch, showSnackbar]);
+
+  const handleDeleteError = useCallback(
+    (err: Error) => {
+      console.error('Delete failed:', err);
+      setOpenDialog(false);
+      showSnackbar(err.message ?? 'Failed to delete expense', 'error');
+    },
+    [showSnackbar]
+  );
+
   const {
     handleDeleteExpense,
     loading: deleteLoading,
     error: deleteError,
   } = useDeleteExpense({
     user_id: sessionAdmin.adminID,
-    onCompleted: () => {
-      // Refetch data after deletion
-      refetch();
-      setOpenDialog(false);
-      showSnackbar('Expense deleted successfully!');
-    },
-    onError: (err) => {
-      console.error('Delete failed:', err);
-      setOpenDialog(false);
-      showSnackbar(err.message ?? 'Failed to delete expense', 'error');
-    },
+    onCompleted: handleDeleteSuccess,
+    onError: handleDeleteError,
   });
 
   // Define table columns with useMemo to prevent unnecessary re-renders
@@ -190,67 +255,136 @@ function Expense() {
     [colors]
   );
 
-  // Handle filter changes
-  const handleApplyFilter = (newFilters: ExpenseFilterValues) => {
-    // Reset pagination when filters change
-    setPaginationModel({ ...paginationModel, page: 0 });
-    setCursors({ 0: null });
-    setFilters(newFilters);
-  };
+  // Callback handlers to prevent unnecessary re-renders
+  const handleApplyFilter = useCallback((newFilters: ExpenseFilterValues) => {
+    dispatch({ type: 'SET_FILTERS', payload: newFilters });
+  }, []);
 
-  // Handle pagination changes
-  const handlePaginationModelChange = (newModel: GridPaginationModel) => {
-    // If we're moving to a new page we haven't visited before
-    // and we have a cursor from the current page, store it
-    if (newModel.page > paginationModel.page && data?.paginatedExpenseTrackers.pageInfo.endCursor && !cursors[newModel.page]) {
-      setCursors({
-        ...cursors,
-        [newModel.page]: data.paginatedExpenseTrackers.pageInfo.endCursor,
-      });
-    }
+  const handlePaginationModelChange = useCallback(
+    (newModel: GridPaginationModel) => {
+      if (newModel.page > paginationModel.page && data?.paginatedExpenseTrackers.pageInfo.endCursor && !cursors[newModel.page]) {
+        dispatch({
+          type: 'SET_CURSORS',
+          payload: { page: newModel.page, cursor: data.paginatedExpenseTrackers.pageInfo.endCursor },
+        });
+      }
+      dispatch({ type: 'SET_PAGINATION_MODEL', payload: newModel });
+    },
+    [paginationModel.page, data, cursors]
+  );
 
-    setPaginationModel(newModel);
-  };
-
-  useEffect(() => {
-    if (data?.paginatedExpenseTrackers.pageInfo.totalCount && paginationModel.page === 0) {
-      // Only update total count on the first page to keep it consistent
-      setTotalItems(data.paginatedExpenseTrackers.pageInfo.totalCount);
-    }
-  }, [data, paginationModel.page]);
-
-  // Action menu handlers
-  const handleActionClick = (event: React.MouseEvent<HTMLElement>, id: string) => {
+  const handleActionClick = useCallback((event: React.MouseEvent<HTMLElement>, id: string) => {
     setActionMenu({
       anchorEl: event.currentTarget,
       selectedId: id,
     });
-  };
+  }, []);
 
-  const handleActionClose = () => {
-    setActionMenu({ ...actionMenu, anchorEl: null });
-  };
+  const handleActionClose = useCallback(() => {
+    setActionMenu((prev) => ({
+      ...prev,
+      anchorEl: null,
+    }));
+  }, []);
 
-  const handleDeleteClick = () => {
+  const handleDeleteClick = useCallback(() => {
     handleActionClose();
     if (sessionAdmin?.adminRole !== 'ADMIN') {
       showSnackbar("You don't have permission to delete items.", 'error');
       return;
     }
     setOpenDialog(true);
-  };
+  }, [handleActionClose, sessionAdmin, showSnackbar]);
 
-  // Handle delete confirmation
-  const handleDelete = () => {
+  const handleDelete = useCallback(() => {
     if (actionMenu.selectedId) {
       handleDeleteExpense(actionMenu.selectedId);
     }
-  };
+  }, [actionMenu.selectedId, handleDeleteExpense]);
 
-  // Check if any filters are active
-  const hasActiveFilters = Object.values(filters).some((value) => value !== null && (Array.isArray(value) ? value.length > 0 : true));
+  const handleDeleteFilter = useCallback(
+    (key: keyof ExpenseFilterValues) => {
+      const newFilters = { ...filters };
+      delete newFilters[key];
+      handleApplyFilter(newFilters);
+    },
+    [filters, handleApplyFilter]
+  );
 
-  // Handle loading and error states with improved messaging
+  const handleResetFilters = useCallback(() => {
+    dispatch({ type: 'RESET_FILTERS' });
+  }, []);
+
+  // Memoize the has active filters check
+  const hasActiveFilters = useMemo(
+    () => Object.values(filters).some((value) => value !== null && (Array.isArray(value) ? value.length > 0 : true)),
+    [filters]
+  );
+
+  // Update total items whenever the data changes
+  useEffect(() => {
+    if (data?.paginatedExpenseTrackers.pageInfo.totalCount !== undefined) {
+      dispatch({
+        type: 'SET_TOTAL_ITEMS',
+        payload: data.paginatedExpenseTrackers.pageInfo.totalCount,
+      });
+
+      // If we get empty results and we're not on the first page, reset to first page
+      if (data.paginatedExpenseTrackers.edges?.length === 0 && paginationModel.page > 0) {
+        dispatch({ type: 'RESET_CURSORS' });
+        dispatch({
+          type: 'SET_PAGINATION_MODEL',
+          payload: { ...paginationModel, page: 0 },
+        });
+      }
+
+      // If there are no results at all, make sure we don't have any cursors
+      if (data.paginatedExpenseTrackers.pageInfo.totalCount === 0) {
+        dispatch({ type: 'RESET_CURSORS' });
+      }
+    }
+  }, [data, paginationModel.page]);
+
+  // Memoize the row data to prevent re-renders
+  const rowData = useMemo(
+    () =>
+      data?.paginatedExpenseTrackers.edges
+        ?.map((row, index) => {
+          if (!row) return null;
+          return {
+            id: index + 1,
+            registeredId: row.node.id,
+            expense_period: row.node.expense_period,
+            amount: row.node.amount,
+            status: row.node.status,
+            tag: row.node.tag.name,
+            mode: row.node.mode.name,
+            fynix: row.node.fynix.name,
+            created_at: formatDate(row.node.created_at),
+            updated_at: formatDate(row.node.updated_at),
+          };
+        })
+        .filter((row) => row !== null) || [],
+    [data]
+  );
+
+  // Calculate if we have next page based on current data
+  const hasNextPage = useMemo(() => {
+    return !!data?.paginatedExpenseTrackers.pageInfo.hasNextPage;
+  }, [data]);
+
+  // Memoize the filter component
+  const filterComponent = useMemo(
+    () => (
+      <Box sx={{ width: '100%' }}>
+        <ExpenseFilter currentFilters={filters} onApplyFilter={handleApplyFilter} onResetFilters={handleResetFilters} />
+        {hasActiveFilters && !isMobile && <ActiveFilterChips filters={filters} onDeleteFilter={handleDeleteFilter} />}
+      </Box>
+    ),
+    [filters, hasActiveFilters, isMobile, handleApplyFilter, handleResetFilters, handleDeleteFilter]
+  );
+
+  // Handle loading and error states
   if (loading) return <LoadingSpinner />;
   if (error) return <ErrorAlert message={`Error loading data: ${error.message}`} />;
   if (deleteError) return <ErrorAlert message={`Error deleting data: ${deleteError.message}`} />;
@@ -258,88 +392,8 @@ function Expense() {
     return <InfoAlert message="No data available" />;
   }
 
-  // Map the fetched data into the format required by DataTable
-  const rowData = data.paginatedExpenseTrackers.edges
-    ?.map((row, index) => {
-      if (!row) return null;
-      return {
-        id: index + 1,
-        registeredId: row.node.id,
-        expense_period: row.node.expense_period,
-        amount: row.node.amount,
-        status: row.node.status,
-        tag: row.node.tag.name,
-        mode: row.node.mode.name,
-        fynix: row.node.fynix.name,
-        created_at: formatDate(row.node.created_at),
-        updated_at: formatDate(row.node.updated_at),
-      };
-    })
-    .filter((row) => row !== null);
-
-  // Create filter component
-  const filterComponent = (
-    <Box sx={{ width: '100%' }}>
-      <ExpenseFilter
-        currentFilters={filters}
-        onApplyFilter={handleApplyFilter}
-        onResetFilters={() => {
-          // Reset pagination here when filters are cleared
-          setPaginationModel({ ...paginationModel, page: 0 });
-          setCursors({ 0: null });
-          setFilters({});
-        }}
-      />
-      {hasActiveFilters && !isMobile && (
-        <Stack direction="row" spacing={1} sx={{ mt: 1, flexWrap: 'wrap', gap: 1 }}>
-          {filters.expense_period && (
-            <Chip
-              label={`Period: ${filters.expense_period}`}
-              size="small"
-              onDelete={() => {
-                const newFilters = { ...filters };
-                delete newFilters.expense_period;
-                handleApplyFilter(newFilters);
-              }}
-            />
-          )}
-          {filters.min_amount && (
-            <Chip
-              label={`Min: $${filters.min_amount}`}
-              size="small"
-              onDelete={() => {
-                const newFilters = { ...filters };
-                delete newFilters.min_amount;
-                handleApplyFilter(newFilters);
-              }}
-            />
-          )}
-          {filters.max_amount && (
-            <Chip
-              label={`Max: $${filters.max_amount}`}
-              size="small"
-              onDelete={() => {
-                const newFilters = { ...filters };
-                delete newFilters.max_amount;
-                handleApplyFilter(newFilters);
-              }}
-            />
-          )}
-          {filters.status && filters.status.length > 0 && (
-            <Chip
-              label={`Status: ${filters.status.join(', ')}`}
-              size="small"
-              onDelete={() => {
-                const newFilters = { ...filters };
-                delete newFilters.status;
-                handleApplyFilter(newFilters);
-              }}
-            />
-          )}
-        </Stack>
-      )}
-    </Box>
-  );
+  // Calculate if we should disable pagination controls
+  const disablePagination = totalItems === 0;
 
   return (
     <Box m="20px" sx={{ p: '0 15px' }}>
@@ -366,6 +420,8 @@ function Expense() {
           onPaginationModelChange={handlePaginationModelChange}
           loading={loading}
           filterComponent={filterComponent}
+          paginationDisabled={disablePagination}
+          hasNextPage={hasNextPage}
         />
       )}
 
@@ -382,6 +438,7 @@ function Expense() {
         }}
         onDelete={handleDeleteClick}
       />
+
       {/* Delete Confirmation Dialog */}
       <DeleteConfirmationDialog
         openDialog={openDialog}

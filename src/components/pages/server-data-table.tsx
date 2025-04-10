@@ -20,6 +20,8 @@ interface DataTableProps {
   onPaginationModelChange?: (model: GridPaginationModel) => void;
   loading?: boolean;
   filterComponent?: React.ReactNode;
+  paginationDisabled?: boolean;
+  hasNextPage?: boolean;
 }
 
 // Function that returns the actual toolbar component
@@ -90,6 +92,8 @@ const ServerDataTable: FC<DataTableProps> = ({
   onPaginationModelChange,
   loading = false,
   filterComponent,
+  paginationDisabled,
+  hasNextPage,
 }) => {
   const theme = useTheme();
   const colorMode = theme.palette.mode;
