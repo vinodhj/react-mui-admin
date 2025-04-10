@@ -368,11 +368,6 @@ function Expense() {
     [data]
   );
 
-  // Calculate if we have next page based on current data
-  const hasNextPage = useMemo(() => {
-    return !!data?.paginatedExpenseTrackers.pageInfo.hasNextPage;
-  }, [data]);
-
   // Memoize the filter component
   const filterComponent = useMemo(
     () => (
@@ -391,9 +386,6 @@ function Expense() {
   if (!data?.paginatedExpenseTrackers.edges) {
     return <InfoAlert message="No data available" />;
   }
-
-  // Calculate if we should disable pagination controls
-  const disablePagination = totalItems === 0;
 
   return (
     <Box m="20px" sx={{ p: '0 15px' }}>
@@ -420,8 +412,6 @@ function Expense() {
           onPaginationModelChange={handlePaginationModelChange}
           loading={loading}
           filterComponent={filterComponent}
-          paginationDisabled={disablePagination}
-          hasNextPage={hasNextPage}
         />
       )}
 
