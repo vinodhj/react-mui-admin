@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import FormControl from '@mui/material/FormControl';
@@ -7,7 +7,7 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import Button from '@mui/material/Button';
 import type { SelectChangeEvent } from '@mui/material/Select';
-import { useTheme } from '@mui/material/styles';
+import { SxProps, Theme, useTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -54,6 +54,21 @@ const validateExpensePeriod = (value: string) => {
   return '';
 };
 
+// Extracted helper function to handle the form submission
+const prepareFilterValues = (
+  expensePeriod: string,
+  minAmount: number | null,
+  maxAmount: number | null,
+  status: ExpenseStatus[]
+): ExpenseFilterValues => {
+  return {
+    expense_period: expensePeriod || null,
+    min_amount: minAmount,
+    max_amount: maxAmount,
+    status: status.length > 0 ? status : null,
+  };
+};
+
 const ExpenseFilter: FC<ExpenseFilterProps> = ({ currentFilters = {}, onApplyFilter, onResetFilters }) => {
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === 'dark';
@@ -65,6 +80,25 @@ const ExpenseFilter: FC<ExpenseFilterProps> = ({ currentFilters = {}, onApplyFil
   const [minAmount, setMinAmount] = useState<number | null>(currentFilters.min_amount ?? null);
   const [maxAmount, setMaxAmount] = useState<number | null>(currentFilters.max_amount ?? null);
   const [status, setStatus] = useState<ExpenseStatus[]>(currentFilters.status ?? []);
+
+  // Define common input styles once as a memoized object
+  const inputStyles = useMemo(
+    (): SxProps<Theme> => ({
+      '& .MuiFormLabel-root': {
+        color: colors.grey[50],
+      },
+      '& .MuiFormLabel-root.Mui-focused': {
+        color: colors.greenAccent[400],
+      },
+      '& .MuiOutlinedInput-root': {
+        color: colors.grey[50],
+      },
+      '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+        borderColor: colors.grey[100],
+      },
+    }),
+    [colors]
+  );
 
   useEffect(() => {
     setExpensePeriod(currentFilters.expense_period ?? '');
@@ -79,28 +113,28 @@ const ExpenseFilter: FC<ExpenseFilterProps> = ({ currentFilters = {}, onApplyFil
     setStatus(typeof value === 'string' ? [value as ExpenseStatus] : value);
   };
 
+  // Extracted method for applying filters
   const handleApplyFilter = () => {
-    const filters = {
-      expense_period: expensePeriod || null,
-      min_amount: minAmount,
-      max_amount: maxAmount,
-      status: status.length > 0 ? status : null,
-    };
+    const filters = prepareFilterValues(expensePeriod, minAmount, maxAmount, status);
     onApplyFilter(filters);
+
     if (isMobile) {
       setExpanded(false);
     }
   };
 
+  // Extracted method for clearing filters
   const handleClearFilter = () => {
     setExpensePeriod('');
     setMinAmount(null);
     setMaxAmount(null);
     setStatus([]);
     onApplyFilter({});
+
     if (onResetFilters) {
       onResetFilters();
     }
+
     if (isMobile) {
       setExpanded(false);
     }
@@ -108,11 +142,14 @@ const ExpenseFilter: FC<ExpenseFilterProps> = ({ currentFilters = {}, onApplyFil
 
   const minAmountError = minAmount && minAmount < 0 ? 'Cannot be negative' : '';
   const maxAmountError = maxAmount && maxAmount < 0 ? 'Cannot be negative' : '';
+  const expensePeriodError = validateExpensePeriod(expensePeriod);
+  const minMaxError = minAmount && maxAmount && minAmount > maxAmount ? 'Minimum amount cannot be greater than maximum amount' : '';
 
   // Check if any filters are active to show visual indicator
   const hasActiveFilters = expensePeriod || minAmount || maxAmount || status.length > 0;
 
-  const filterContent = (
+  // Extracted the filter form content to reduce nesting
+  const renderFilterContent = () => (
     <Box
       sx={{
         display: 'flex',
@@ -122,9 +159,9 @@ const ExpenseFilter: FC<ExpenseFilterProps> = ({ currentFilters = {}, onApplyFil
         alignItems: { xs: 'stretch', md: 'center' },
       }}
     >
-      {/* Simple text field for date input in YYYY-MM-DD format */}
       <TextField
         id="expense_period"
+        name="expense_period"
         label="Expense Period"
         type="text"
         size="small"
@@ -132,36 +169,16 @@ const ExpenseFilter: FC<ExpenseFilterProps> = ({ currentFilters = {}, onApplyFil
         onChange={(e) => setExpensePeriod(e.target.value ?? '')}
         placeholder="YYYY-MM"
         sx={{
-          minWidth: '150px', // Default (unfocused) label color
-          '& .MuiFormLabel-root': {
-            color: colors.grey[50],
-          },
-          // Label color when focused or hovered
-          '& .MuiFormLabel-root.Mui-focused': {
-            color: colors.greenAccent[400],
-          },
-          //input text color:
-          '& .MuiOutlinedInput-root': {
-            color: colors.grey[50],
-          },
-          // The border color on hover/focus
-          '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-            borderColor: colors.grey[100],
-          },
+          minWidth: '150px',
+          ...inputStyles,
         }}
-        helperText={validateExpensePeriod(expensePeriod)}
-        error={expensePeriod !== '' && validateExpensePeriod(expensePeriod) !== ''}
-        slotProps={{
-          input: {
-            inputProps: {
-              pattern: '\\d{4}-\\d{2}',
-            },
-          },
-        }}
+        helperText={expensePeriodError}
+        error={expensePeriod !== '' && expensePeriodError !== ''}
       />
 
       <TextField
         id="min_amount"
+        name="min_amount"
         label="Min Amount"
         type="number"
         size="small"
@@ -169,21 +186,7 @@ const ExpenseFilter: FC<ExpenseFilterProps> = ({ currentFilters = {}, onApplyFil
         onChange={(e) => setMinAmount(Number(e.target.value))}
         sx={{
           minWidth: '100px',
-          '& .MuiFormLabel-root': {
-            color: colors.grey[50],
-          },
-          // Label color when focused or hovered
-          '& .MuiFormLabel-root.Mui-focused': {
-            color: colors.greenAccent[400],
-          },
-          //input text color:
-          '& .MuiOutlinedInput-root': {
-            color: colors.grey[50],
-          },
-          // The border color on hover/focus
-          '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-            borderColor: colors.grey[100],
-          },
+          ...inputStyles,
         }}
         slotProps={{
           input: {
@@ -193,14 +196,13 @@ const ExpenseFilter: FC<ExpenseFilterProps> = ({ currentFilters = {}, onApplyFil
             },
           },
         }}
-        helperText={
-          minAmount && maxAmount && minAmount > maxAmount ? 'Minimum amount cannot be greater than maximum amount' : minAmountError
-        }
-        error={(!!minAmount && minAmount < 0) || (!!minAmount && !!maxAmount && minAmount > maxAmount)}
+        helperText={minMaxError || minAmountError}
+        error={!!minAmountError || !!minMaxError}
       />
 
       <TextField
         id="max_amount"
+        name="max_amount"
         label="Max Amount"
         type="number"
         size="small"
@@ -208,21 +210,7 @@ const ExpenseFilter: FC<ExpenseFilterProps> = ({ currentFilters = {}, onApplyFil
         onChange={(e) => setMaxAmount(Number(e.target.value))}
         sx={{
           minWidth: '100px',
-          '& .MuiFormLabel-root': {
-            color: colors.grey[50],
-          },
-          // Label color when focused or hovered
-          '& .MuiFormLabel-root.Mui-focused': {
-            color: colors.greenAccent[400],
-          },
-          //input text color:
-          '& .MuiOutlinedInput-root': {
-            color: colors.grey[50],
-          },
-          // The border color on hover/focus
-          '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-            borderColor: colors.grey[100],
-          },
+          ...inputStyles,
         }}
         slotProps={{
           input: {
@@ -232,33 +220,27 @@ const ExpenseFilter: FC<ExpenseFilterProps> = ({ currentFilters = {}, onApplyFil
             },
           },
         }}
-        helperText={maxAmount && minAmount && maxAmount < minAmount ? 'Maximum amount cannot be less than minimum amount' : maxAmountError}
-        error={(!!maxAmount && maxAmount < 0) || (!!maxAmount && !!minAmount && maxAmount < minAmount)}
+        helperText={maxAmountError || (minMaxError && !minAmountError ? minMaxError : '')}
+        error={!!maxAmountError || (!!minMaxError && !minAmountError)}
       />
 
       <FormControl
         size="small"
         sx={{
           minWidth: '120px',
-          '& .MuiFormLabel-root': {
-            color: colors.grey[50],
-          },
-          // Label color when focused or hovered
-          '& .MuiFormLabel-root.Mui-focused': {
-            color: colors.greenAccent[400],
-          },
-          //input text color:
-          '& .MuiOutlinedInput-root': {
-            color: colors.grey[50],
-          },
-          // The border color on hover/focus
-          '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-            borderColor: colors.grey[100],
-          },
+          ...inputStyles,
         }}
       >
-        <InputLabel>Status</InputLabel>
-        <Select multiple value={status} label="Status" onChange={handleStatusChange} id="expense-status" name="expense-status">
+        <InputLabel id="expense-status-label">Status</InputLabel>
+        <Select
+          multiple
+          value={status}
+          label="Status"
+          onChange={handleStatusChange}
+          labelId="expense-status-label"
+          id="expense-status"
+          name="expense-status"
+        >
           <MenuItem value={ExpenseStatus.Paid}>Paid</MenuItem>
           <MenuItem value={ExpenseStatus.UnPaid}>Unpaid</MenuItem>
           <MenuItem value={ExpenseStatus.NextDue}>Next Due</MenuItem>
@@ -292,7 +274,6 @@ const ExpenseFilter: FC<ExpenseFilterProps> = ({ currentFilters = {}, onApplyFil
         sx={{
           mb: 2,
           width: '100%',
-          bgcolor: hasActiveFilters ? colors.greenAccent[600] : colors.primary[400],
           '&::before': {
             display: 'none',
           },
@@ -304,12 +285,12 @@ const ExpenseFilter: FC<ExpenseFilterProps> = ({ currentFilters = {}, onApplyFil
             Filters {hasActiveFilters && ' (Active)'}
           </Typography>
         </AccordionSummary>
-        <AccordionDetails>{filterContent}</AccordionDetails>
+        <AccordionDetails>{renderFilterContent()}</AccordionDetails>
       </Accordion>
     );
   }
 
-  return filterContent;
+  return renderFilterContent();
 };
 
 export default ExpenseFilter;

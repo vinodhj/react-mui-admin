@@ -22,28 +22,64 @@ interface DataTableProps {
   filterComponent?: React.ReactNode;
 }
 
-interface CustomToolbarProps {
-  filterComponent?: React.ReactNode;
+// Function that returns the actual toolbar component
+function createToolbar(filterComponent: React.ReactNode) {
+  // This function returns a component that accepts GridToolbarProps
+  return function CustomToolbar() {
+    return (
+      <GridToolbarContainer
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', md: 'row' },
+          alignItems: { xs: 'flex-start', md: 'center' },
+          gap: 2,
+          p: 1,
+        }}
+      >
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <GridToolbarColumnsButton />
+          <GridToolbarDensitySelector />
+          <GridToolbarQuickFilter debounceMs={200} sx={{ width: '300px', fontSize: '1rem' }} />
+        </Box>
+        {filterComponent && (
+          <Box sx={{ display: 'flex', flexGrow: 1, justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+            {filterComponent}
+          </Box>
+        )}
+      </GridToolbarContainer>
+    );
+  };
 }
 
-const CustomToolbar = ({ filterComponent }: CustomToolbarProps) => (
-  <GridToolbarContainer
-    sx={{
-      display: 'flex',
-      flexDirection: { xs: 'column', md: 'row' },
-      alignItems: { xs: 'flex-start', md: 'center' },
-      gap: 2,
-      p: 1,
-    }}
-  >
-    <Box sx={{ display: 'flex', gap: 1 }}>
-      <GridToolbarColumnsButton />
-      <GridToolbarDensitySelector />
-      <GridToolbarQuickFilter debounceMs={200} sx={{ width: '300px', fontSize: '1rem' }} />
-    </Box>
-    <Box sx={{ display: 'flex', flexGrow: 1, justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>{filterComponent}</Box>
-  </GridToolbarContainer>
-);
+// Create style object outside component to prevent recreation on each render
+const createStyles = (colors: any, colorMode: string) => ({
+  '& .MuiDataGrid-cell:focus, & .MuiDataGrid-cell:focus-within': {
+    outline: 'none !important',
+  },
+  '& .MuiDataGrid-root': {
+    border: 'none',
+  },
+  '& .MuiDataGrid-cell': {
+    borderBottom: 'none',
+  },
+  '& .MuiDataGrid-columnHeaders': {
+    backgroundColor: colors.blueAccent[700],
+    borderBottom: 'none',
+  },
+  '& .MuiDataGrid-virtualScroller': {
+    backgroundColor: colorMode === 'dark' ? colors.primary[400] : colors.blackWhite[300],
+  },
+  '& .MuiDataGrid-footerContainer': {
+    borderTop: 'none',
+    backgroundColor: colors.blueAccent[700],
+  },
+  '& .MuiCheckbox-root': {
+    color: `${colors.greenAccent[200]} !important`,
+  },
+  '& .MuiDataGrid-toolbarContainer .MuiButton-text': {
+    color: `${colors.grey[100]} !important`,
+  },
+});
 
 const ServerDataTable: FC<DataTableProps> = ({
   rows,
@@ -58,40 +94,15 @@ const ServerDataTable: FC<DataTableProps> = ({
   const theme = useTheme();
   const colorMode = theme.palette.mode;
   const colors = tokens(colorMode);
+
+  // Memoize grid styles
+  const gridStyles = createStyles(colors, colorMode);
+
+  // Create the toolbar component with the current filterComponent
+  const CustomToolbarComponent = createToolbar(filterComponent);
+
   return (
-    <Box
-      width="100%"
-      height="80vh"
-      overflow={'auto'}
-      sx={{
-        '& .MuiDataGrid-cell:focus, & .MuiDataGrid-cell:focus-within': {
-          outline: 'none !important',
-        },
-        '& .MuiDataGrid-root': {
-          border: 'none',
-        },
-        '& .MuiDataGrid-cell': {
-          borderBottom: 'none',
-        },
-        '& .MuiDataGrid-columnHeaders': {
-          backgroundColor: colors.blueAccent[700],
-          borderBottom: 'none',
-        },
-        '& .MuiDataGrid-virtualScroller': {
-          backgroundColor: colorMode === 'dark' ? colors.primary[400] : colors.blackWhite[300],
-        },
-        '& .MuiDataGrid-footerContainer': {
-          borderTop: 'none',
-          backgroundColor: colors.blueAccent[700],
-        },
-        '& .MuiCheckbox-root': {
-          color: `${colors.greenAccent[200]} !important`,
-        },
-        '& .MuiDataGrid-toolbarContainer .MuiButton-text': {
-          color: `${colors.grey[100]} !important`,
-        },
-      }}
-    >
+    <Box width="100%" height="80vh" overflow={'auto'} sx={gridStyles}>
       {/* paginationMode -> need to check and tweaks */}
       <Box sx={{ width: '100%', maxWidth: 1300, height: '100%' }}>
         <DataGrid
@@ -109,7 +120,7 @@ const ServerDataTable: FC<DataTableProps> = ({
           }}
           pageSizeOptions={pageSizeOptions}
           slots={{
-            toolbar: () => <CustomToolbar filterComponent={filterComponent} />,
+            toolbar: CustomToolbarComponent,
           }}
           disableColumnFilter
           disableRowSelectionOnClick
