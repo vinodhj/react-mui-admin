@@ -3,7 +3,7 @@ import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import Link from '@mui/material/Link';
 import { tokens } from '../../theme/main-theme';
 import { useSnackbar } from '../../hooks/use-snackbar';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useUserPaginatedExpenseQuery } from '../../graphql/graphql-generated';
 import { useSession } from '../../hooks/use-session';
 import { GridColDef, GridPaginationModel } from '@mui/x-data-grid/models';
@@ -30,6 +30,8 @@ function Expense() {
   const mode = theme.palette.mode;
   const colors = tokens(mode);
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
+  const [totalItems, setTotalItems] = useState(0);
 
   // Pagination state
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
@@ -210,6 +212,13 @@ function Expense() {
     setPaginationModel(newModel);
   };
 
+  useEffect(() => {
+    if (data?.paginatedExpenseTrackers.pageInfo.totalCount && paginationModel.page === 0) {
+      // Only update total count on the first page to keep it consistent
+      setTotalItems(data.paginatedExpenseTrackers.pageInfo.totalCount);
+    }
+  }, [data, paginationModel.page]);
+
   // Action menu handlers
   const handleActionClick = (event: React.MouseEvent<HTMLElement>, id: string) => {
     setActionMenu({
@@ -267,10 +276,6 @@ function Expense() {
       };
     })
     .filter((row) => row !== null);
-
-  // Pagination
-  const pageInfo = data.paginatedExpenseTrackers.pageInfo;
-  const totalCount = pageInfo.totalCount;
 
   // Create filter component
   const filterComponent = (
@@ -356,7 +361,7 @@ function Expense() {
         <ServerDataTable
           rows={rowData}
           columns={columns}
-          totalCount={totalCount}
+          totalCount={totalItems}
           paginationModel={paginationModel}
           onPaginationModelChange={handlePaginationModelChange}
           loading={loading}

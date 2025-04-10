@@ -50,7 +50,7 @@ const ServerDataTable: FC<DataTableProps> = ({
   columns,
   totalCount,
   paginationModel = { page: 0, pageSize: 10 },
-  pageSizeOptions = [10],
+  pageSizeOptions = [10, 20],
   onPaginationModelChange,
   loading = false,
   filterComponent,
@@ -58,7 +58,6 @@ const ServerDataTable: FC<DataTableProps> = ({
   const theme = useTheme();
   const colorMode = theme.palette.mode;
   const colors = tokens(colorMode);
-
   return (
     <Box
       width="100%"

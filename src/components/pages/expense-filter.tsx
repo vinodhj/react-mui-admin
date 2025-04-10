@@ -56,6 +56,7 @@ const validateExpensePeriod = (value: string) => {
 
 const ExpenseFilter: FC<ExpenseFilterProps> = ({ currentFilters = {}, onApplyFilter, onResetFilters }) => {
   const theme = useTheme();
+  const isDarkMode = theme.palette.mode === 'dark';
   const colors = tokens(theme.palette.mode);
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -123,13 +124,31 @@ const ExpenseFilter: FC<ExpenseFilterProps> = ({ currentFilters = {}, onApplyFil
     >
       {/* Simple text field for date input in YYYY-MM-DD format */}
       <TextField
+        id="expense_period"
         label="Expense Period"
         type="text"
         size="small"
-        value={expensePeriod}
+        value={expensePeriod ?? ''}
         onChange={(e) => setExpensePeriod(e.target.value ?? '')}
         placeholder="YYYY-MM"
-        sx={{ minWidth: '150px' }}
+        sx={{
+          minWidth: '150px', // Default (unfocused) label color
+          '& .MuiFormLabel-root': {
+            color: colors.grey[50],
+          },
+          // Label color when focused or hovered
+          '& .MuiFormLabel-root.Mui-focused': {
+            color: colors.greenAccent[400],
+          },
+          //input text color:
+          '& .MuiOutlinedInput-root': {
+            color: colors.grey[50],
+          },
+          // The border color on hover/focus
+          '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: colors.grey[100],
+          },
+        }}
         helperText={validateExpensePeriod(expensePeriod)}
         error={expensePeriod !== '' && validateExpensePeriod(expensePeriod) !== ''}
         slotProps={{
@@ -142,12 +161,30 @@ const ExpenseFilter: FC<ExpenseFilterProps> = ({ currentFilters = {}, onApplyFil
       />
 
       <TextField
+        id="min_amount"
         label="Min Amount"
         type="number"
         size="small"
-        value={minAmount}
+        value={minAmount ?? ''}
         onChange={(e) => setMinAmount(Number(e.target.value))}
-        sx={{ minWidth: '100px' }}
+        sx={{
+          minWidth: '100px',
+          '& .MuiFormLabel-root': {
+            color: colors.grey[50],
+          },
+          // Label color when focused or hovered
+          '& .MuiFormLabel-root.Mui-focused': {
+            color: colors.greenAccent[400],
+          },
+          //input text color:
+          '& .MuiOutlinedInput-root': {
+            color: colors.grey[50],
+          },
+          // The border color on hover/focus
+          '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: colors.grey[100],
+          },
+        }}
         slotProps={{
           input: {
             inputProps: {
@@ -163,12 +200,30 @@ const ExpenseFilter: FC<ExpenseFilterProps> = ({ currentFilters = {}, onApplyFil
       />
 
       <TextField
+        id="max_amount"
         label="Max Amount"
         type="number"
         size="small"
-        value={maxAmount}
+        value={maxAmount ?? ''}
         onChange={(e) => setMaxAmount(Number(e.target.value))}
-        sx={{ minWidth: '100px' }}
+        sx={{
+          minWidth: '100px',
+          '& .MuiFormLabel-root': {
+            color: colors.grey[50],
+          },
+          // Label color when focused or hovered
+          '& .MuiFormLabel-root.Mui-focused': {
+            color: colors.greenAccent[400],
+          },
+          //input text color:
+          '& .MuiOutlinedInput-root': {
+            color: colors.grey[50],
+          },
+          // The border color on hover/focus
+          '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: colors.grey[100],
+          },
+        }}
         slotProps={{
           input: {
             inputProps: {
@@ -181,9 +236,29 @@ const ExpenseFilter: FC<ExpenseFilterProps> = ({ currentFilters = {}, onApplyFil
         error={(!!maxAmount && maxAmount < 0) || (!!maxAmount && !!minAmount && maxAmount < minAmount)}
       />
 
-      <FormControl size="small" sx={{ minWidth: '120px' }}>
+      <FormControl
+        size="small"
+        sx={{
+          minWidth: '120px',
+          '& .MuiFormLabel-root': {
+            color: colors.grey[50],
+          },
+          // Label color when focused or hovered
+          '& .MuiFormLabel-root.Mui-focused': {
+            color: colors.greenAccent[400],
+          },
+          //input text color:
+          '& .MuiOutlinedInput-root': {
+            color: colors.grey[50],
+          },
+          // The border color on hover/focus
+          '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: colors.grey[100],
+          },
+        }}
+      >
         <InputLabel>Status</InputLabel>
-        <Select multiple value={status} label="Status" onChange={handleStatusChange}>
+        <Select multiple value={status} label="Status" onChange={handleStatusChange} id="expense-status" name="expense-status">
           <MenuItem value={ExpenseStatus.Paid}>Paid</MenuItem>
           <MenuItem value={ExpenseStatus.UnPaid}>Unpaid</MenuItem>
           <MenuItem value={ExpenseStatus.NextDue}>Next Due</MenuItem>
@@ -193,7 +268,7 @@ const ExpenseFilter: FC<ExpenseFilterProps> = ({ currentFilters = {}, onApplyFil
       <Box sx={{ display: 'flex', gap: 1 }}>
         <Button
           variant="contained"
-          color="primary"
+          color={isDarkMode ? 'inherit' : 'primary'}
           onClick={handleApplyFilter}
           startIcon={<FilterAltIcon />}
           size="small"
