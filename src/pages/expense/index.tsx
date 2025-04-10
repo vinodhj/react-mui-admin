@@ -22,6 +22,7 @@ import ServerDataTable from '../../components/pages/server-data-table';
 import DeleteConfirmationDialog from '../../components/pages/delete-confirmation-dialog';
 import { useDeleteExpense } from '../../hooks/use-delete-expense';
 import ExpenseFilter, { ExpenseFilterValues } from '../../components/pages/expense-filter';
+import { useDebounce } from '../../hooks/use-debounce';
 
 // Define state reducer for pagination and filter state management
 type StateAction =
@@ -111,6 +112,9 @@ function Expense() {
   const [state, dispatch] = useReducer(stateReducer, initialState);
   const { paginationModel, cursors, filters, totalItems } = state;
 
+  // Apply debounce to filters to prevent excessive API calls
+  const debouncedFilters = useDebounce(filters, 500);
+
   // Keep action menu and dialog as separate state hooks
   const [actionMenu, setActionMenu] = useState<{
     anchorEl: HTMLElement | null;
@@ -129,13 +133,13 @@ function Expense() {
       input: {
         first: paginationModel.pageSize,
         after: cursors[paginationModel.page] ?? null,
-        expense_period: filters.expense_period ?? undefined,
-        min_amount: filters.min_amount ?? undefined,
-        max_amount: filters.max_amount ?? undefined,
-        statuses: filters.status ?? undefined,
+        expense_period: debouncedFilters.expense_period ?? undefined,
+        min_amount: debouncedFilters.min_amount ?? undefined,
+        max_amount: debouncedFilters.max_amount ?? undefined,
+        statuses: debouncedFilters.status ?? undefined,
       },
     }),
-    [sessionAdmin.adminID, paginationModel.pageSize, cursors, paginationModel.page, filters]
+    [sessionAdmin.adminID, paginationModel.pageSize, cursors, paginationModel.page, debouncedFilters]
   );
 
   const { data, loading, error, refetch } = useUserPaginatedExpenseQuery({
