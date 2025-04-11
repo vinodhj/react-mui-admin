@@ -68,7 +68,7 @@ const SidebarMenuItems: FC<SidebarMenuItemsProps> = ({ collapsed, selected, setS
         </Typography>
         <SidebarItem
           title="Tracker Expense"
-          to="/form"
+          to="/expense"
           icon={<PersonOutlinedIcon />}
           selected={selected}
           setSelected={setSelected}
@@ -78,7 +78,7 @@ const SidebarMenuItems: FC<SidebarMenuItemsProps> = ({ collapsed, selected, setS
         />
 
         <Typography variant="h6" color={colors.grey[300]} sx={{ m: '15px 20px 5px 20px' }}>
-          Category
+          Stash
         </Typography>
         <SidebarItem
           title="Tag"

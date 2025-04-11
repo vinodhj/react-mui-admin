@@ -1,0 +1,39 @@
+query AdminPaginatedExpense($session_id: ID!, $input: PaginatedExpenseInputs) {
+  paginatedExpenseTrackers(input: $input, session_id: $session_id) {
+    __typename
+    edges {
+      __typename
+      node {
+        __typename
+        id
+        user_id
+        expense_period
+        amount
+        description
+        status
+        created_at
+        updated_at
+        created_by
+        updated_by
+        tag {
+          name
+        }
+        mode {
+          name
+        }
+        fynix {
+          name
+        }
+        user {
+          name
+        }
+      }
+      cursor
+    }
+    pageInfo {
+      __typename
+      endCursor
+      hasNextPage
+    }
+  }
+}

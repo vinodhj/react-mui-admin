@@ -120,7 +120,7 @@ const DataTable: FC<DataTableProps> = ({ rows, columns, paginationModel = { page
           rowCount={rows.length} // -> If you're using server-side pagination, you must pass the total row count (rowCount).
           rows={rows}
           columns={columns}
-          paginationMode="server" // server or client
+          paginationMode="client" // server or client
           initialState={{ pagination: { paginationModel: { page, pageSize } } }}
           pageSizeOptions={pageSizeOptions}
           // slots={{ toolbar: GridToolbar }}
@@ -133,7 +133,6 @@ const DataTable: FC<DataTableProps> = ({ rows, columns, paginationModel = { page
           sx={{
             maxWidth: 1300,
             height: '80vh',
-            boxShadow: 5,
             border: 1,
             '--DataGrid-containerBackground': colors.blueAccent[700],
           }}

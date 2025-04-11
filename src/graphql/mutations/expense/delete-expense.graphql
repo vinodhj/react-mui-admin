@@ -1,0 +1,4 @@
+mutation DeleteExpenseTracker($input: DeleteExpenseTrackerInput!) {
+  __typename
+  deleteExpenseTracker(input: $input)
+}

@@ -180,10 +180,11 @@ export type MutationFieldPolicy = {
   updateCategory?: FieldPolicy<any> | FieldReadFunction<any>;
   updateExpenseTracker?: FieldPolicy<any> | FieldReadFunction<any>;
 };
-export type PageInfoKeySpecifier = ('endCursor' | 'hasNextPage' | PageInfoKeySpecifier)[];
+export type PageInfoKeySpecifier = ('endCursor' | 'hasNextPage' | 'totalCount' | PageInfoKeySpecifier)[];
 export type PageInfoFieldPolicy = {
   endCursor?: FieldPolicy<any> | FieldReadFunction<any>;
   hasNextPage?: FieldPolicy<any> | FieldReadFunction<any>;
+  totalCount?: FieldPolicy<any> | FieldReadFunction<any>;
 };
 export type QueryKeySpecifier = (
   | 'adminKvAsset'
