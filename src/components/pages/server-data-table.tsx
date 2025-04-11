@@ -130,7 +130,6 @@ const ServerDataTable: FC<DataTableProps> = ({
           sx={{
             maxWidth: 1300,
             height: '80vh',
-            boxShadow: 5,
             border: 1,
             '--DataGrid-containerBackground': colors.blueAccent[700],
           }}

@@ -1,4 +1,4 @@
-import { Chip, Stack, useMediaQuery, useTheme } from '@mui/material';
+import { Chip, CircularProgress, Fade, Stack, useMediaQuery, useTheme } from '@mui/material';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import Link from '@mui/material/Link';
 import { tokens } from '../../theme/main-theme';
@@ -23,6 +23,7 @@ import DeleteConfirmationDialog from '../../components/pages/delete-confirmation
 import { useDeleteExpense } from '../../hooks/use-delete-expense';
 import ExpenseFilter, { ExpenseFilterValues } from '../../components/pages/expense-filter';
 import { useDebounce } from '../../hooks/use-debounce';
+import { useTypedLocalStorage } from '../../hooks/use-typed-local-storage.ts';
 
 // Define state reducer for pagination and filter state management
 type StateAction =
@@ -31,13 +32,15 @@ type StateAction =
   | { type: 'SET_FILTERS'; payload: ExpenseFilterValues }
   | { type: 'RESET_FILTERS' }
   | { type: 'SET_TOTAL_ITEMS'; payload: number }
-  | { type: 'RESET_CURSORS' };
+  | { type: 'RESET_CURSORS' }
+  | { type: 'SET_FILTERS_PENDING'; payload: boolean };
 
 interface State {
   paginationModel: GridPaginationModel;
   cursors: { [page: number]: string | null };
   filters: ExpenseFilterValues;
   totalItems: number;
+  filtersPending: boolean;
 }
 
 const initialState: State = {
@@ -45,6 +48,7 @@ const initialState: State = {
   cursors: { 0: null },
   filters: {},
   totalItems: 0,
+  filtersPending: false,
 };
 
 function stateReducer(state: State, action: StateAction): State {
@@ -62,6 +66,7 @@ function stateReducer(state: State, action: StateAction): State {
         filters: action.payload,
         paginationModel: { ...state.paginationModel, page: 0 },
         cursors: { 0: null },
+        filtersPending: true,
       };
     case 'RESET_FILTERS':
       return {
@@ -69,31 +74,99 @@ function stateReducer(state: State, action: StateAction): State {
         filters: {},
         paginationModel: { ...state.paginationModel, page: 0 },
         cursors: { 0: null },
+        filtersPending: true,
       };
     case 'SET_TOTAL_ITEMS':
       return { ...state, totalItems: action.payload };
+    case 'SET_FILTERS_PENDING':
+      return { ...state, filtersPending: action.payload };
     default:
       return state;
   }
+}
+
+// Custom hook for different debounce times based on filter type
+function useSmartDebounce(filters: ExpenseFilterValues) {
+  // Use a shorter delay for dropdown selections
+  const discreteFilters = useMemo(
+    () => ({
+      expense_period: filters.expense_period,
+      status: filters.status,
+    }),
+    [filters.expense_period, filters.status]
+  );
+
+  // Use a longer delay for numeric inputs that users might type continuously
+  const rangeFilters = useMemo(
+    () => ({
+      min_amount: filters.min_amount,
+      max_amount: filters.max_amount,
+    }),
+    [filters.min_amount, filters.max_amount]
+  );
+
+  // Debounce with different delays
+  const debouncedDiscreteFilters = useDebounce(discreteFilters, 200);
+  const debouncedRangeFilters = useDebounce(rangeFilters, 600);
+
+  // Combine debounced filters
+  return useMemo(
+    () => ({
+      ...debouncedDiscreteFilters,
+      ...debouncedRangeFilters,
+    }),
+    [debouncedDiscreteFilters, debouncedRangeFilters]
+  );
 }
 
 // Separate reusable components
 const ActiveFilterChips = ({
   filters,
   onDeleteFilter,
+  isPending,
 }: {
   filters: ExpenseFilterValues;
   onDeleteFilter: (key: keyof ExpenseFilterValues) => void;
+  isPending: boolean;
 }) => {
   return (
     <Stack direction="row" spacing={1} sx={{ mt: 1, flexWrap: 'wrap', gap: 1 }}>
       {filters.expense_period && (
-        <Chip label={`Period: ${filters.expense_period}`} size="small" onDelete={() => onDeleteFilter('expense_period')} />
+        <Chip
+          label={`Period: ${filters.expense_period}`}
+          size="small"
+          onDelete={() => onDeleteFilter('expense_period')}
+          sx={isPending ? { opacity: 0.7 } : {}}
+        />
       )}
-      {filters.min_amount && <Chip label={`Min: $${filters.min_amount}`} size="small" onDelete={() => onDeleteFilter('min_amount')} />}
-      {filters.max_amount && <Chip label={`Max: $${filters.max_amount}`} size="small" onDelete={() => onDeleteFilter('max_amount')} />}
+      {filters.min_amount && (
+        <Chip
+          label={`Min: $${filters.min_amount}`}
+          size="small"
+          onDelete={() => onDeleteFilter('min_amount')}
+          sx={isPending ? { opacity: 0.7 } : {}}
+        />
+      )}
+      {filters.max_amount && (
+        <Chip
+          label={`Max: $${filters.max_amount}`}
+          size="small"
+          onDelete={() => onDeleteFilter('max_amount')}
+          sx={isPending ? { opacity: 0.7 } : {}}
+        />
+      )}
       {filters.status && filters.status.length > 0 && (
-        <Chip label={`Status: ${filters.status.join(', ')}`} size="small" onDelete={() => onDeleteFilter('status')} />
+        <Chip
+          label={`Status: ${filters.status.join(', ')}`}
+          size="small"
+          onDelete={() => onDeleteFilter('status')}
+          sx={isPending ? { opacity: 0.7 } : {}}
+        />
+      )}
+      {isPending && (
+        <Fade in={isPending}>
+          <CircularProgress size={20} thickness={5} sx={{ ml: 1 }} />
+        </Fade>
       )}
     </Stack>
   );
@@ -108,12 +181,19 @@ function Expense() {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const { snackbar, showSnackbar, closeSnackbar } = useSnackbar();
 
-  // Use reducer for pagination and filter state management
-  const [state, dispatch] = useReducer(stateReducer, initialState);
-  const { paginationModel, cursors, filters, totalItems } = state;
+  // Load saved filters from local storage
+  const [savedFilters, setSavedFilters] = useTypedLocalStorage<ExpenseFilterValues>('expenseFilters', {});
 
-  // Apply debounce to filters to prevent excessive API calls
-  const debouncedFilters = useDebounce(filters, 500);
+  // Use reducer for pagination and filter state management
+  const [state, dispatch] = useReducer(stateReducer, {
+    ...initialState,
+    filters: savedFilters,
+  });
+
+  const { paginationModel, cursors, filters, totalItems, filtersPending } = state;
+
+  // Apply smart debounce to filters based on their type
+  const debouncedFilters = useSmartDebounce(filters);
 
   // Keep action menu and dialog as separate state hooks
   const [actionMenu, setActionMenu] = useState<{
@@ -147,6 +227,25 @@ function Expense() {
     notifyOnNetworkStatusChange: true,
     fetchPolicy: 'cache-and-network',
   });
+
+  // Update filters pending state when debounced filters change
+  useEffect(() => {
+    // If the debounced filters have caught up with the current filters
+    const isEqual =
+      debouncedFilters.expense_period === filters.expense_period &&
+      debouncedFilters.min_amount === filters.min_amount &&
+      debouncedFilters.max_amount === filters.max_amount &&
+      JSON.stringify(debouncedFilters.status) === JSON.stringify(filters.status);
+
+    if (isEqual && filtersPending) {
+      dispatch({ type: 'SET_FILTERS_PENDING', payload: false });
+    }
+  }, [debouncedFilters, filters, filtersPending]);
+
+  // Save filters to local storage when they change
+  useEffect(() => {
+    setSavedFilters(filters);
+  }, [filters, setSavedFilters]);
 
   // Optimize delete expense hook with callbacks
   const handleDeleteSuccess = useCallback(() => {
@@ -259,8 +358,16 @@ function Expense() {
     [colors]
   );
 
-  // Callback handlers to prevent unnecessary re-renders
-  const handleApplyFilter = useCallback((newFilters: ExpenseFilterValues) => {
+  // Modified handleApplyFilter to conditionally apply debounce
+  const handleApplyFilter = useCallback((newFilters: ExpenseFilterValues, skipDebounce = false) => {
+    // For select/dropdown changes, we can apply immediately without debounce
+    if (skipDebounce) {
+      dispatch({ type: 'SET_FILTERS', payload: newFilters });
+      // Also update the debounced value immediately
+      return;
+    }
+
+    // For text input changes, use the normal debounce behavior
     dispatch({ type: 'SET_FILTERS', payload: newFilters });
   }, []);
 
@@ -328,11 +435,6 @@ function Expense() {
   // Update total items whenever the data changes
   useEffect(() => {
     if (data?.paginatedExpenseTrackers.pageInfo.totalCount !== undefined) {
-      dispatch({
-        type: 'SET_TOTAL_ITEMS',
-        payload: data.paginatedExpenseTrackers.pageInfo.totalCount,
-      });
-
       // If we get empty results and we're not on the first page, reset to first page
       if (data.paginatedExpenseTrackers.edges?.length === 0 && paginationModel.page > 0) {
         dispatch({ type: 'RESET_CURSORS' });
@@ -345,6 +447,15 @@ function Expense() {
       // If there are no results at all, make sure we don't have any cursors
       if (data.paginatedExpenseTrackers.pageInfo.totalCount === 0) {
         dispatch({ type: 'RESET_CURSORS' });
+      }
+
+      if (data?.paginatedExpenseTrackers.pageInfo.totalCount && paginationModel.page === 0) {
+        console.log('total count', data.paginatedExpenseTrackers.pageInfo.totalCount);
+        // Only update total count on the first page to keep it consistent
+        dispatch({
+          type: 'SET_TOTAL_ITEMS',
+          payload: data.paginatedExpenseTrackers.pageInfo.totalCount,
+        });
       }
     }
   }, [data, paginationModel.page]);
@@ -372,15 +483,25 @@ function Expense() {
     [data]
   );
 
-  // Memoize the filter component
+  // Memoize the filter component with pending indicator
   const filterComponent = useMemo(
     () => (
       <Box sx={{ width: '100%' }}>
-        <ExpenseFilter currentFilters={filters} onApplyFilter={handleApplyFilter} onResetFilters={handleResetFilters} />
-        {hasActiveFilters && !isMobile && <ActiveFilterChips filters={filters} onDeleteFilter={handleDeleteFilter} />}
+        <ExpenseFilter
+          currentFilters={filters}
+          onApplyFilter={(newFilters) => {
+            // Check if this is a dropdown change vs text input
+            const isDropdownChange = 'expense_period' in newFilters || 'status' in newFilters;
+            handleApplyFilter(newFilters, isDropdownChange);
+          }}
+          onResetFilters={handleResetFilters}
+        />
+        {hasActiveFilters && !isMobile && (
+          <ActiveFilterChips filters={filters} onDeleteFilter={handleDeleteFilter} isPending={filtersPending} />
+        )}
       </Box>
     ),
-    [filters, hasActiveFilters, isMobile, handleApplyFilter, handleResetFilters, handleDeleteFilter]
+    [filters, hasActiveFilters, isMobile, handleApplyFilter, handleResetFilters, handleDeleteFilter, filtersPending]
   );
 
   // Handle loading and error states
@@ -405,7 +526,7 @@ function Expense() {
       {/* Snackbar Alert */}
       <CustomSnackbar open={snackbar.open} message={snackbar.message} severity={snackbar.severity} onClose={closeSnackbar} />
 
-      {loading ? (
+      {loading && !data ? (
         <LoadingSpinner />
       ) : (
         <ServerDataTable
@@ -414,7 +535,7 @@ function Expense() {
           totalCount={totalItems}
           paginationModel={paginationModel}
           onPaginationModelChange={handlePaginationModelChange}
-          loading={loading}
+          loading={false} // We're handling loading state separately now
           filterComponent={filterComponent}
         />
       )}
