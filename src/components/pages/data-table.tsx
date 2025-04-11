@@ -112,6 +112,10 @@ const DataTable: FC<DataTableProps> = ({ rows, columns, paginationModel = { page
         '& .MuiDataGrid-toolbarContainer .MuiButton-text': {
           color: `${colors.grey[100]} !important`,
         },
+        '& .MuiDataGrid-main': {
+          borderRight: `1px solid ${colors.grey[900]}`,
+          borderLeft: `1px solid ${colors.grey[900]}`,
+        },
       }}
     >
       {/* paginationMode -> need to check and tweaks */}

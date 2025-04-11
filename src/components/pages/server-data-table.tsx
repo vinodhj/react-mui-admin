@@ -76,8 +76,15 @@ const createStyles = (colors: any, colorMode: string) => ({
   '& .MuiCheckbox-root': {
     color: `${colors.greenAccent[200]} !important`,
   },
+  '& .MuiDataGrid-toolbarContainer': {
+    border: `1px solid ${colors.grey[900]}`,
+  },
   '& .MuiDataGrid-toolbarContainer .MuiButton-text': {
     color: `${colors.grey[100]} !important`,
+  },
+  '& .MuiDataGrid-main': {
+    borderRight: `1px solid ${colors.grey[900]}`,
+    borderLeft: `1px solid ${colors.grey[900]}`,
   },
 });
 
