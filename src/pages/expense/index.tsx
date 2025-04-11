@@ -11,7 +11,6 @@ import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import LoadingSpinner from '../../components/common/loading-spinner';
 import ErrorAlert from '../../components/common/error-alert';
-import InfoAlert from '../../components/common/info-alert';
 import { formatDate } from '../../utils/date-utils';
 import Box from '@mui/material/Box';
 import PageHeader from '../../components/pages/page-header';
