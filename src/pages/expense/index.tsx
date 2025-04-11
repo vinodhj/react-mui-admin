@@ -1,4 +1,4 @@
-import { Chip, CircularProgress, Fade, Stack, useMediaQuery, useTheme } from '@mui/material';
+import { useMediaQuery, useTheme } from '@mui/material';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import Link from '@mui/material/Link';
 import { tokens } from '../../theme/main-theme';
@@ -22,8 +22,9 @@ import ServerDataTable from '../../components/pages/server-data-table';
 import DeleteConfirmationDialog from '../../components/pages/delete-confirmation-dialog';
 import { useDeleteExpense } from '../../hooks/use-delete-expense';
 import ExpenseFilter, { ExpenseFilterValues } from '../../components/pages/expense-filter';
-import { useDebounce } from '../../hooks/use-debounce';
 import { useTypedLocalStorage } from '../../hooks/use-typed-local-storage.ts';
+import { useSmartDebounce } from './helper/use-smart-debounce.ts';
+import ActiveFilterChips from './helper/active-filter-chips.tsx';
 
 // Define state reducer for pagination and filter state management
 type StateAction =
@@ -84,93 +85,6 @@ function stateReducer(state: State, action: StateAction): State {
       return state;
   }
 }
-
-// Custom hook for different debounce times based on filter type
-function useSmartDebounce(filters: ExpenseFilterValues) {
-  // Use a shorter delay for dropdown selections
-  const discreteFilters = useMemo(
-    () => ({
-      expense_period: filters.expense_period,
-      status: filters.status,
-    }),
-    [filters.expense_period, filters.status]
-  );
-
-  // Use a longer delay for numeric inputs that users might type continuously
-  const rangeFilters = useMemo(
-    () => ({
-      min_amount: filters.min_amount,
-      max_amount: filters.max_amount,
-    }),
-    [filters.min_amount, filters.max_amount]
-  );
-
-  // Debounce with different delays
-  const debouncedDiscreteFilters = useDebounce(discreteFilters, 200);
-  const debouncedRangeFilters = useDebounce(rangeFilters, 600);
-
-  // Combine debounced filters
-  return useMemo(
-    () => ({
-      ...debouncedDiscreteFilters,
-      ...debouncedRangeFilters,
-    }),
-    [debouncedDiscreteFilters, debouncedRangeFilters]
-  );
-}
-
-// Separate reusable components
-const ActiveFilterChips = ({
-  filters,
-  onDeleteFilter,
-  isPending,
-}: {
-  filters: ExpenseFilterValues;
-  onDeleteFilter: (key: keyof ExpenseFilterValues) => void;
-  isPending: boolean;
-}) => {
-  return (
-    <Stack direction="row" spacing={1} sx={{ mt: 1, flexWrap: 'wrap', gap: 1 }}>
-      {filters.expense_period && (
-        <Chip
-          label={`Period: ${filters.expense_period}`}
-          size="small"
-          onDelete={() => onDeleteFilter('expense_period')}
-          sx={isPending ? { opacity: 0.7 } : {}}
-        />
-      )}
-      {filters.min_amount && (
-        <Chip
-          label={`Min: $${filters.min_amount}`}
-          size="small"
-          onDelete={() => onDeleteFilter('min_amount')}
-          sx={isPending ? { opacity: 0.7 } : {}}
-        />
-      )}
-      {filters.max_amount && (
-        <Chip
-          label={`Max: $${filters.max_amount}`}
-          size="small"
-          onDelete={() => onDeleteFilter('max_amount')}
-          sx={isPending ? { opacity: 0.7 } : {}}
-        />
-      )}
-      {filters.status && filters.status.length > 0 && (
-        <Chip
-          label={`Status: ${filters.status.join(', ')}`}
-          size="small"
-          onDelete={() => onDeleteFilter('status')}
-          sx={isPending ? { opacity: 0.7 } : {}}
-        />
-      )}
-      {isPending && (
-        <Fade in={isPending}>
-          <CircularProgress size={20} thickness={5} sx={{ ml: 1 }} />
-        </Fade>
-      )}
-    </Stack>
-  );
-};
 
 function Expense() {
   const navigate = useNavigate();
@@ -504,14 +418,6 @@ function Expense() {
     [filters, hasActiveFilters, isMobile, handleApplyFilter, handleResetFilters, handleDeleteFilter, filtersPending]
   );
 
-  // Handle loading and error states
-  if (loading) return <LoadingSpinner />;
-  if (error) return <ErrorAlert message={`Error loading data: ${error.message}`} />;
-  if (deleteError) return <ErrorAlert message={`Error deleting data: ${deleteError.message}`} />;
-  if (!data?.paginatedExpenseTrackers.edges) {
-    return <InfoAlert message="No data available" />;
-  }
-
   return (
     <Box m="20px" sx={{ p: '0 15px' }}>
       <Box display="flex" flexWrap="wrap" justifyContent="space-between" alignItems="center" mb={2}>
@@ -525,6 +431,10 @@ function Expense() {
 
       {/* Snackbar Alert */}
       <CustomSnackbar open={snackbar.open} message={snackbar.message} severity={snackbar.severity} onClose={closeSnackbar} />
+
+      {/* Error displays */}
+      {error && <ErrorAlert message={`Error loading data: ${error.message}`} />}
+      {deleteError && <ErrorAlert message={`Error deleting data: ${deleteError.message}`} />}
 
       {loading && !data ? (
         <LoadingSpinner />
