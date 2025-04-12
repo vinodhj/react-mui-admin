@@ -276,7 +276,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onSubmit, loading, initialVal
     <>
       {/* Error displays */}
       {dataErrors.map((error, index) => (
-        <ErrorAlert key={`${error?.slice(0, 2)}-${index}`} message={error as string} />
+        <ErrorAlert key={`${error?.slice(0, 4)}-${index}`} message={error as string} />
       ))}
       <form onSubmit={formik.handleSubmit}>
         <Typography variant="h3" gutterBottom sx={{ p: 2, borderBottom: `1px solid ${theme.palette.divider}` }}>
@@ -314,7 +314,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onSubmit, loading, initialVal
               margin="normal"
               name="amount"
               id="amount"
-              placeholder="0.00"
+              placeholder="Enter Expense Amount"
               value={formik.values.amount}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
@@ -327,7 +327,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onSubmit, loading, initialVal
                 input: {
                   inputProps: {
                     min: 0,
-                    step: '1',
+                    step: '0.01',
                   },
                 },
               }}
