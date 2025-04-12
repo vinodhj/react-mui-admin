@@ -8,22 +8,49 @@ import * as yup from 'yup';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import { validateExpensePeriod } from '../../../components/pages/expense-filter';
-import { ExpenseStatus, useExpenseFynixesQuery, useExpenseModesQuery, useExpenseTagsQuery } from '../../../graphql/graphql-generated';
+import {
+  Category,
+  ExpenseStatus,
+  useExpenseFynixesQuery,
+  useExpenseModesQuery,
+  useExpenseTagsQuery,
+} from '../../../graphql/graphql-generated';
 import Grid from '@mui/material/Grid2';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
-import Select from '@mui/material/Select';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
-import { useEffect, useMemo, useState } from 'react';
+import { ReactNode, useMemo } from 'react';
 import ErrorAlert from '../../../components/common/error-alert';
 import { useSession } from '../../../hooks/use-session';
+
+interface ExpenseFormValues {
+  id?: string;
+  user_id: string;
+  expense_period: string;
+  amount: number | string;
+  description?: string;
+  item_details?: string;
+  tag_id: string;
+  mode_id: string;
+  fynix_id: string;
+  status: ExpenseStatus | string;
+}
+
+interface ExpenseFormProps {
+  onSubmit: (values: ExpenseFormValues) => Promise<void>;
+  loading: boolean;
+  initialValues?: ExpenseFormValues;
+  submitButtonText?: string;
+  title?: string;
+}
 
 const validationSchema = yup.object({
   expense_period: yup
     .string()
     .required('Expense period is required')
     .test('expense-period', 'Invalid expense period', (value) => {
-      const error = validateExpensePeriod(value);
+      const error = validateExpensePeriod(value ?? '');
       return error === '';
     }),
   amount: yup.number().required('Amount is required').positive('Amount must be positive'),
@@ -35,72 +62,134 @@ const validationSchema = yup.object({
   item_details: yup.string(),
 });
 
-interface ExpenseFormProps {
-  onSubmit: (values: any) => Promise<void>;
-  loading: boolean;
-  initialValues?: {
-    id?: string;
-    user_id: string;
-    expense_period: string;
-    amount: number;
-    description?: string;
-    item_details?: string;
-    tag_id: string;
-    mode_id: string;
-    fynix_id: string;
-    status: ExpenseStatus;
-  };
-  submitButtonText?: string;
-  title?: string;
-}
+const useExpenseFormData = () => {
+  const { data: tagsData, loading: tagsLoading, error: tagsError } = useExpenseTagsQuery();
+  const { data: modesData, loading: modesLoading, error: modesError } = useExpenseModesQuery();
+  const { data: fynixData, loading: fynixLoading, error: fynixError } = useExpenseFynixesQuery();
 
-const ExpenseForm: React.FC<ExpenseFormProps> = ({
-  onSubmit,
-  loading,
-  initialValues = {
-    id: '',
-    user_id: '',
-    expense_period: '',
-    amount: '',
-    description: '',
-    item_details: '',
-    tag_id: '',
-    mode_id: '',
-    fynix_id: '',
-    status: '',
+  const isLoading = tagsLoading || modesLoading || fynixLoading;
+  // Consolidate errors
+  const errors = useMemo(() => {
+    return [
+      tagsError && `Tags error: ${tagsError.message}`,
+      modesError && `Modes error: ${modesError.message}`,
+      fynixError && `Fynix error: ${fynixError.message}`,
+    ].filter(Boolean);
+  }, [tagsError, modesError, fynixError]);
+
+  const optionsLoaded = !isLoading && tagsData && modesData && fynixData;
+
+  return {
+    tagsData: tagsData?.expenseTags || [],
+    modesData: modesData?.expenseModes || [],
+    fynixData: fynixData?.expenseFynixes || [],
+    isLoading,
+    errors,
+    optionsLoaded,
+  };
+};
+
+// Form select component to reduce duplication
+const FormSelect = ({
+  name,
+  label,
+  value,
+  onChange,
+  onBlur,
+  error,
+  helperText,
+  options,
+  disabled,
+  selectStyles,
+  inputStyles,
+  menuProps,
+  colors,
+}: {
+  name: string;
+  label: string;
+  value: string;
+  onChange: (event: SelectChangeEvent<string>, _child: ReactNode) => void;
+  onBlur: (e: React.FocusEvent<any>) => void;
+  error: boolean;
+  helperText: string | undefined;
+  options: any[];
+  disabled?: boolean;
+  selectStyles: SxProps<Theme>;
+  inputStyles: SxProps<Theme>;
+  menuProps: any;
+  colors: any;
+}) => (
+  <FormControl fullWidth margin="normal" error={error} sx={{ ...inputStyles }}>
+    <InputLabel id={`${name}-select-label`} sx={{ color: colors.grey[50] }}>
+      {label}
+    </InputLabel>
+    <Select
+      labelId={`${name}-select-label`}
+      id={name}
+      name={name}
+      value={value}
+      onChange={onChange}
+      onBlur={onBlur}
+      label={label}
+      disabled={disabled}
+      sx={selectStyles}
+      MenuProps={menuProps}
+    >
+      {options.map((option) => (
+        <MenuItem key={option.id} value={option.id}>
+          {option.name}
+        </MenuItem>
+      ))}
+    </Select>
+    {error && helperText && (
+      <Typography color="error" variant="caption">
+        {helperText}
+      </Typography>
+    )}
+  </FormControl>
+);
+
+const getInputStyles = (colors: any): SxProps<Theme> => ({
+  '& .MuiFormLabel-root': {
+    color: colors.grey[50],
   },
-  submitButtonText,
-  title,
-}) => {
+  '& .MuiFormLabel-root.Mui-focused': {
+    color: colors.greenAccent[400],
+  },
+  '& .MuiOutlinedInput-root': {
+    color: colors.grey[50],
+  },
+  '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+    borderColor: colors.grey[100],
+  },
+});
+
+const getInitialValues = (): ExpenseFormValues => ({
+  id: '',
+  user_id: '',
+  expense_period: '',
+  amount: '',
+  description: '',
+  item_details: '',
+  tag_id: '',
+  mode_id: '',
+  fynix_id: '',
+  status: '',
+});
+
+const ExpenseForm: React.FC<ExpenseFormProps> = ({ onSubmit, loading, initialValues = getInitialValues(), submitButtonText, title }) => {
   const theme = useTheme();
   const mode = theme.palette.mode;
   const colors = tokens(mode);
   const { sessionAdmin } = useSession();
 
-  // Define common input styles once as a memoized object
-  const inputStyles = useMemo(
-    (): SxProps<Theme> => ({
-      '& .MuiFormLabel-root': {
-        color: colors.grey[50],
-      },
-      '& .MuiFormLabel-root.Mui-focused': {
-        color: colors.greenAccent[400],
-      },
-      '& .MuiOutlinedInput-root': {
-        color: colors.grey[50],
-      },
-      '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-        borderColor: colors.grey[100],
-      },
-    }),
-    [colors]
-  );
+  // Define common input styles
+  const inputStyles = getInputStyles(colors);
 
   const selectMenuProps = useMemo(
     () => ({
       PaperProps: {
         sx: {
-          backgroundColor: '#70d8bd', // Your custom background color
           '& .MuiMenuItem-root': {
             '&:hover': {
               backgroundColor: colors.greenAccent[900],
@@ -123,35 +212,24 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     [colors]
   );
 
-  const [optionsLoaded, setOptionsLoaded] = useState(false);
-
-  // Fetch data for dropdowns
-  const { data: tagsData, loading: tagsLoading, error: tagsError } = useExpenseTagsQuery();
-  const { data: modesData, loading: modesLoading, error: modesError } = useExpenseModesQuery();
-  const { data: fynixData, loading: fynixLoading, error: fynixError } = useExpenseFynixesQuery();
-
-  // Wait for all options to load before initializing the form
-  useEffect(() => {
-    if (!tagsLoading && !modesLoading && !fynixLoading && tagsData && modesData && fynixData) {
-      setOptionsLoaded(true);
-    }
-  }, [tagsLoading, modesLoading, fynixLoading, tagsData, modesData, fynixData]);
+  // Use custom hook for data fetching
+  const { tagsData, modesData, fynixData, isLoading: optionsLoading, errors: dataErrors, optionsLoaded } = useExpenseFormData();
 
   const formik = useFormik({
     initialValues: {
       ...initialValues,
-      user_id: sessionAdmin?.adminID,
+      user_id: sessionAdmin?.adminID || initialValues.user_id,
       // Only set select values if they exist in the options
       tag_id:
-        optionsLoaded && initialValues.tag_id && tagsData?.expenseTags?.some((tag: any) => tag.id === initialValues.tag_id)
+        optionsLoaded && initialValues.tag_id && tagsData?.some((tag: Category | null) => tag?.id === initialValues.tag_id)
           ? initialValues.tag_id
           : '',
       mode_id:
-        optionsLoaded && initialValues.mode_id && modesData?.expenseModes?.some((mode: any) => mode.id === initialValues.mode_id)
+        optionsLoaded && initialValues.mode_id && modesData?.some((mode: Category | null) => mode?.id === initialValues.mode_id)
           ? initialValues.mode_id
           : '',
       fynix_id:
-        optionsLoaded && initialValues.fynix_id && fynixData?.expenseFynixes?.some((fynix: any) => fynix.id === initialValues.fynix_id)
+        optionsLoaded && initialValues.fynix_id && fynixData?.some((fynix: Category | null) => fynix?.id === initialValues.fynix_id)
           ? initialValues.fynix_id
           : '',
     },
@@ -162,7 +240,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
         // Ensure amount is a number
         const formattedValues = {
           ...values,
-          amount: parseFloat(values.amount as any),
+          amount: parseFloat(values.amount as string),
         };
 
         // For create, we don't want to send the id field
@@ -192,14 +270,14 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   }
 
   const submitText = initialValues.id ? 'Update' : 'Create';
-  const isLoading = loading || tagsLoading || modesLoading || fynixLoading;
+  const isLoading = loading || optionsLoading;
 
   return (
     <>
       {/* Error displays */}
-      {tagsError && <ErrorAlert message={`Error loading data: ${tagsError.message}`} />}
-      {modesError && <ErrorAlert message={`Error loading data: ${modesError.message}`} />}
-      {fynixError && <ErrorAlert message={`Error loading data: ${fynixError.message}`} />}
+      {dataErrors.map((error, index) => (
+        <ErrorAlert key={`${error?.slice(0, 2)}-${index}`} message={error as string} />
+      ))}
       <form onSubmit={formik.handleSubmit}>
         <Typography variant="h3" gutterBottom sx={{ p: 2, borderBottom: `1px solid ${theme.palette.divider}` }}>
           {title ?? `${initialValues.id ? 'Edit' : 'Create'} Expense`}
@@ -257,101 +335,57 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
           </Grid>
 
           <Grid size={{ xs: 12, md: 6 }}>
-            <FormControl fullWidth margin="normal" error={formik.touched.tag_id && Boolean(formik.errors.tag_id)} sx={{ ...inputStyles }}>
-              <InputLabel id="tag-select-label" sx={{ color: colors.grey[50] }}>
-                Tag
-              </InputLabel>
-              <Select
-                labelId="tag-select-label"
-                id="tag_id"
-                name="tag_id"
-                value={formik.values.tag_id}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                label="Tag"
-                disabled={tagsLoading}
-                sx={selectStyles}
-                MenuProps={selectMenuProps}
-              >
-                {tagsData?.expenseTags?.map((tag: any) => (
-                  <MenuItem key={tag.id} value={tag.id}>
-                    {tag.name}
-                  </MenuItem>
-                ))}
-              </Select>
-              {formik.touched.tag_id && formik.errors.tag_id && (
-                <Typography color="error" variant="caption">
-                  {formik.errors.tag_id}
-                </Typography>
-              )}
-            </FormControl>
+            <FormSelect
+              name="tag_id"
+              label="Tag"
+              value={formik.values.tag_id}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={!!(formik.touched.tag_id && formik.errors.tag_id)}
+              helperText={formik.touched.tag_id ? formik.errors.tag_id : undefined}
+              options={tagsData}
+              disabled={optionsLoading}
+              selectStyles={selectStyles}
+              inputStyles={inputStyles}
+              menuProps={selectMenuProps}
+              colors={colors}
+            />
           </Grid>
 
           <Grid size={{ xs: 12, md: 6 }}>
-            <FormControl fullWidth margin="normal" error={formik.touched.mode_id && Boolean(formik.errors.mode_id)} sx={{ ...inputStyles }}>
-              <InputLabel id="mode-select-label" sx={{ color: colors.grey[50] }}>
-                Payment Mode
-              </InputLabel>
-              <Select
-                labelId="mode-select-label"
-                id="mode_id"
-                name="mode_id"
-                value={formik.values.mode_id}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                label="Payment Mode"
-                disabled={modesLoading}
-                sx={selectStyles}
-                MenuProps={selectMenuProps}
-              >
-                {modesData?.expenseModes?.map((mode: any) => (
-                  <MenuItem key={mode.id} value={mode.id}>
-                    {mode.name}
-                  </MenuItem>
-                ))}
-              </Select>
-              {formik.touched.mode_id && formik.errors.mode_id && (
-                <Typography color="error" variant="caption">
-                  {formik.errors.mode_id}
-                </Typography>
-              )}
-            </FormControl>
+            <FormSelect
+              name="mode_id"
+              label="Payment Mode"
+              value={formik.values.mode_id}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={!!(formik.touched.mode_id && formik.errors.mode_id)}
+              helperText={formik.touched.mode_id ? formik.errors.mode_id : undefined}
+              options={modesData}
+              disabled={optionsLoading}
+              selectStyles={selectStyles}
+              inputStyles={inputStyles}
+              menuProps={selectMenuProps}
+              colors={colors}
+            />
           </Grid>
 
           <Grid size={{ xs: 12, md: 6 }}>
-            <FormControl
-              fullWidth
-              margin="normal"
-              error={formik.touched.fynix_id && Boolean(formik.errors.fynix_id)}
-              sx={{ ...inputStyles }}
-            >
-              <InputLabel id="fynix-select-label" sx={{ color: colors.grey[50] }}>
-                Fynix
-              </InputLabel>
-              <Select
-                labelId="fynix-select-label"
-                id="fynix_id"
-                name="fynix_id"
-                value={formik.values.fynix_id}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                label="Fynix"
-                disabled={fynixLoading}
-                sx={selectStyles}
-                MenuProps={selectMenuProps}
-              >
-                {fynixData?.expenseFynixes?.map((fynix: any) => (
-                  <MenuItem key={fynix.id} value={fynix.id}>
-                    {fynix.name}
-                  </MenuItem>
-                ))}
-              </Select>
-              {formik.touched.fynix_id && formik.errors.fynix_id && (
-                <Typography color="error" variant="caption">
-                  {formik.errors.fynix_id}
-                </Typography>
-              )}
-            </FormControl>
+            <FormSelect
+              name="fynix_id"
+              label="Fynix"
+              value={formik.values.fynix_id}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={!!(formik.touched.fynix_id && formik.errors.fynix_id)}
+              helperText={formik.touched.fynix_id ? formik.errors.fynix_id : undefined}
+              options={fynixData}
+              disabled={optionsLoading}
+              selectStyles={selectStyles}
+              inputStyles={inputStyles}
+              menuProps={selectMenuProps}
+              colors={colors}
+            />
           </Grid>
 
           <Grid size={{ xs: 12, md: 6 }}>

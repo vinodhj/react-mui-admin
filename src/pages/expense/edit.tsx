@@ -2,15 +2,16 @@ import Box from '@mui/material/Box';
 import PageHeader from '../../components/pages/page-header';
 import CustomSnackbar from '../../components/common/custom-snackbar';
 import Container from '@mui/material/Container';
-import { useTheme } from '@mui/material';
+import { CircularProgress, useTheme } from '@mui/material';
 import { SearchTokens } from '../../theme/main-theme';
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { useEditExpenseTrackerByIdQuery, useUpdateExpenseTrackerMutation } from '../../graphql/graphql-generated';
 import { useSnackbar } from '../../hooks/use-snackbar';
-import ExpenseForm from './helper/expense-form';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import LoadingSpinner from '../../components/common/loading-spinner';
 import { useSession } from '../../hooks/use-session';
+
+const LazyExpenseForm = lazy(() => import('./helper/expense-form'));
 
 function UpdateExpense() {
   const { id } = useParams<{ id: string }>();
@@ -37,12 +38,10 @@ function UpdateExpense() {
 
   // Handle API response
   useEffect(() => {
-    if (error || updateError) {
-      if (error?.message) {
-        showSnackbar(error.message, 'error');
-      } else if (updateError?.message) {
-        showSnackbar(updateError.message, 'error');
-      }
+    if (error?.message) {
+      showSnackbar(error.message, 'error');
+    } else if (updateError?.message) {
+      showSnackbar(updateError.message, 'error');
     }
   }, [error, updateError, showSnackbar]); // Runs only when `error` changes
 
@@ -112,7 +111,15 @@ function UpdateExpense() {
         maxWidth="md"
         sx={{ backgroundColor: searchTokens.primary[200], p: 2, borderRadius: 2, border: `1px solid ${searchTokens.primary[400]}` }}
       >
-        <ExpenseForm onSubmit={handleSubmit} loading={loading ?? updateLoading} initialValues={initialValues} />
+        <Suspense
+          fallback={
+            <Box display="flex" justifyContent="center" p={3}>
+              <CircularProgress />
+            </Box>
+          }
+        >
+          <LazyExpenseForm onSubmit={handleSubmit} loading={updateLoading} initialValues={initialValues} />
+        </Suspense>
       </Container>
     </Box>
   );
