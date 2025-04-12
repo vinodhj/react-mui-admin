@@ -1,0 +1,15 @@
+query EditExpenseTrackerById($session_id: ID!, $id: ID!) {
+  expenseTrackerById(id: $id, session_id: $session_id) {
+    __typename
+    id
+    user_id
+    expense_period
+    amount
+    description
+    item_details
+    tag_id
+    mode_id
+    fynix_id
+    status
+  }
+}
