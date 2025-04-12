@@ -717,6 +717,34 @@ export type AdminPaginatedExpenseQuery = {
   };
 };
 
+export type DetailsExpenseTrackerByIdQueryVariables = Exact<{
+  session_id: Scalars['ID']['input'];
+  id: Scalars['ID']['input'];
+}>;
+
+export type DetailsExpenseTrackerByIdQuery = {
+  __typename?: 'Query';
+  expenseTrackerById?: {
+    __typename: 'ExpenseTracker';
+    id: string;
+    user_id: string;
+    expense_period: string;
+    amount: number;
+    description?: string | null;
+    item_details?: string | null;
+    tag_id: string;
+    mode_id: string;
+    fynix_id: string;
+    status: ExpenseStatus;
+    created_at: string;
+    updated_at: string;
+    tag: { __typename: 'Category'; name: string };
+    mode: { __typename: 'Category'; name: string };
+    fynix: { __typename: 'Category'; name: string };
+    user: { __typename: 'User'; id: string; name: string };
+  } | null;
+};
+
 export type EditExpenseTrackerByIdQueryVariables = Exact<{
   session_id: Scalars['ID']['input'];
   id: Scalars['ID']['input'];
@@ -1486,6 +1514,95 @@ export type AdminPaginatedExpenseQueryHookResult = ReturnType<typeof useAdminPag
 export type AdminPaginatedExpenseLazyQueryHookResult = ReturnType<typeof useAdminPaginatedExpenseLazyQuery>;
 export type AdminPaginatedExpenseSuspenseQueryHookResult = ReturnType<typeof useAdminPaginatedExpenseSuspenseQuery>;
 export type AdminPaginatedExpenseQueryResult = Apollo.QueryResult<AdminPaginatedExpenseQuery, AdminPaginatedExpenseQueryVariables>;
+export const DetailsExpenseTrackerByIdDocument = gql`
+  query DetailsExpenseTrackerById($session_id: ID!, $id: ID!) {
+    expenseTrackerById(id: $id, session_id: $session_id) {
+      __typename
+      id
+      user_id
+      expense_period
+      amount
+      description
+      item_details
+      tag_id
+      mode_id
+      fynix_id
+      status
+      tag {
+        __typename
+        name
+      }
+      mode {
+        __typename
+        name
+      }
+      fynix {
+        __typename
+        name
+      }
+      user {
+        __typename
+        id
+        name
+      }
+      created_at
+      updated_at
+    }
+  }
+`;
+
+/**
+ * __useDetailsExpenseTrackerByIdQuery__
+ *
+ * To run a query within a React component, call `useDetailsExpenseTrackerByIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useDetailsExpenseTrackerByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useDetailsExpenseTrackerByIdQuery({
+ *   variables: {
+ *      session_id: // value for 'session_id'
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useDetailsExpenseTrackerByIdQuery(
+  baseOptions: Apollo.QueryHookOptions<DetailsExpenseTrackerByIdQuery, DetailsExpenseTrackerByIdQueryVariables> &
+    ({ variables: DetailsExpenseTrackerByIdQueryVariables; skip?: boolean } | { skip: boolean })
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<DetailsExpenseTrackerByIdQuery, DetailsExpenseTrackerByIdQueryVariables>(
+    DetailsExpenseTrackerByIdDocument,
+    options
+  );
+}
+export function useDetailsExpenseTrackerByIdLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<DetailsExpenseTrackerByIdQuery, DetailsExpenseTrackerByIdQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<DetailsExpenseTrackerByIdQuery, DetailsExpenseTrackerByIdQueryVariables>(
+    DetailsExpenseTrackerByIdDocument,
+    options
+  );
+}
+export function useDetailsExpenseTrackerByIdSuspenseQuery(
+  baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<DetailsExpenseTrackerByIdQuery, DetailsExpenseTrackerByIdQueryVariables>
+) {
+  const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<DetailsExpenseTrackerByIdQuery, DetailsExpenseTrackerByIdQueryVariables>(
+    DetailsExpenseTrackerByIdDocument,
+    options
+  );
+}
+export type DetailsExpenseTrackerByIdQueryHookResult = ReturnType<typeof useDetailsExpenseTrackerByIdQuery>;
+export type DetailsExpenseTrackerByIdLazyQueryHookResult = ReturnType<typeof useDetailsExpenseTrackerByIdLazyQuery>;
+export type DetailsExpenseTrackerByIdSuspenseQueryHookResult = ReturnType<typeof useDetailsExpenseTrackerByIdSuspenseQuery>;
+export type DetailsExpenseTrackerByIdQueryResult = Apollo.QueryResult<
+  DetailsExpenseTrackerByIdQuery,
+  DetailsExpenseTrackerByIdQueryVariables
+>;
 export const EditExpenseTrackerByIdDocument = gql`
   query EditExpenseTrackerById($session_id: ID!, $id: ID!) {
     expenseTrackerById(id: $id, session_id: $session_id) {
