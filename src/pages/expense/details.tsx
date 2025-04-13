@@ -14,10 +14,48 @@ import NewUserButton from '../../components/pages/new-user-button';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import Grid from '@mui/material/Grid2';
-import InfoRow from '../../components/pages/info-row';
 import { useSnackbar } from '../../hooks/use-snackbar';
 import { useDeleteExpense } from '../../hooks/use-delete-expense';
 import { useDetailsExpenseTrackerByIdQuery } from '../../graphql/graphql-generated';
+import { capitalize } from '../category/category-config';
+
+interface InfoFieldProps {
+  label: string;
+  value: string;
+  colors: any;
+}
+
+const InfoField = ({ label, value, colors }: InfoFieldProps) => (
+  <Box sx={{ mb: 2 }}>
+    <Typography variant="body2" color={colors.grey[400]} gutterBottom>
+      {label}
+    </Typography>
+    <Typography variant="body1" sx={{ color: colors.grey[50], fontWeight: 'medium' }}>
+      {value || '-'}
+    </Typography>
+  </Box>
+);
+
+interface SectionTitleProps {
+  title: string;
+  colors: any;
+}
+
+const SectionTitle = ({ title, colors }: SectionTitleProps) => (
+  <Box sx={{ mt: 3, mb: 2 }}>
+    <Typography
+      variant="h5"
+      fontWeight="medium"
+      color={colors.greenAccent[400]}
+      sx={{
+        pb: 1,
+        borderBottom: `1px solid ${colors.greenAccent[700]}`,
+      }}
+    >
+      {title}
+    </Typography>
+  </Box>
+);
 
 function ExpenseDetails() {
   const { id } = useParams<{ id: string }>();
@@ -26,6 +64,7 @@ function ExpenseDetails() {
   const theme = useTheme();
   const mode = theme.palette.mode;
   const colors = tokens(mode);
+  const isDarkMode = mode === 'dark';
   const [openDialog, setOpenDialog] = useState(false);
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -49,14 +88,13 @@ function ExpenseDetails() {
   // Optimize delete expense hook with callbacks
   const handleDeleteSuccess = useCallback(() => {
     setOpenDialog(false);
-    // showSnackbar('Expense deleted successfully!');
     navigate('/expense', {
       state: {
         alertType: 'success',
         alertMessage: 'Expense deleted successfully',
       },
     });
-  }, [showSnackbar]);
+  }, [navigate]);
 
   const handleDeleteError = useCallback(
     (err: Error) => {
@@ -100,6 +138,7 @@ function ExpenseDetails() {
   if (!expenseData) {
     return <ErrorAlert message={`Expense not found with ID: ${id}`} />;
   }
+
   return (
     <Box m="20px" sx={{ p: '0 15px' }}>
       {/* Snackbar Alert */}
@@ -117,73 +156,124 @@ function ExpenseDetails() {
 
         <NewUserButton to={'/expense/create'} label={`+ New Expense`} />
       </Box>
-      <Box sx={{ maxWidth: 800, mx: 'auto', mt: 4, p: 2 }}>
-        {/* User Header */}
-        <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Typography variant="h6" fontWeight="bold">
-            Expense Basic Details
+
+      <Box sx={{ maxWidth: '75%', mx: 'auto', mt: 4 }}>
+        {/* Header with actions */}
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between"
+          sx={{
+            p: 2,
+            borderBottom: `1px solid ${theme.palette.divider}`,
+          }}
+        >
+          <Typography variant="h3" fontWeight="bold">
+            {capitalize(expenseData.fynix.name)} - {capitalize(expenseData.tag.name)} - {capitalize(expenseData.mode.name)}
           </Typography>
           <Box>
-            <Tooltip title="Delete" placement="bottom">
+            <Tooltip title="Delete" placement="top">
               <IconButton
-                size="small"
-                onClick={() => {
-                  setOpenDialog(true);
+                onClick={() => setOpenDialog(true)}
+                sx={{
+                  color: colors.redAccent[400],
+                  '&:hover': {
+                    color: colors.redAccent[300],
+                    backgroundColor: colors.redAccent[900],
+                  },
                 }}
               >
-                <DeleteIcon sx={{ color: colors.redAccent[400], mr: 1 }} />
+                <DeleteIcon />
               </IconButton>
             </Tooltip>
-            <Tooltip title="Edit" placement="bottom">
-              <IconButton size="small" component={RouterLink} to={`/expense/edit/${id}`}>
+            <Tooltip title="Edit" placement="top">
+              <IconButton
+                component={RouterLink}
+                to={`/expense/edit/${id}`}
+                sx={{
+                  color: colors.greenAccent[400],
+                  '&:hover': {
+                    color: colors.greenAccent[300],
+                    backgroundColor: colors.greenAccent[900],
+                  },
+                }}
+              >
                 <EditIcon />
               </IconButton>
             </Tooltip>
           </Box>
         </Box>
 
-        {/* Details Card */}
-        <Card variant="outlined">
-          <CardContent>
-            {/* User Info */}
-            <Grid container spacing={2} mt={1}>
-              <Grid size={{ xs: 12 }} sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <InfoRow label={'Expense ID'} value={isMobile && id.length > 10 ? `${id.substring(0, 10)}...` : id} />
+        {/* Content in grid layout similar to form */}
+        <Card
+          variant="outlined"
+          sx={{
+            backgroundColor: isDarkMode ? colors.primary[400] : 'inherit',
+            // boxShadow: '2px 2px 4px rgba(0, 0, 0, 0.2)',
+            boxShadow: `2px 2px 8px ${colors.primary[400]}`,
+            border: `1px solid ${theme.palette.divider}`,
+          }}
+        >
+          <CardContent sx={{ p: 3 }}>
+            {/* Basic Information Section */}
+            <SectionTitle title="Basic Information" colors={colors} />
+            <Grid container spacing={2}>
+              {id && (
+                <Grid size={{ xs: 12, md: 4 }}>
+                  <InfoField label="Expense ID" value={isMobile && id.length > 10 ? `${id.substring(0, 10)}...` : id} colors={colors} />
+                </Grid>
+              )}
+              <Grid size={{ xs: 12, md: 4 }}>
+                <InfoField label="Expense Period" value={expenseData.expense_period} colors={colors} />
               </Grid>
-              <Grid size={{ xs: 12 }} sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <InfoRow label="Expense Period" value={expenseData.expense_period} />
+              <Grid size={{ xs: 12, md: 4 }}>
+                <InfoField label="Amount" value={expenseData.amount.toString()} colors={colors} />
               </Grid>
-              <Grid size={{ xs: 12 }} sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <InfoRow label="Expense Amount" value={expenseData.amount.toString()} />
-              </Grid>
-              <Grid size={{ xs: 12 }} sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <InfoRow label="Tag" value={expenseData.tag.name} />
-              </Grid>
-              <Grid size={{ xs: 12 }} sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <InfoRow label="Mode" value={expenseData.mode.name} />
-              </Grid>
-              <Grid size={{ xs: 12 }} sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <InfoRow label="Fynix" value={expenseData.fynix.name} />
-              </Grid>
+            </Grid>
 
-              <Grid size={{ xs: 12 }} sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <InfoRow label="Expense Description" value={expenseData.description ? expenseData.description : '-'} />
+            {/* Category Information Section */}
+            <SectionTitle title="Category Information" colors={colors} />
+            <Grid container spacing={2}>
+              <Grid size={{ xs: 12, md: 3 }}>
+                <InfoField label="Tag" value={expenseData.tag.name} colors={colors} />
               </Grid>
-
-              <Grid size={{ xs: 12 }} sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <InfoRow label="Item details" value={expenseData.item_details ? expenseData.item_details : '-'} />
+              <Grid size={{ xs: 12, md: 3 }}>
+                <InfoField label="Payment Mode" value={expenseData.mode.name} colors={colors} />
               </Grid>
+              <Grid size={{ xs: 12, md: 3 }}>
+                <InfoField label="Fynix" value={expenseData.fynix.name} colors={colors} />
+              </Grid>
+              <Grid size={{ xs: 12, md: 3 }}>
+                <InfoField label="Status" value={expenseData.status || '-'} colors={colors} />
+              </Grid>
+            </Grid>
 
-              <Grid size={{ xs: 12 }} sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <InfoRow
+            {/* Description Section */}
+            <SectionTitle title="Expense Details" colors={colors} />
+            <Grid container spacing={2}>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <InfoField label="Description" value={expenseData.description ?? '-'} colors={colors} />
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <InfoField label="Item Details" value={expenseData.item_details ?? '-'} colors={colors} />
+              </Grid>
+            </Grid>
+
+            {/* Metadata Section */}
+            <SectionTitle title="Record Information" colors={colors} />
+            <Grid container spacing={2}>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <InfoField
                   label="Created At"
                   value={isMobile ? formatDate(expenseData.created_at, 'MMM dd, yyyy') : formatDate(expenseData.created_at)}
+                  colors={colors}
                 />
               </Grid>
-              <Grid size={{ xs: 12 }}>
-                <InfoRow
+              <Grid size={{ xs: 12, md: 6 }}>
+                <InfoField
                   label="Updated At"
                   value={isMobile ? formatDate(expenseData.updated_at, 'MMM dd, yyyy') : formatDate(expenseData.updated_at)}
+                  colors={colors}
                 />
               </Grid>
             </Grid>

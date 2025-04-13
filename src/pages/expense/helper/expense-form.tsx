@@ -63,9 +63,30 @@ const validationSchema = yup.object({
 });
 
 const useExpenseFormData = () => {
-  const { data: tagsData, loading: tagsLoading, error: tagsError } = useExpenseTagsQuery();
-  const { data: modesData, loading: modesLoading, error: modesError } = useExpenseModesQuery();
-  const { data: fynixData, loading: fynixLoading, error: fynixError } = useExpenseFynixesQuery();
+  const {
+    data: tagsData,
+    loading: tagsLoading,
+    error: tagsError,
+  } = useExpenseTagsQuery({
+    notifyOnNetworkStatusChange: true,
+    fetchPolicy: 'cache-and-network',
+  });
+  const {
+    data: modesData,
+    loading: modesLoading,
+    error: modesError,
+  } = useExpenseModesQuery({
+    notifyOnNetworkStatusChange: true,
+    fetchPolicy: 'cache-and-network',
+  });
+  const {
+    data: fynixData,
+    loading: fynixLoading,
+    error: fynixError,
+  } = useExpenseFynixesQuery({
+    notifyOnNetworkStatusChange: true,
+    fetchPolicy: 'cache-and-network',
+  });
 
   const isLoading = tagsLoading || modesLoading || fynixLoading;
   // Consolidate errors
