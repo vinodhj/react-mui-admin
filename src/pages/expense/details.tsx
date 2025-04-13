@@ -262,14 +262,17 @@ function ExpenseDetails() {
             {/* Metadata Section */}
             <SectionTitle title="Record Information" colors={colors} />
             <Grid container spacing={2}>
-              <Grid size={{ xs: 12, md: 6 }}>
+              <Grid size={{ xs: 12, md: 4 }}>
+                <InfoField label="Updated By" value={expenseData.user.name || '-'} colors={colors} />
+              </Grid>
+              <Grid size={{ xs: 12, md: 4 }}>
                 <InfoField
                   label="Created At"
                   value={isMobile ? formatDate(expenseData.created_at, 'MMM dd, yyyy') : formatDate(expenseData.created_at)}
                   colors={colors}
                 />
               </Grid>
-              <Grid size={{ xs: 12, md: 6 }}>
+              <Grid size={{ xs: 12, md: 4 }}>
                 <InfoField
                   label="Updated At"
                   value={isMobile ? formatDate(expenseData.updated_at, 'MMM dd, yyyy') : formatDate(expenseData.updated_at)}
