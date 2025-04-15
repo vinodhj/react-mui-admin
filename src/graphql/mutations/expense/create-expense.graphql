@@ -1,4 +1,4 @@
-mutation CreateExpenseTracker($input: CreateExpenseTrackerInput!) {
+mutation createExpenseTracker($input: CreateExpenseTrackerInput!) {
   createExpenseTracker(input: $input) {
     __typename
     success
@@ -6,12 +6,9 @@ mutation CreateExpenseTracker($input: CreateExpenseTrackerInput!) {
       __typename
       id
       user_id
-      expense_period
       amount
+      expense_period
       status
-      tag_id
-      mode_id
-      fynix_id
     }
   }
 }

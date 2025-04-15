@@ -577,6 +577,26 @@ export type CreateCategoryMutation = {
   };
 };
 
+export type CreateExpenseTrackerMutationVariables = Exact<{
+  input: CreateExpenseTrackerInput;
+}>;
+
+export type CreateExpenseTrackerMutation = {
+  __typename?: 'Mutation';
+  createExpenseTracker: {
+    __typename: 'ExpenseTrackerResponse';
+    success: boolean;
+    expenseTracker?: {
+      __typename: 'ExpenseTrackerSuccessResponse';
+      id: string;
+      user_id: string;
+      amount: number;
+      expense_period: string;
+      status: ExpenseStatus;
+    } | null;
+  };
+};
+
 export type DeleteCategoryMutationVariables = Exact<{
   input: DeleteCategoryInput;
 }>;
@@ -599,6 +619,27 @@ export type UpdateCategoryMutation = {
     __typename: 'CategoryResponse';
     success: boolean;
     category?: { __typename: 'CategorySuccessResponse'; id: string; name: string; category_type: CategoryType } | null;
+  };
+};
+
+export type UpdateExpenseTrackerMutationVariables = Exact<{
+  input: UpdateExpenseTrackerInput;
+}>;
+
+export type UpdateExpenseTrackerMutation = {
+  __typename?: 'Mutation';
+  updateExpenseTracker: {
+    __typename: 'ExpenseTrackerResponse';
+    success: boolean;
+    expenseTracker?: {
+      __typename: 'ExpenseTrackerSuccessResponse';
+      id: string;
+      user_id: string;
+      amount: number;
+      expense_period: string;
+      status: ExpenseStatus;
+      description?: string | null;
+    } | null;
   };
 };
 
@@ -676,27 +717,54 @@ export type AdminPaginatedExpenseQuery = {
   };
 };
 
-export type CreateExpenseTrackerMutationVariables = Exact<{
-  input: CreateExpenseTrackerInput;
+export type DetailsExpenseTrackerByIdQueryVariables = Exact<{
+  session_id: Scalars['ID']['input'];
+  id: Scalars['ID']['input'];
 }>;
 
-export type CreateExpenseTrackerMutation = {
-  __typename?: 'Mutation';
-  createExpenseTracker: {
-    __typename: 'ExpenseTrackerResponse';
-    success: boolean;
-    expenseTracker?: {
-      __typename: 'ExpenseTrackerSuccessResponse';
-      id: string;
-      user_id: string;
-      expense_period: string;
-      amount: number;
-      status: ExpenseStatus;
-      tag_id: string;
-      mode_id: string;
-      fynix_id: string;
-    } | null;
-  };
+export type DetailsExpenseTrackerByIdQuery = {
+  __typename?: 'Query';
+  expenseTrackerById?: {
+    __typename: 'ExpenseTracker';
+    id: string;
+    user_id: string;
+    expense_period: string;
+    amount: number;
+    description?: string | null;
+    item_details?: string | null;
+    tag_id: string;
+    mode_id: string;
+    fynix_id: string;
+    status: ExpenseStatus;
+    created_at: string;
+    updated_at: string;
+    tag: { __typename: 'Category'; name: string };
+    mode: { __typename: 'Category'; name: string };
+    fynix: { __typename: 'Category'; name: string };
+    user: { __typename: 'User'; id: string; name: string };
+  } | null;
+};
+
+export type EditExpenseTrackerByIdQueryVariables = Exact<{
+  session_id: Scalars['ID']['input'];
+  id: Scalars['ID']['input'];
+}>;
+
+export type EditExpenseTrackerByIdQuery = {
+  __typename?: 'Query';
+  expenseTrackerById?: {
+    __typename: 'ExpenseTracker';
+    id: string;
+    user_id: string;
+    expense_period: string;
+    amount: number;
+    description?: string | null;
+    item_details?: string | null;
+    tag_id: string;
+    mode_id: string;
+    fynix_id: string;
+    status: ExpenseStatus;
+  } | null;
 };
 
 export type ExpenseFynixesQueryVariables = Exact<{
@@ -1028,6 +1096,53 @@ export function useCreateCategoryMutation(
 export type CreateCategoryMutationHookResult = ReturnType<typeof useCreateCategoryMutation>;
 export type CreateCategoryMutationResult = Apollo.MutationResult<CreateCategoryMutation>;
 export type CreateCategoryMutationOptions = Apollo.BaseMutationOptions<CreateCategoryMutation, CreateCategoryMutationVariables>;
+export const CreateExpenseTrackerDocument = gql`
+  mutation createExpenseTracker($input: CreateExpenseTrackerInput!) {
+    createExpenseTracker(input: $input) {
+      __typename
+      success
+      expenseTracker {
+        __typename
+        id
+        user_id
+        amount
+        expense_period
+        status
+      }
+    }
+  }
+`;
+export type CreateExpenseTrackerMutationFn = Apollo.MutationFunction<CreateExpenseTrackerMutation, CreateExpenseTrackerMutationVariables>;
+
+/**
+ * __useCreateExpenseTrackerMutation__
+ *
+ * To run a mutation, you first call `useCreateExpenseTrackerMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateExpenseTrackerMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createExpenseTrackerMutation, { data, loading, error }] = useCreateExpenseTrackerMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateExpenseTrackerMutation(
+  baseOptions?: Apollo.MutationHookOptions<CreateExpenseTrackerMutation, CreateExpenseTrackerMutationVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<CreateExpenseTrackerMutation, CreateExpenseTrackerMutationVariables>(CreateExpenseTrackerDocument, options);
+}
+export type CreateExpenseTrackerMutationHookResult = ReturnType<typeof useCreateExpenseTrackerMutation>;
+export type CreateExpenseTrackerMutationResult = Apollo.MutationResult<CreateExpenseTrackerMutation>;
+export type CreateExpenseTrackerMutationOptions = Apollo.BaseMutationOptions<
+  CreateExpenseTrackerMutation,
+  CreateExpenseTrackerMutationVariables
+>;
 export const DeleteCategoryDocument = gql`
   mutation DeleteCategory($input: DeleteCategoryInput!) {
     __typename
@@ -1141,6 +1256,54 @@ export function useUpdateCategoryMutation(
 export type UpdateCategoryMutationHookResult = ReturnType<typeof useUpdateCategoryMutation>;
 export type UpdateCategoryMutationResult = Apollo.MutationResult<UpdateCategoryMutation>;
 export type UpdateCategoryMutationOptions = Apollo.BaseMutationOptions<UpdateCategoryMutation, UpdateCategoryMutationVariables>;
+export const UpdateExpenseTrackerDocument = gql`
+  mutation UpdateExpenseTracker($input: UpdateExpenseTrackerInput!) {
+    updateExpenseTracker(input: $input) {
+      __typename
+      success
+      expenseTracker {
+        __typename
+        id
+        user_id
+        amount
+        expense_period
+        status
+        description
+      }
+    }
+  }
+`;
+export type UpdateExpenseTrackerMutationFn = Apollo.MutationFunction<UpdateExpenseTrackerMutation, UpdateExpenseTrackerMutationVariables>;
+
+/**
+ * __useUpdateExpenseTrackerMutation__
+ *
+ * To run a mutation, you first call `useUpdateExpenseTrackerMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateExpenseTrackerMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateExpenseTrackerMutation, { data, loading, error }] = useUpdateExpenseTrackerMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateExpenseTrackerMutation(
+  baseOptions?: Apollo.MutationHookOptions<UpdateExpenseTrackerMutation, UpdateExpenseTrackerMutationVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<UpdateExpenseTrackerMutation, UpdateExpenseTrackerMutationVariables>(UpdateExpenseTrackerDocument, options);
+}
+export type UpdateExpenseTrackerMutationHookResult = ReturnType<typeof useUpdateExpenseTrackerMutation>;
+export type UpdateExpenseTrackerMutationResult = Apollo.MutationResult<UpdateExpenseTrackerMutation>;
+export type UpdateExpenseTrackerMutationOptions = Apollo.BaseMutationOptions<
+  UpdateExpenseTrackerMutation,
+  UpdateExpenseTrackerMutationVariables
+>;
 export const LogOutDocument = gql`
   mutation LogOut {
     logout {
@@ -1351,56 +1514,156 @@ export type AdminPaginatedExpenseQueryHookResult = ReturnType<typeof useAdminPag
 export type AdminPaginatedExpenseLazyQueryHookResult = ReturnType<typeof useAdminPaginatedExpenseLazyQuery>;
 export type AdminPaginatedExpenseSuspenseQueryHookResult = ReturnType<typeof useAdminPaginatedExpenseSuspenseQuery>;
 export type AdminPaginatedExpenseQueryResult = Apollo.QueryResult<AdminPaginatedExpenseQuery, AdminPaginatedExpenseQueryVariables>;
-export const CreateExpenseTrackerDocument = gql`
-  mutation CreateExpenseTracker($input: CreateExpenseTrackerInput!) {
-    createExpenseTracker(input: $input) {
+export const DetailsExpenseTrackerByIdDocument = gql`
+  query DetailsExpenseTrackerById($session_id: ID!, $id: ID!) {
+    expenseTrackerById(id: $id, session_id: $session_id) {
       __typename
-      success
-      expenseTracker {
+      id
+      user_id
+      expense_period
+      amount
+      description
+      item_details
+      tag_id
+      mode_id
+      fynix_id
+      status
+      tag {
+        __typename
+        name
+      }
+      mode {
+        __typename
+        name
+      }
+      fynix {
+        __typename
+        name
+      }
+      user {
         __typename
         id
-        user_id
-        expense_period
-        amount
-        status
-        tag_id
-        mode_id
-        fynix_id
+        name
       }
+      created_at
+      updated_at
     }
   }
 `;
-export type CreateExpenseTrackerMutationFn = Apollo.MutationFunction<CreateExpenseTrackerMutation, CreateExpenseTrackerMutationVariables>;
 
 /**
- * __useCreateExpenseTrackerMutation__
+ * __useDetailsExpenseTrackerByIdQuery__
  *
- * To run a mutation, you first call `useCreateExpenseTrackerMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateExpenseTrackerMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
+ * To run a query within a React component, call `useDetailsExpenseTrackerByIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useDetailsExpenseTrackerByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
  *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const [createExpenseTrackerMutation, { data, loading, error }] = useCreateExpenseTrackerMutation({
+ * const { data, loading, error } = useDetailsExpenseTrackerByIdQuery({
  *   variables: {
- *      input: // value for 'input'
+ *      session_id: // value for 'session_id'
+ *      id: // value for 'id'
  *   },
  * });
  */
-export function useCreateExpenseTrackerMutation(
-  baseOptions?: Apollo.MutationHookOptions<CreateExpenseTrackerMutation, CreateExpenseTrackerMutationVariables>
+export function useDetailsExpenseTrackerByIdQuery(
+  baseOptions: Apollo.QueryHookOptions<DetailsExpenseTrackerByIdQuery, DetailsExpenseTrackerByIdQueryVariables> &
+    ({ variables: DetailsExpenseTrackerByIdQueryVariables; skip?: boolean } | { skip: boolean })
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<CreateExpenseTrackerMutation, CreateExpenseTrackerMutationVariables>(CreateExpenseTrackerDocument, options);
+  return Apollo.useQuery<DetailsExpenseTrackerByIdQuery, DetailsExpenseTrackerByIdQueryVariables>(
+    DetailsExpenseTrackerByIdDocument,
+    options
+  );
 }
-export type CreateExpenseTrackerMutationHookResult = ReturnType<typeof useCreateExpenseTrackerMutation>;
-export type CreateExpenseTrackerMutationResult = Apollo.MutationResult<CreateExpenseTrackerMutation>;
-export type CreateExpenseTrackerMutationOptions = Apollo.BaseMutationOptions<
-  CreateExpenseTrackerMutation,
-  CreateExpenseTrackerMutationVariables
+export function useDetailsExpenseTrackerByIdLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<DetailsExpenseTrackerByIdQuery, DetailsExpenseTrackerByIdQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<DetailsExpenseTrackerByIdQuery, DetailsExpenseTrackerByIdQueryVariables>(
+    DetailsExpenseTrackerByIdDocument,
+    options
+  );
+}
+export function useDetailsExpenseTrackerByIdSuspenseQuery(
+  baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<DetailsExpenseTrackerByIdQuery, DetailsExpenseTrackerByIdQueryVariables>
+) {
+  const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<DetailsExpenseTrackerByIdQuery, DetailsExpenseTrackerByIdQueryVariables>(
+    DetailsExpenseTrackerByIdDocument,
+    options
+  );
+}
+export type DetailsExpenseTrackerByIdQueryHookResult = ReturnType<typeof useDetailsExpenseTrackerByIdQuery>;
+export type DetailsExpenseTrackerByIdLazyQueryHookResult = ReturnType<typeof useDetailsExpenseTrackerByIdLazyQuery>;
+export type DetailsExpenseTrackerByIdSuspenseQueryHookResult = ReturnType<typeof useDetailsExpenseTrackerByIdSuspenseQuery>;
+export type DetailsExpenseTrackerByIdQueryResult = Apollo.QueryResult<
+  DetailsExpenseTrackerByIdQuery,
+  DetailsExpenseTrackerByIdQueryVariables
 >;
+export const EditExpenseTrackerByIdDocument = gql`
+  query EditExpenseTrackerById($session_id: ID!, $id: ID!) {
+    expenseTrackerById(id: $id, session_id: $session_id) {
+      __typename
+      id
+      user_id
+      expense_period
+      amount
+      description
+      item_details
+      tag_id
+      mode_id
+      fynix_id
+      status
+    }
+  }
+`;
+
+/**
+ * __useEditExpenseTrackerByIdQuery__
+ *
+ * To run a query within a React component, call `useEditExpenseTrackerByIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useEditExpenseTrackerByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useEditExpenseTrackerByIdQuery({
+ *   variables: {
+ *      session_id: // value for 'session_id'
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useEditExpenseTrackerByIdQuery(
+  baseOptions: Apollo.QueryHookOptions<EditExpenseTrackerByIdQuery, EditExpenseTrackerByIdQueryVariables> &
+    ({ variables: EditExpenseTrackerByIdQueryVariables; skip?: boolean } | { skip: boolean })
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<EditExpenseTrackerByIdQuery, EditExpenseTrackerByIdQueryVariables>(EditExpenseTrackerByIdDocument, options);
+}
+export function useEditExpenseTrackerByIdLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<EditExpenseTrackerByIdQuery, EditExpenseTrackerByIdQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<EditExpenseTrackerByIdQuery, EditExpenseTrackerByIdQueryVariables>(EditExpenseTrackerByIdDocument, options);
+}
+export function useEditExpenseTrackerByIdSuspenseQuery(
+  baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<EditExpenseTrackerByIdQuery, EditExpenseTrackerByIdQueryVariables>
+) {
+  const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<EditExpenseTrackerByIdQuery, EditExpenseTrackerByIdQueryVariables>(
+    EditExpenseTrackerByIdDocument,
+    options
+  );
+}
+export type EditExpenseTrackerByIdQueryHookResult = ReturnType<typeof useEditExpenseTrackerByIdQuery>;
+export type EditExpenseTrackerByIdLazyQueryHookResult = ReturnType<typeof useEditExpenseTrackerByIdLazyQuery>;
+export type EditExpenseTrackerByIdSuspenseQueryHookResult = ReturnType<typeof useEditExpenseTrackerByIdSuspenseQuery>;
+export type EditExpenseTrackerByIdQueryResult = Apollo.QueryResult<EditExpenseTrackerByIdQuery, EditExpenseTrackerByIdQueryVariables>;
 export const ExpenseFynixesDocument = gql`
   query ExpenseFynixes($categoryFilter: CategoryFilter) {
     expenseFynixes(input: $categoryFilter) {

@@ -18,6 +18,9 @@ import CreateCategory from '../pages/category/create';
 import ErrorPage from '../pages/error';
 import EditCategory from '../pages/category/edit';
 import Expense from '../pages/expense';
+import CreateExpense from '../pages/expense/create';
+import UpdateExpense from '../pages/expense/edit';
+import ExpenseDetails from '../pages/expense/details';
 
 const AppRoutes: React.FC = () => {
   return (
@@ -52,9 +55,9 @@ const AppRoutes: React.FC = () => {
         {/* expense routes */}
         <Route path="expense">
           <Route index element={<Expense />} />
-          {/* <Route path="create" element={<Expense />} />
-          <Route path=":id" element={<Expense />} />
-          <Route path="edit/:id" element={<Expense />} /> */}
+          <Route path="create" element={<CreateExpense />} />
+          <Route path=":id" element={<ExpenseDetails />} />
+          <Route path="edit/:id" element={<UpdateExpense />} />
         </Route>
 
         {/* FAQ */}

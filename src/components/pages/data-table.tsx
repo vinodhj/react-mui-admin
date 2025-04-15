@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { useTheme } from '@mui/material';
 import Box from '@mui/material/Box';
 
@@ -78,7 +78,12 @@ const DataTable: FC<DataTableProps> = ({ rows, columns, paginationModel = { page
   const theme = useTheme();
   const colorMode = theme.palette.mode;
   const colors = tokens(colorMode);
-  const { page, pageSize } = paginationModel;
+
+  // Create state for pagination
+  const [pageModel, setPageModel] = useState({
+    page: paginationModel.page,
+    pageSize: paginationModel.pageSize,
+  });
 
   return (
     <Box
@@ -118,22 +123,22 @@ const DataTable: FC<DataTableProps> = ({ rows, columns, paginationModel = { page
         },
       }}
     >
-      {/* paginationMode -> need to check and tweaks */}
       <Box sx={{ minWidth: 1300, height: '100%' }}>
         <DataGrid
-          rowCount={rows.length} // -> If you're using server-side pagination, you must pass the total row count (rowCount).
           rows={rows}
           columns={columns}
-          paginationMode="client" // server or client
-          initialState={{ pagination: { paginationModel: { page, pageSize } } }}
+          paginationMode="client"
+          paginationModel={pageModel}
+          onPaginationModelChange={setPageModel}
           pageSizeOptions={pageSizeOptions}
-          // slots={{ toolbar: GridToolbar }}
-          slots={{ toolbar: CustomToolbar }} // Use the custom toolbar here
-          // disableColumnFilter -> to disable column filter
+          slots={{ toolbar: CustomToolbar }}
+          slotProps={{
+            pagination: {
+              count: rows.length,
+            },
+          }}
           disableRowSelectionOnClick
           checkboxSelection
-          // Disabling virtualization is fine for smaller data sets, but if you have hundreds or thousands of rows, it can impact performance in normal usage
-          // disableVirtualization
           sx={{
             maxWidth: 1300,
             height: '80vh',

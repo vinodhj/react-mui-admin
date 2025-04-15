@@ -32,7 +32,7 @@ interface ExpenseFilterProps {
   onResetFilters?: () => void; // Optional prop
 }
 
-const validateExpensePeriod = (value: string) => {
+export const validateExpensePeriod = (value: string) => {
   if (!value) return '';
   // Check format first
   if (!/^\d{4}-\d{2}$/.test(value)) {

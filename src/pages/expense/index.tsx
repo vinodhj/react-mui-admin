@@ -363,7 +363,6 @@ function Expense() {
       }
 
       if (data?.paginatedExpenseTrackers.pageInfo.totalCount && paginationModel.page === 0) {
-        console.log('total count', data.paginatedExpenseTrackers.pageInfo.totalCount);
         // Only update total count on the first page to keep it consistent
         dispatch({
           type: 'SET_TOTAL_ITEMS',
