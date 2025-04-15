@@ -1,4 +1,3 @@
-import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { SxProps, Theme, useTheme } from '@mui/material/styles';
@@ -8,23 +7,15 @@ import * as yup from 'yup';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import { validateExpensePeriod } from '../../../components/pages/expense-filter';
-import {
-  Category,
-  ExpenseStatus,
-  useExpenseFynixesQuery,
-  useExpenseModesQuery,
-  useExpenseTagsQuery,
-} from '../../../graphql/graphql-generated';
+import { Category, ExpenseStatus } from '../../../graphql/graphql-generated';
 import Grid from '@mui/material/Grid2';
-import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
-import { ReactNode, useMemo } from 'react';
+import { useMemo } from 'react';
 import ErrorAlert from '../../../components/common/error-alert';
 import { useSession } from '../../../hooks/use-session';
+import { FormSelect, FormTextField, getInputStyles, StatusSelectField } from './form-components';
+import { useExpenseFormData } from '../../../hooks/use-expense-form-data';
 
-interface ExpenseFormValues {
+export interface ExpenseFormValues {
   id?: string;
   user_id: string;
   expense_period: string;
@@ -62,129 +53,6 @@ const validationSchema = yup.object({
   item_details: yup.string(),
 });
 
-const useExpenseFormData = () => {
-  const {
-    data: tagsData,
-    loading: tagsLoading,
-    error: tagsError,
-  } = useExpenseTagsQuery({
-    notifyOnNetworkStatusChange: true,
-    fetchPolicy: 'cache-and-network',
-  });
-  const {
-    data: modesData,
-    loading: modesLoading,
-    error: modesError,
-  } = useExpenseModesQuery({
-    notifyOnNetworkStatusChange: true,
-    fetchPolicy: 'cache-and-network',
-  });
-  const {
-    data: fynixData,
-    loading: fynixLoading,
-    error: fynixError,
-  } = useExpenseFynixesQuery({
-    notifyOnNetworkStatusChange: true,
-    fetchPolicy: 'cache-and-network',
-  });
-
-  const isLoading = tagsLoading || modesLoading || fynixLoading;
-  // Consolidate errors
-  const errors = useMemo(() => {
-    return [
-      tagsError && `Tags error: ${tagsError.message}`,
-      modesError && `Modes error: ${modesError.message}`,
-      fynixError && `Fynix error: ${fynixError.message}`,
-    ].filter(Boolean);
-  }, [tagsError, modesError, fynixError]);
-
-  const optionsLoaded = !isLoading && tagsData && modesData && fynixData;
-
-  return {
-    tagsData: tagsData?.expenseTags || [],
-    modesData: modesData?.expenseModes || [],
-    fynixData: fynixData?.expenseFynixes || [],
-    isLoading,
-    errors,
-    optionsLoaded,
-  };
-};
-
-// Form select component to reduce duplication
-const FormSelect = ({
-  name,
-  label,
-  value,
-  onChange,
-  onBlur,
-  error,
-  helperText,
-  options,
-  disabled,
-  selectStyles,
-  inputStyles,
-  menuProps,
-  colors,
-}: {
-  name: string;
-  label: string;
-  value: string;
-  onChange: (event: SelectChangeEvent<string>, _child: ReactNode) => void;
-  onBlur: (e: React.FocusEvent<any>) => void;
-  error: boolean;
-  helperText: string | undefined;
-  options: any[];
-  disabled?: boolean;
-  selectStyles: SxProps<Theme>;
-  inputStyles: SxProps<Theme>;
-  menuProps: any;
-  colors: any;
-}) => (
-  <FormControl fullWidth margin="normal" error={error} sx={{ ...inputStyles }}>
-    <InputLabel id={`${name}-select-label`} sx={{ color: colors.grey[50] }}>
-      {label}
-    </InputLabel>
-    <Select
-      labelId={`${name}-select-label`}
-      id={name}
-      name={name}
-      value={value}
-      onChange={onChange}
-      onBlur={onBlur}
-      label={label}
-      disabled={disabled}
-      sx={selectStyles}
-      MenuProps={menuProps}
-    >
-      {options.map((option) => (
-        <MenuItem key={option.id} value={option.id}>
-          {option.name}
-        </MenuItem>
-      ))}
-    </Select>
-    {error && helperText && (
-      <Typography color="error" variant="caption">
-        {helperText}
-      </Typography>
-    )}
-  </FormControl>
-);
-
-const getInputStyles = (colors: any): SxProps<Theme> => ({
-  '& .MuiFormLabel-root': {
-    color: colors.grey[50],
-  },
-  '& .MuiFormLabel-root.Mui-focused': {
-    color: colors.greenAccent[400],
-  },
-  '& .MuiOutlinedInput-root': {
-    color: colors.grey[50],
-  },
-  '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-    borderColor: colors.grey[100],
-  },
-});
-
 const getInitialValues = (): ExpenseFormValues => ({
   id: '',
   user_id: '',
@@ -197,6 +65,16 @@ const getInitialValues = (): ExpenseFormValues => ({
   fynix_id: '',
   status: '',
 });
+
+// Helper function to determine initial option value
+const getInitialOptionValue = (
+  initialId: string | undefined,
+  optionsData: (Category | null)[] | undefined,
+  optionsLoaded: boolean
+): string => {
+  if (!optionsLoaded || !initialId) return '';
+  return optionsData?.some((item: Category | null) => item?.id === initialId) ? initialId : '';
+};
 
 const ExpenseForm: React.FC<ExpenseFormProps> = ({ onSubmit, loading, initialValues = getInitialValues(), submitButtonText, title }) => {
   const theme = useTheme();
@@ -236,24 +114,21 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onSubmit, loading, initialVal
   // Use custom hook for data fetching
   const { tagsData, modesData, fynixData, isLoading: optionsLoading, errors: dataErrors, optionsLoaded } = useExpenseFormData();
 
-  const formik = useFormik({
-    initialValues: {
+  // Pre-process initial values to use in formik
+  const processedInitialValues = useMemo(() => {
+    if (!optionsLoaded) return initialValues;
+
+    return {
       ...initialValues,
       user_id: sessionAdmin?.adminID || initialValues.user_id,
-      // Only set select values if they exist in the options
-      tag_id:
-        optionsLoaded && initialValues.tag_id && tagsData?.some((tag: Category | null) => tag?.id === initialValues.tag_id)
-          ? initialValues.tag_id
-          : '',
-      mode_id:
-        optionsLoaded && initialValues.mode_id && modesData?.some((mode: Category | null) => mode?.id === initialValues.mode_id)
-          ? initialValues.mode_id
-          : '',
-      fynix_id:
-        optionsLoaded && initialValues.fynix_id && fynixData?.some((fynix: Category | null) => fynix?.id === initialValues.fynix_id)
-          ? initialValues.fynix_id
-          : '',
-    },
+      tag_id: getInitialOptionValue(initialValues.tag_id, tagsData, optionsLoaded),
+      mode_id: getInitialOptionValue(initialValues.mode_id, modesData, optionsLoaded),
+      fynix_id: getInitialOptionValue(initialValues.fynix_id, fynixData, optionsLoaded),
+    };
+  }, [initialValues, optionsLoaded, tagsData, modesData, fynixData, sessionAdmin]);
+
+  const formik = useFormik<ExpenseFormValues>({
+    initialValues: processedInitialValues,
     validationSchema,
     enableReinitialize: true, // Reinitialize form when initialValues change
     onSubmit: async (values, { resetForm, setSubmitting }) => {
@@ -292,67 +167,26 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onSubmit, loading, initialVal
 
   const submitText = initialValues.id ? 'Update' : 'Create';
   const isLoading = loading || optionsLoading;
+  const formTitle = title ?? `${initialValues.id ? 'Edit' : 'Create'} Expense`;
 
   return (
     <>
       {/* Error displays */}
       {dataErrors.map((error, index) => (
-        <ErrorAlert key={`${error?.slice(0, 4)}-${index}`} message={error as string} />
+        <ErrorAlert key={`${String(error)?.slice(0, 4)}-${index}`} message={error as string} />
       ))}
       <form onSubmit={formik.handleSubmit}>
         <Typography variant="h3" gutterBottom sx={{ p: 2, borderBottom: `1px solid ${theme.palette.divider}` }}>
-          {title ?? `${initialValues.id ? 'Edit' : 'Create'} Expense`}
+          {formTitle}
         </Typography>
 
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, md: 6 }}>
-            <TextField
-              label="Expense Period"
-              type="text"
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              name="expense_period"
-              id="expense_period"
-              placeholder="YYYY-MM"
-              value={formik.values.expense_period}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              error={formik.touched.expense_period && Boolean(formik.errors.expense_period)}
-              helperText={formik.touched.expense_period && formik.errors.expense_period}
-              sx={{
-                ...inputStyles,
-              }}
-            />
+            <FormTextField name="expense_period" label="Expense Period" formik={formik} inputStyles={inputStyles} />
           </Grid>
 
           <Grid size={{ xs: 12, md: 6 }}>
-            <TextField
-              label="Amount"
-              type="number"
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              name="amount"
-              id="amount"
-              placeholder="Enter Expense Amount"
-              value={formik.values.amount}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              error={formik.touched.amount && Boolean(formik.errors.amount)}
-              helperText={formik.touched.amount && formik.errors.amount}
-              sx={{
-                ...inputStyles,
-              }}
-              slotProps={{
-                input: {
-                  inputProps: {
-                    min: 0,
-                    step: '0.01',
-                  },
-                },
-              }}
-            />
+            <FormTextField name="amount" label="Amount" formik={formik} inputStyles={inputStyles} />
           </Grid>
 
           <Grid size={{ xs: 12, md: 6 }}>
@@ -363,7 +197,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onSubmit, loading, initialVal
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               error={!!(formik.touched.tag_id && formik.errors.tag_id)}
-              helperText={formik.touched.tag_id ? formik.errors.tag_id : undefined}
+              helperText={formik.touched.tag_id && formik.errors.tag_id ? String(formik.errors.tag_id) : undefined}
               options={tagsData}
               disabled={optionsLoading}
               selectStyles={selectStyles}
@@ -381,7 +215,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onSubmit, loading, initialVal
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               error={!!(formik.touched.mode_id && formik.errors.mode_id)}
-              helperText={formik.touched.mode_id ? formik.errors.mode_id : undefined}
+              helperText={formik.touched.mode_id && formik.errors.mode_id ? String(formik.errors.mode_id) : undefined}
               options={modesData}
               disabled={optionsLoading}
               selectStyles={selectStyles}
@@ -399,7 +233,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onSubmit, loading, initialVal
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               error={!!(formik.touched.fynix_id && formik.errors.fynix_id)}
-              helperText={formik.touched.fynix_id ? formik.errors.fynix_id : undefined}
+              helperText={formik.touched.fynix_id && formik.errors.fynix_id ? String(formik.errors.fynix_id) : undefined}
               options={fynixData}
               disabled={optionsLoading}
               selectStyles={selectStyles}
@@ -410,75 +244,21 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onSubmit, loading, initialVal
           </Grid>
 
           <Grid size={{ xs: 12, md: 6 }}>
-            <FormControl fullWidth margin="normal" error={formik.touched.status && Boolean(formik.errors.status)} sx={{ ...inputStyles }}>
-              <InputLabel id="status-select-label" sx={{ color: colors.grey[50] }}>
-                Status
-              </InputLabel>
-              <Select
-                labelId="status-select-label"
-                id="status"
-                name="status"
-                value={formik.values.status}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                label="Status"
-                sx={selectStyles}
-                MenuProps={selectMenuProps}
-              >
-                <MenuItem value={ExpenseStatus.Paid}>Paid</MenuItem>
-                <MenuItem value={ExpenseStatus.UnPaid}>Unpaid</MenuItem>
-                <MenuItem value={ExpenseStatus.NextDue}>Next Due</MenuItem>
-              </Select>
-              {formik.touched.status && formik.errors.status && (
-                <Typography color="error" variant="caption">
-                  {formik.errors.status}
-                </Typography>
-              )}
-            </FormControl>
-          </Grid>
-
-          <Grid size={{ xs: 12 }}>
-            <TextField
-              label="Description"
-              type="text"
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              name="description"
-              id="description"
-              multiline
-              rows={2}
-              value={formik.values.description}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              error={formik.touched.description && Boolean(formik.errors.description)}
-              helperText={formik.touched.description && formik.errors.description}
-              sx={{
-                ...inputStyles,
-              }}
+            <StatusSelectField
+              formik={formik}
+              selectStyles={selectStyles}
+              menuProps={selectMenuProps}
+              colors={colors}
+              inputStyles={inputStyles}
             />
           </Grid>
 
           <Grid size={{ xs: 12 }}>
-            <TextField
-              label="Item Details"
-              type="text"
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              name="item_details"
-              id="item_details"
-              multiline
-              rows={3}
-              value={formik.values.item_details}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              error={formik.touched.item_details && Boolean(formik.errors.item_details)}
-              helperText={formik.touched.item_details && formik.errors.item_details}
-              sx={{
-                ...inputStyles,
-              }}
-            />
+            <FormTextField name="description" label="Description" formik={formik} inputStyles={inputStyles} multiline={true} rows={2} />
+          </Grid>
+
+          <Grid size={{ xs: 12 }}>
+            <FormTextField name="item_details" label="Item Details" formik={formik} inputStyles={inputStyles} multiline={true} rows={3} />
           </Grid>
         </Grid>
 

@@ -18,44 +18,7 @@ import { useSnackbar } from '../../hooks/use-snackbar';
 import { useDeleteExpense } from '../../hooks/use-delete-expense';
 import { useDetailsExpenseTrackerByIdQuery } from '../../graphql/graphql-generated';
 import { capitalize } from '../category/category-config';
-
-interface InfoFieldProps {
-  label: string;
-  value: string;
-  colors: any;
-}
-
-const InfoField = ({ label, value, colors }: InfoFieldProps) => (
-  <Box sx={{ mb: 2 }}>
-    <Typography variant="body2" color={colors.grey[400]} gutterBottom>
-      {label}
-    </Typography>
-    <Typography variant="body1" sx={{ color: colors.grey[50], fontWeight: 'medium' }}>
-      {value || '-'}
-    </Typography>
-  </Box>
-);
-
-interface SectionTitleProps {
-  title: string;
-  colors: any;
-}
-
-const SectionTitle = ({ title, colors }: SectionTitleProps) => (
-  <Box sx={{ mt: 3, mb: 2 }}>
-    <Typography
-      variant="h5"
-      fontWeight="medium"
-      color={colors.greenAccent[400]}
-      sx={{
-        pb: 1,
-        borderBottom: `1px solid ${colors.greenAccent[700]}`,
-      }}
-    >
-      {title}
-    </Typography>
-  </Box>
-);
+import { InfoField, SectionTitle } from './helper/section-info';
 
 function ExpenseDetails() {
   const { id } = useParams<{ id: string }>();
