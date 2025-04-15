@@ -1,11 +1,12 @@
 import SidebarItem from './item';
-import React, { FC } from 'react';
+import React, { FC, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import PeopleOutlinedIcon from '@mui/icons-material/PeopleOutlined';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import CategoryIcon from '@mui/icons-material/Category';
+import { useLocation } from 'react-router-dom';
 
 interface SidebarMenuItemsProps {
   collapsed: boolean;
@@ -18,6 +19,24 @@ interface SidebarMenuItemsProps {
 }
 
 const SidebarMenuItems: FC<SidebarMenuItemsProps> = ({ collapsed, selected, setSelected, colors, setCollapsed, setToggled, isMobile }) => {
+  const location = useLocation(); // Get current location
+
+  // Map paths to titles with priority for parent routes
+  useEffect(() => {
+    const pathToTitleMap = [
+      { path: '/category/tag', title: 'Tag' },
+      { path: '/category/mode', title: 'Mode' },
+      { path: '/category/fynix', title: 'Fynix' },
+      { path: '/dashboard', title: 'Dashboard' },
+      { path: '/team', title: 'Manage Team' },
+      { path: '/expense', title: 'Tracker Expense' },
+    ].sort((a, b) => b.path.length - a.path.length); // Sort by longest path first
+
+    // Find the first path that matches the start of the current URL
+    const matchedEntry = pathToTitleMap.find(({ path }) => location.pathname.startsWith(path));
+
+    setSelected(matchedEntry?.title ?? 'Dashboard');
+  }, [location.pathname, setSelected]);
   return (
     <Box
       sx={{
