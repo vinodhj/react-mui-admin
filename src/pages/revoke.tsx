@@ -45,7 +45,7 @@ export default function RevokeError({ message }: Readonly<{ message: string }>) 
           </Typography>
           <Typography variant="body1" align="center" sx={{ mt: 1 }}>
             {message === 'REVOKE_ERROR'
-              ? 'For security reasons, your session is no longer valid.'
+              ? 'Your session has timed out. Please sign in again to continue.'
               : 'Due to the required infrastructure upgrades, the application is currently under maintenance.'}
             <br />
             {message === 'REVOKE_ERROR' && 'Please sign in again to continue.'}
