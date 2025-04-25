@@ -113,16 +113,6 @@ const ExpenseFilter: FC<ExpenseFilterProps> = ({ currentFilters = {}, onApplyFil
     setStatus(typeof value === 'string' ? [value as ExpenseStatus] : value);
   };
 
-  // Extracted method for applying filters
-  const handleApplyFilter = () => {
-    const filters = prepareFilterValues(expensePeriod, minAmount, maxAmount, status);
-    onApplyFilter(filters);
-
-    if (isMobile) {
-      setExpanded(false);
-    }
-  };
-
   // Extracted method for clearing filters
   const handleClearFilter = () => {
     setExpensePeriod('');
@@ -147,6 +137,20 @@ const ExpenseFilter: FC<ExpenseFilterProps> = ({ currentFilters = {}, onApplyFil
 
   // Check if any filters are active to show visual indicator
   const hasActiveFilters = expensePeriod || minAmount || maxAmount || status.length > 0;
+
+  // Extracted method for applying filters
+  const handleApplyFilter = () => {
+    // Check if any validation errors exist
+    if (expensePeriodError || minAmountError || maxAmountError || minMaxError) {
+      return; // Exit the function without submitting
+    }
+    const filters = prepareFilterValues(expensePeriod, minAmount, maxAmount, status);
+    onApplyFilter(filters);
+
+    if (isMobile) {
+      setExpanded(false);
+    }
+  };
 
   // Extracted the filter form content to reduce nesting
   const renderFilterContent = () => (
