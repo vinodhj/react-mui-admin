@@ -313,10 +313,6 @@ function Expense() {
 
   const handleDeleteClick = useCallback(() => {
     handleActionClose();
-    if (sessionAdmin?.adminRole !== 'ADMIN') {
-      showSnackbar("You don't have permission to delete items.", 'error');
-      return;
-    }
     setOpenDialog(true);
   }, [handleActionClose, sessionAdmin, showSnackbar]);
 
